@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/showroom.css">
+</head>
+<body>
+<%- include('partials/site-nav') %>
+
+<main class="page-shell">
+    <section class="page-title">
+        <p class="eyebrow">Mua xe</p>
+        <h1>Chương trình khuyến mãi</h1>
+        <p>Các ưu đãi mua xe, đặt cọc, trả góp và hỗ trợ khách hàng đang áp dụng tại showroom.</p>
+    </section>
+
+    <section class="promo-grid">
+        <% if (promotions.length > 0) { %>
+            <% promotions.forEach(promo => { %>
+                <article class="promo-card">
+                    <p class="eyebrow"><%= promo.loai_giam_gia === 'phan_tram' ? 'Giảm theo phần trăm' : 'Ưu đãi tiền mặt' %></p>
+                    <h2><%= promo.tieu_de %></h2>
+                    <p><%= promo.mo_ta || 'Liên hệ showroom để biết điều kiện áp dụng.' %></p>
+                    <strong><%= promo.loai_giam_gia === 'phan_tram' ? Number(promo.gia_tri_giam) + '%' : formatPrice(promo.gia_tri_giam) %></strong>
+                    <a href="/bao-gia">Nhận thông tin</a>
+                </article>
+            <% }) %>
+        <% } else { %>
+            <article class="promo-card">
+                <p class="eyebrow">Ưu đãi tháng này</p>
+                <h2>Nhận báo giá và chương trình hỗ trợ tài chính</h2>
+                <p>Showroom sẽ tư vấn ưu đãi mới nhất theo mẫu xe và khu vực đăng ký.</p>
+                <strong>Liên hệ tư vấn</strong>
+                <a href="/bao-gia">Nhận thông tin</a>
+            </article>
+        <% } %>
+    </section>
+</main>
+
+<%- include('partials/site-footer') %>
+</body>
+</html>

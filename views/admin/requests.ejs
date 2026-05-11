@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+    <%- include('partials/nav') %>
+
+    <main class="admin-main">
+        <header class="admin-top"><div><p>Khách hàng</p><h1>Quản lý yêu cầu</h1></div></header>
+
+        <section class="admin-card">
+            <h2>Yêu cầu báo giá</h2>
+            <table>
+                <thead><tr><th>Khách hàng</th><th>Xe</th><th>Nội dung</th><th>Trạng thái</th></tr></thead>
+                <tbody>
+                    <% quotes.forEach(item => { %>
+                        <tr>
+                            <td><%= item.ho_ten %><br><small><%= item.so_dien_thoai %> · <%= item.email || '' %></small></td>
+                            <td><%= item.ten_xe || 'Chưa chọn xe' %></td>
+                            <td><%= item.noi_dung || '' %></td>
+                            <td>
+                                <form action="/admin/yeu-cau-tu-van/<%= item.id %>/trang-thai" method="POST" class="inline-form">
+                                    <select name="trang_thai">
+                                        <option value="moi" <%= item.trang_thai === 'moi' ? 'selected' : '' %>>Mới</option>
+                                        <option value="da_lien_he" <%= item.trang_thai === 'da_lien_he' ? 'selected' : '' %>>Đã liên hệ</option>
+                                        <option value="da_dong" <%= item.trang_thai === 'da_dong' ? 'selected' : '' %>>Đã đóng</option>
+                                    </select>
+                                    <button>Lưu</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="admin-card">
+            <h2>Đăng ký lái thử</h2>
+            <table>
+                <thead><tr><th>Khách hàng</th><th>Xe</th><th>Lịch hẹn</th><th>Trạng thái</th></tr></thead>
+                <tbody>
+                    <% testDrives.forEach(item => { %>
+                        <tr>
+                            <td><%= item.ho_ten %><br><small><%= item.so_dien_thoai %> · <%= item.email || '' %></small></td>
+                            <td><%= item.ten_xe %></td>
+                            <td><%= item.ngay_muon_lai ? item.ngay_muon_lai.toISOString().slice(0, 10) : '' %> <%= item.gio_muon_lai %><br><small><%= item.dia_diem_showroom || '' %></small></td>
+                            <td>
+                                <form action="/admin/lai-thu/<%= item.id %>/trang-thai" method="POST" class="inline-form">
+                                    <select name="trang_thai">
+                                        <option value="cho_xac_nhan" <%= item.trang_thai === 'cho_xac_nhan' ? 'selected' : '' %>>Chờ xác nhận</option>
+                                        <option value="da_xac_nhan" <%= item.trang_thai === 'da_xac_nhan' ? 'selected' : '' %>>Đã xác nhận</option>
+                                        <option value="da_huy" <%= item.trang_thai === 'da_huy' ? 'selected' : '' %>>Đã hủy</option>
+                                        <option value="hoan_thanh" <%= item.trang_thai === 'hoan_thanh' ? 'selected' : '' %>>Hoàn thành</option>
+                                    </select>
+                                    <button>Lưu</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </section>
+    </main>
+</div>
+</body>
+</html>

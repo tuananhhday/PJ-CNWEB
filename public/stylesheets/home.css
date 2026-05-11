@@ -1,0 +1,273 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: white;
+    color: #333;
+}
+
+.header-logo {
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+}
+
+.logo-text {
+    font-size: 30px;
+    font-weight: 800;
+    color: #005baa;
+}
+
+.logo-text span {
+    color: #003c7c;
+}
+
+.navbar {
+    height: 64px;
+    background: #202931;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.navbar a {
+    height: 64px;
+    padding: 0 22px;
+    display: flex;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.navbar a.active {
+    background: #f05a00;
+}
+
+.navbar a:hover {
+    background: #f05a00;
+}
+
+.hero {
+    position: relative;
+    height: 560px;
+    overflow: hidden;
+}
+
+.hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hero-text {
+    position: absolute;
+    top: 160px;
+    left: 26%;
+    color: white;
+    text-align: left;
+}
+
+.hero-text h1 {
+    font-size: 52px;
+    letter-spacing: 1px;
+}
+
+.hero-text p {
+    font-size: 28px;
+    margin-top: 15px;
+}
+
+.car-section {
+    padding: 50px 12% 30px;
+}
+
+.car-section h2,
+.news-section h2 {
+    text-align: center;
+    font-size: 42px;
+    color: #384848;
+    letter-spacing: 2px;
+}
+
+.line {
+    width: 350px;
+    height: 1px;
+    background: #333;
+    margin: 20px auto 45px;
+}
+
+.car-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 45px 30px;
+}
+
+.car-card {
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 15px;
+}
+
+.car-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: contain;
+}
+
+.car-card h3 {
+    font-size: 18px;
+    margin: 15px 0;
+    color: #555;
+}
+
+.car-actions {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+}
+
+.price-btn,
+.fee-btn {
+    padding: 9px 14px;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.price-btn {
+    background: #3498db;
+}
+
+.fee-btn {
+    background: #999;
+}
+
+.news-section {
+    padding: 70px 13%;
+    background: #fafafa;
+}
+
+.news-section h2 {
+    text-align: left;
+    color: #777;
+    border-bottom: 1px solid #3498db;
+    padding-bottom: 12px;
+    margin-bottom: 40px;
+}
+
+.news-content {
+    display: grid;
+    grid-template-columns: 58% 42%;
+    gap: 30px;
+}
+
+.news-large img {
+    width: 100%;
+    height: 360px;
+    object-fit: cover;
+}
+
+.news-item {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 18px;
+    margin-bottom: 28px;
+}
+
+.news-item img {
+    width: 140px;
+    height: 90px;
+    object-fit: cover;
+}
+
+.news-item h4 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #444;
+}
+
+.news-item p {
+    color: #777;
+    line-height: 1.5;
+}
+
+.floating-left {
+    position: fixed;
+    left: 0;
+    bottom: 35px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 99;
+}
+
+.floating-left a {
+    background: #d71920;
+    color: white;
+    text-decoration: none;
+    padding: 14px 28px;
+    border-radius: 0 25px 25px 0;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.floating-right {
+    position: fixed;
+    right: 0;
+    bottom: 120px;
+    z-index: 99;
+}
+
+.floating-right a {
+    background: #0094e8;
+    color: white;
+    text-decoration: none;
+    padding: 15px 28px;
+    border-radius: 25px 0 0 25px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+@media (max-width: 1100px) {
+    .navbar {
+        overflow-x: auto;
+        justify-content: flex-start;
+    }
+
+    .car-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .news-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 650px) {
+    .car-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero {
+        height: 320px;
+    }
+
+    .hero-text {
+        left: 30px;
+        top: 100px;
+    }
+
+    .hero-text h1 {
+        font-size: 32px;
+    }
+}

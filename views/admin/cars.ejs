@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+    <%- include('partials/nav') %>
+
+    <main class="admin-main">
+        <header class="admin-top">
+            <div>
+                <p>Kho xe</p>
+                <h1>Quản lý xe</h1>
+            </div>
+        </header>
+
+        <% if (success) { %><div class="admin-alert"><%= success %></div><% } %>
+
+        <section class="admin-card">
+            <h2>Thêm xe mới</h2>
+            <form class="admin-form grid-form" action="/admin/xe/them" method="POST">
+                <select name="dong_xe_id" required>
+                    <option value="">Chọn dòng xe</option>
+                    <% models.forEach(model => { %>
+                        <option value="<%= model.id %>"><%= model.ten_dong %></option>
+                    <% }) %>
+                </select>
+                <input name="ten_xe" placeholder="Tên xe" required>
+                <input name="duong_dan" placeholder="duong-dan-xe" required>
+                <input name="phien_ban" placeholder="Phiên bản">
+                <input name="nam_san_xuat" type="number" placeholder="Năm sản xuất">
+                <input name="gia_ban" type="number" placeholder="Giá bán" required>
+                <input name="dong_co" placeholder="Động cơ">
+                <input name="hop_so" placeholder="Hộp số">
+                <select name="nhien_lieu">
+                    <option value="xang">Xăng</option>
+                    <option value="dau">Dầu</option>
+                    <option value="dien">Điện</option>
+                    <option value="hybrid">Hybrid</option>
+                </select>
+                <input name="so_cho_ngoi" type="number" placeholder="Số chỗ">
+                <input name="so_luong_ton" type="number" placeholder="Tồn kho">
+                <input name="anh_dai_dien" placeholder="Ảnh đại diện, ví dụ: tucson-1.jpg">
+                <input name="mo_ta_ngan" placeholder="Mô tả ngắn">
+                <button type="submit">Thêm xe</button>
+            </form>
+        </section>
+
+        <section class="admin-card">
+            <h2>Danh sách xe</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Xe</th>
+                        <th>Ảnh</th>
+                        <th>Hãng/Dòng</th>
+                        <th>Giá</th>
+                        <th>Trạng thái</th>
+                        <th>Cập nhật</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% cars.forEach(car => { %>
+                        <tr>
+                            <td><strong><%= car.ten_xe %></strong><br><small><%= car.duong_dan %></small></td>
+                            <td>
+                                <img class="admin-thumb" src="/images/<%= car.duong_dan_anh || 'no-car.jpg' %>" alt="<%= car.ten_xe %>">
+                                <small><%= car.duong_dan_anh || 'Chưa có ảnh' %></small>
+                            </td>
+                            <td><%= car.ten_hang %> / <%= car.ten_dong %></td>
+                            <td><%= formatPrice(car.gia_ban) %></td>
+                            <td><%= car.trang_thai %></td>
+                            <td>
+                                <a class="admin-link" href="/admin/xe/<%= car.id %>/sua">Sửa</a>
+                                <form action="/admin/xe/<%= car.id %>/trang-thai" method="POST" class="inline-form">
+                                    <select name="trang_thai">
+                                        <option value="con_hang" <%= car.trang_thai === 'con_hang' ? 'selected' : '' %>>Còn hàng</option>
+                                        <option value="het_hang" <%= car.trang_thai === 'het_hang' ? 'selected' : '' %>>Hết hàng</option>
+                                        <option value="an" <%= car.trang_thai === 'an' ? 'selected' : '' %>>Ẩn</option>
+                                    </select>
+                                    <button>Lưu</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </section>
+    </main>
+</div>
+</body>
+</html>

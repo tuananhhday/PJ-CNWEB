@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/showroom.css">
+</head>
+<body>
+<%- include('partials/site-nav') %>
+
+<main class="form-page">
+    <section class="form-copy">
+        <p class="eyebrow">Mua xe</p>
+        <h1>Yêu cầu báo giá</h1>
+        <p>Để lại thông tin, showroom sẽ tư vấn phiên bản, ưu đãi, trả góp và chi phí lăn bánh.</p>
+    </section>
+
+    <form class="sales-form" action="/bao-gia" method="POST">
+        <% if (error) { %><div class="message error-message"><%= error %></div><% } %>
+        <% if (success) { %><div class="message success-message"><%= success %></div><% } %>
+
+        <label>Họ và tên*
+            <input type="text" name="ho_ten" value="<%= formData.ho_ten || (currentUser ? currentUser.ho_ten : '') %>">
+        </label>
+        <label>Số điện thoại*
+            <input type="tel" name="so_dien_thoai" value="<%= formData.so_dien_thoai || (currentUser ? currentUser.so_dien_thoai : '') %>">
+        </label>
+        <label>Email
+            <input type="email" name="email" value="<%= formData.email || (currentUser ? currentUser.email : '') %>">
+        </label>
+        <label>Mẫu xe quan tâm
+            <select name="xe_id">
+                <option value="">Chọn mẫu xe</option>
+                <% cars.forEach(car => { %>
+                    <option value="<%= car.id %>" <%= String(formData.xe_id || '') === String(car.id) ? 'selected' : '' %>><%= car.ten_xe %></option>
+                <% }) %>
+            </select>
+        </label>
+        <label>Nội dung
+            <textarea name="noi_dung" rows="4"><%= formData.noi_dung || '' %></textarea>
+        </label>
+        <button type="submit" class="primary-btn">Gửi yêu cầu</button>
+    </form>
+</main>
+
+<%- include('partials/site-footer') %>
+</body>
+</html>

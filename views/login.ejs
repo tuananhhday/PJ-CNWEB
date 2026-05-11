@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/login.css">
+</head>
+<body>
+
+<header class="topbar">
+    <div class="brand">SHOWROOM TUẤN ANH</div>
+
+    <nav>
+        <a href="/trang-chu">Tổng quan</a>
+        <a class="active" href="/login">Đăng nhập</a>
+        <a href="/xe">Ô tô</a>
+        <a href="/bang-gia">Bảng giá</a>
+        <a href="/dich-vu">Dịch vụ</a>
+    </nav>
+
+    <a href="/dang-ky-lai-thu" class="trial-btn">Đặt cọc & Lái thử</a>
+</header>
+
+<main class="login-layout">
+    <section class="login-left">
+        <h1>Đăng nhập<br>tài khoản</h1>
+
+        <% if (error) { %>
+            <div class="error-message"><%= error %></div>
+        <% } %>
+
+        <form action="/login" method="POST">
+            <input type="email" name="email" id="email" placeholder="Email">
+
+            <div class="password-box">
+                <input type="password" name="mat_khau" id="password" placeholder="Mật khẩu">
+                <span id="eye">👁</span>
+            </div>
+
+            <div class="option">
+                <label>
+                    <input type="checkbox">
+                    Ghi nhớ tài khoản
+                </label>
+                <a href="#">Quên mật khẩu?</a>
+            </div>
+
+            <button type="submit" id="loginBtn">Đăng nhập</button>
+
+            <p>Chưa có tài khoản?</p>
+
+            <a href="/register" class="register-btn">Đăng ký tài khoản</a>
+        </form>
+    </section>
+
+    <section class="login-right">
+        <img src="/images/ford-everest.jpg" alt="Ford Everest">
+    </section>
+</main>
+
+<script src="/javascripts/login.js"></script>
+</body>
+</html>

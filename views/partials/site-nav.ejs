@@ -1,0 +1,96 @@
+<header class="site-header">
+    <nav class="site-nav" aria-label="Điều hướng chính">
+        <div class="nav-left">
+            <div class="nav-item">
+                <a href="/xe">Sản Phẩm</a>
+                <div class="mega-menu product-menu">
+                    <aside>
+                        <a href="/xe" class="active">Xe SUV</a>
+                        <a href="/xe">Xe Thương Mại</a>
+                        <a href="/xe">Xe Điện</a>
+                    </aside>
+                    <section>
+                        <div class="mega-top">
+                            <strong>Khám phá ngay các mẫu xe Ford</strong>
+                            <span>
+                                <a href="/bao-gia">Báo giá</a>
+                                <a href="/xe">Chọn mẫu xe</a>
+                                <a href="/dang-ky-lai-thu">Lái thử</a>
+                            </span>
+                        </div>
+                        <div class="mega-cars">
+                            <article>
+                                <img src="/images/ford-everest.jpg" alt="Ford Everest">
+                                <h4>Ford Everest Mới</h4>
+                                <p>Giá từ: 1,129,000,000 VNĐ</p>
+                                <a href="/bao-gia">Bắt đầu mua xe</a>
+                            </article>
+                            <article>
+                                <img src="/images/ford-everest.jpg" alt="Ford Territory">
+                                <h4>Ford Territory</h4>
+                                <p>Giá từ: 739,000,000 VNĐ</p>
+                                <a href="/bao-gia">Bắt đầu mua xe</a>
+                            </article>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <div class="nav-item">
+                <a href="/bang-gia">Mua Xe</a>
+                <div class="dropdown-menu">
+                    <a href="/dat-coc-truc-tuyen">Đặt cọc trực tuyến</a>
+                    <a href="/kiem-tra-xe-co-san">Kiểm tra xe có sẵn</a>
+                    <a href="/chon-mau-xe-va-bao-gia">Lựa chọn mẫu xe và báo giá</a>
+                    <a href="/khuyen-mai">Chương trình khuyến mãi</a>
+                    <a href="/bao-gia">Báo giá</a>
+                    <a href="/bang-gia">Bảng giá</a>
+                    <a href="/so-sanh-xe">So sánh xe</a>
+                    <a href="/phu-kien-phu-tung">Phụ kiện & Phụ tùng</a>
+                    <a href="/dang-ky-lai-thu">Đăng ký lái thử xe</a>
+                    <a href="/dang-ky-catalogue">Đăng ký Catalogue</a>
+                    <a href="/ban-lo">Bán lô</a>
+                    <a href="/bao-gia">Yêu cầu báo giá</a>
+                </div>
+            </div>
+
+            <div class="nav-item">
+                <a href="/dich-vu">Dịch Vụ & Hỗ Trợ</a>
+                <div class="dropdown-menu service-dropdown">
+                    <a href="/dich-vu">Dịch Vụ</a>
+                    <a href="/dat-lich-dich-vu">Đặt lịch Dịch vụ trực tuyến</a>
+                    <a href="/bao-gia-dich-vu">Báo Giá Tạm tính Chi phí Dịch vụ</a>
+                    <a href="/quy-trinh-bao-duong-nhanh">Quy trình bảo dưỡng nhanh</a>
+                    <a href="/lich-bao-duong-dinh-ky">Lịch bảo dưỡng định kỳ</a>
+                    <a href="/co-so-bao-hanh-bao-duong">Cơ sở bảo hành bảo dưỡng</a>
+                    <a href="/nhan-giao-xe-tan-noi">Nhận & giao xe tận nơi miễn phí</a>
+                    <a href="/he-thong-canh-bao-thay-dau">Hệ thống Cảnh báo Thay dầu Thông minh</a>
+                    <a href="/ford-sync-cap-nhat-dinh-vi">Ford SYNC và Cập nhật Định vị</a>
+                    <a href="/ung-dung-ford">Ứng dụng Ford</a>
+                    <a href="/ford-ensure">Ford Ensure</a>
+                    <a href="/bao-hanh-mo-rong">Chứng nhận và Điều khoản hợp đồng bảo hành mở rộng</a>
+                    <a href="/chu-xe">Chủ xe</a>
+                    <a href="/lien-he">Liên hệ</a>
+                </div>
+            </div>
+        </div>
+
+        <a href="/trang-chu" class="brand-mark">Ford</a>
+
+        <div class="nav-right">
+            <a href="/khuyen-mai">Khuyến mãi</a>
+            <a href="/tin-tuc">Tin tức</a>
+            <a href="/lien-he">Liên hệ</a>
+            <% if (currentUser) { %>
+                <% if (currentUser.vai_tro === 'admin' || currentUser.vai_tro === 'nhan_vien') { %>
+                    <a href="/admin">Admin</a>
+                <% } else { %>
+                    <a href="/tai-khoan">Hộp thư</a>
+                <% } %>
+                <a href="/logout">Đăng xuất</a>
+            <% } else { %>
+                <a href="/login">Tài khoản</a>
+            <% } %>
+        </div>
+    </nav>
+</header>

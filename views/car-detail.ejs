@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/showroom.css">
+</head>
+<body>
+<%- include('partials/site-nav') %>
+
+<main>
+    <section class="detail-hero">
+        <div class="detail-copy">
+            <p class="eyebrow"><%= car.ten_hang %> · <%= car.ten_loai %></p>
+            <h1><%= car.ten_xe %></h1>
+            <p><%= car.mo_ta_ngan || 'Mẫu xe phù hợp cho nhu cầu di chuyển hiện đại.' %></p>
+            <strong>Từ <%= formatPrice(car.gia_ban) %></strong>
+            <div class="hero-actions">
+                <a href="/bao-gia?xe_id=<%= car.id %>" class="primary-btn">Nhận báo giá</a>
+                <a href="/dang-ky-lai-thu" class="secondary-btn">Đăng ký lái thử</a>
+            </div>
+        </div>
+        <img src="/images/<%= car.anh_dai_dien || 'ford-everest.jpg' %>" alt="<%= car.ten_xe %>">
+    </section>
+
+    <section class="section-wrap detail-grid">
+        <div>
+            <h2>Thông tin xe</h2>
+            <p><%= car.mo_ta_chi_tiet || car.mo_ta_ngan || 'Thông tin chi tiết đang được cập nhật.' %></p>
+            <dl class="info-list">
+                <div><dt>Phiên bản</dt><dd><%= car.phien_ban || 'Đang cập nhật' %></dd></div>
+                <div><dt>Năm sản xuất</dt><dd><%= car.nam_san_xuat || 'Đang cập nhật' %></dd></div>
+                <div><dt>Động cơ</dt><dd><%= car.dong_co || 'Đang cập nhật' %></dd></div>
+                <div><dt>Hộp số</dt><dd><%= car.hop_so || 'Đang cập nhật' %></dd></div>
+                <div><dt>Nhiên liệu</dt><dd><%= car.nhien_lieu || 'Đang cập nhật' %></dd></div>
+                <div><dt>Bảo hành</dt><dd><%= car.bao_hanh || 'Đang cập nhật' %></dd></div>
+            </dl>
+        </div>
+
+        <aside class="side-card">
+            <h3>Màu xe</h3>
+            <div class="color-list">
+                <% if (colors.length > 0) { %>
+                    <% colors.forEach(color => { %>
+                        <span><i style="background:<%= color.ma_mau || '#ccc' %>"></i><%= color.ten_mau %></span>
+                    <% }) %>
+                <% } else { %>
+                    <span>Đang cập nhật màu xe</span>
+                <% } %>
+            </div>
+        </aside>
+    </section>
+
+    <section class="section-wrap">
+        <div class="section-heading">
+            <p class="eyebrow">Thông số</p>
+            <h2>Thông số kỹ thuật</h2>
+        </div>
+        <div class="spec-table">
+            <% if (specs.length > 0) { %>
+                <% specs.forEach(spec => { %>
+                    <div><span><%= spec.ten_thong_so %></span><strong><%= spec.gia_tri %></strong></div>
+                <% }) %>
+            <% } else { %>
+                <div><span>Thông số</span><strong>Đang cập nhật</strong></div>
+            <% } %>
+        </div>
+    </section>
+</main>
+
+<%- include('partials/site-footer') %>
+</body>
+</html>

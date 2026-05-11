@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/showroom.css">
+</head>
+<body>
+<%- include('partials/site-nav') %>
+
+<main class="page-shell">
+    <section class="page-title">
+        <p class="eyebrow">Mua xe</p>
+        <h1>Bảng giá xe</h1>
+        <p>Giá bán tham khảo theo dữ liệu showroom. Vui lòng gửi yêu cầu để nhận giá lăn bánh chi tiết.</p>
+    </section>
+
+    <div class="price-table">
+        <div class="price-row head">
+            <span>Mẫu xe</span>
+            <span>Phiên bản</span>
+            <span>Giá bán</span>
+            <span></span>
+        </div>
+        <% cars.forEach(car => { %>
+            <div class="price-row">
+                <span><%= car.ten_xe %></span>
+                <span><%= car.phien_ban || 'Tiêu chuẩn' %></span>
+                <strong><%= formatPrice(car.gia_ban) %></strong>
+                <a href="/bao-gia?xe_id=<%= car.id %>">Nhận báo giá</a>
+            </div>
+        <% }) %>
+    </div>
+</main>
+
+<%- include('partials/site-footer') %>
+</body>
+</html>

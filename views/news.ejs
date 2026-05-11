@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/showroom.css">
+</head>
+<body>
+<%- include('partials/site-nav') %>
+
+<main class="page-shell">
+    <section class="page-title">
+        <p class="eyebrow">Tin tức</p>
+        <h1>Cập nhật từ showroom</h1>
+        <p>Tin sản phẩm, ưu đãi, dịch vụ và kinh nghiệm chọn xe.</p>
+    </section>
+
+    <section class="news-grid">
+        <% if (news.length > 0) { %>
+            <% news.forEach(item => { %>
+                <article class="news-card">
+                    <img src="/images/<%= item.anh_dai_dien || 'ford-everest.jpg' %>" alt="<%= item.tieu_de %>">
+                    <h3><%= item.tieu_de %></h3>
+                    <p><%= (item.noi_dung || '').slice(0, 180) %></p>
+                </article>
+            <% }) %>
+        <% } else { %>
+            <article class="news-card">
+                <img src="/images/ford-everest.jpg" alt="Tin showroom">
+                <h3>Chưa có tin tức được đăng</h3>
+                <p>Vui lòng quay lại sau để xem các cập nhật mới nhất từ showroom.</p>
+            </article>
+        <% } %>
+    </section>
+</main>
+
+<%- include('partials/site-footer') %>
+</body>
+</html>

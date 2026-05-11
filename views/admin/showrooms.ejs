@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+    <%- include('partials/nav') %>
+
+    <main class="admin-main">
+        <header class="admin-top"><div><p>Đại lý</p><h1>Quản lý showroom</h1></div></header>
+
+        <% if (success) { %><div class="admin-alert"><%= success %></div><% } %>
+
+        <section class="admin-card">
+            <h2>Thêm showroom</h2>
+            <form class="admin-form grid-form" action="/admin/showroom/them" method="POST">
+                <input name="ten_showroom" placeholder="Tên showroom" required>
+                <input name="dia_chi" placeholder="Địa chỉ" required>
+                <input name="so_dien_thoai" placeholder="Số điện thoại">
+                <input name="email" placeholder="Email">
+                <input name="ban_do" placeholder="Link bản đồ">
+                <input name="gio_mo_cua" placeholder="Giờ mở cửa">
+                <button type="submit">Thêm showroom</button>
+            </form>
+        </section>
+
+        <section class="admin-card">
+            <h2>Danh sách showroom</h2>
+            <table>
+                <thead><tr><th>Tên</th><th>Địa chỉ</th><th>Liên hệ</th><th>Giờ mở cửa</th></tr></thead>
+                <tbody>
+                    <% showrooms.forEach(item => { %>
+                        <tr>
+                            <td><%= item.ten_showroom %></td>
+                            <td><%= item.dia_chi %></td>
+                            <td><%= item.so_dien_thoai || '' %><br><small><%= item.email || '' %></small></td>
+                            <td><%= item.gio_mo_cua || '' %></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </section>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/test-drive.css">
+</head>
+<body>
+
+<header class="test-header">
+    <nav class="main-nav" aria-label="Điều hướng chính">
+        <a href="/xe">Sản Phẩm</a>
+        <a href="/bang-gia">Mua Xe</a>
+        <a href="/dich-vu">Dịch Vụ & Hỗ Trợ</a>
+    </nav>
+
+    <a href="/trang-chu" class="ford-badge" aria-label="Về trang chủ">Ford</a>
+
+    <div class="header-actions" aria-label="Liên kết nhanh">
+        <a href="/lien-he" title="Tìm đại lý">⌖</a>
+        <a href="/login" title="Tài khoản">♙</a>
+        <a href="/xe" title="Tìm kiếm">⌕</a>
+    </div>
+</header>
+
+<main class="test-drive-page">
+    <section class="form-panel">
+        <h1>Đăng ký lái thử</h1>
+        <p class="intro">Khám phá ngay sự mạnh mẽ và tiện nghi vượt trội.</p>
+
+        <% if (error) { %>
+            <div class="message error-message"><%= error %></div>
+        <% } %>
+
+        <% if (success) { %>
+            <div class="message success-message"><%= success %></div>
+        <% } %>
+
+        <form action="/dang-ky-lai-thu" method="POST" id="testDriveForm" novalidate>
+            <div class="field full">
+                <label for="ho_ten">Họ và tên*</label>
+                <input type="text" id="ho_ten" name="ho_ten" placeholder="Vui lòng nhập Họ và Tên" value="<%= formData.ho_ten || '' %>">
+                <span class="field-error"></span>
+            </div>
+
+            <div class="form-row">
+                <div class="field">
+                    <label for="email">Địa chỉ email*</label>
+                    <input type="email" id="email" name="email" placeholder="Vui lòng nhập địa chỉ email của bạn" value="<%= formData.email || '' %>">
+                    <span class="field-error"></span>
+                </div>
+
+                <div class="field">
+                    <label for="so_dien_thoai">Điện thoại di động*</label>
+                    <input type="tel" id="so_dien_thoai" name="so_dien_thoai" placeholder="Vui lòng nhập số điện thoại của bạn" value="<%= formData.so_dien_thoai || '' %>">
+                    <span class="field-error"></span>
+                </div>
+            </div>
+
+            <div class="field full">
+                <label for="mau_xe">Mẫu xe*</label>
+                <select id="mau_xe" name="mau_xe">
+                    <option value="">Vui lòng chọn mẫu xe bạn muốn lái thử</option>
+                    <% if (cars && cars.length > 0) { %>
+                        <% cars.forEach(car => { %>
+                            <option value="<%= car.id %>" <%= String(formData.mau_xe || '') === String(car.id) ? 'selected' : '' %>><%= car.ten_xe %></option>
+                        <% }) %>
+                    <% } else { %>
+                        <% ['Ford Everest', 'Ford Ranger', 'Ford Territory', 'Ford Transit', 'Ford Explorer'].forEach(carName => { %>
+                            <option value="1" <%= formData.mau_xe === '1' ? 'selected' : '' %>><%= carName %></option>
+                        <% }) %>
+                    <% } %>
+                </select>
+                <span class="field-error"></span>
+            </div>
+
+            <div class="field full search-field">
+                <label for="thanh_pho">Thành phố*</label>
+                <span class="search-icon">⌕</span>
+                <input type="text" id="thanh_pho" name="thanh_pho" placeholder="Vui lòng nhập Tỉnh hoặc Thành phố" value="<%= formData.thanh_pho || '' %>">
+                <span class="field-error"></span>
+            </div>
+
+            <div class="field full">
+                <label for="dai_ly">Đại lý*</label>
+                <select id="dai_ly" name="dai_ly">
+                    <option value="">Vui lòng chọn đại lý</option>
+                    <% ['Showroom Tuấn Anh - Hà Nội', 'Showroom Tuấn Anh - TP. Hồ Chí Minh', 'Showroom Tuấn Anh - Đà Nẵng', 'Showroom Tuấn Anh - Cần Thơ'].forEach(dealer => { %>
+                        <option value="<%= dealer %>" <%= formData.dai_ly === dealer ? 'selected' : '' %>><%= dealer %></option>
+                    <% }) %>
+                </select>
+                <span class="field-error"></span>
+            </div>
+
+            <div class="form-row">
+                <div class="field">
+                    <label for="ngay_muon_lai">Ngày muốn lái thử*</label>
+                    <input type="date" id="ngay_muon_lai" name="ngay_muon_lai" value="<%= formData.ngay_muon_lai || '' %>">
+                    <span class="field-error"></span>
+                </div>
+
+                <div class="field">
+                    <label for="gio_muon_lai">Giờ muốn lái thử*</label>
+                    <input type="time" id="gio_muon_lai" name="gio_muon_lai" value="<%= formData.gio_muon_lai || '' %>">
+                    <span class="field-error"></span>
+                </div>
+            </div>
+
+            <label class="checkbox-line">
+                <input type="checkbox" name="dong_y_chinh_sach" value="yes" <%= formData.dong_y_chinh_sach ? 'checked' : '' %>>
+                <span>Bằng việc cung cấp thông tin cho Ford Việt Nam, tôi đồng ý với <a href="#">Chính sách Bảo mật</a> và cho phép xử lý dữ liệu cá nhân của tôi cho mục đích phục vụ yêu cầu lái thử.</span>
+            </label>
+
+            <div class="marketing-copy">
+                Tôi đồng ý để Ford Việt Nam và các bên xử lý dữ liệu liên quan sử dụng thông tin cá nhân của tôi cho mục đích tiếp thị, nhận thông tin ưu đãi hay các mục đích khác được quy định trong <a href="#">Chính sách Bảo mật</a>.
+            </div>
+
+            <div class="radio-group" aria-label="Đồng ý nhận thông tin tiếp thị">
+                <label>
+                    <input type="radio" name="dong_y_marketing" value="co" <%= formData.dong_y_marketing === 'co' ? 'checked' : '' %>>
+                    <span>Có</span>
+                </label>
+                <label>
+                    <input type="radio" name="dong_y_marketing" value="khong" <%= formData.dong_y_marketing === 'khong' ? 'checked' : '' %>>
+                    <span>Không</span>
+                </label>
+            </div>
+
+            <button type="submit" id="submitBtn">Gửi đi</button>
+        </form>
+    </section>
+</main>
+
+<div class="assist-buttons" aria-hidden="true">
+    <span>⌘</span>
+    <span>◉</span>
+</div>
+
+<script src="/javascripts/test-drive.js"></script>
+</body>
+</html>

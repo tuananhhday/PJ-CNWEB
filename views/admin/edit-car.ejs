@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+    <%- include('partials/nav') %>
+
+    <main class="admin-main">
+        <header class="admin-top">
+            <div>
+                <p>Kho xe</p>
+                <h1>Sửa thông tin xe</h1>
+            </div>
+            <a class="admin-link" href="/admin/xe">Quay lại danh sách</a>
+        </header>
+
+        <% if (error) { %><div class="admin-alert error"><%= error %></div><% } %>
+
+        <section class="admin-card">
+            <form class="admin-form grid-form edit-grid" action="/admin/xe/<%= car.id %>/sua" method="POST">
+                <label>Dòng xe
+                    <select name="dong_xe_id" required>
+                        <% models.forEach(model => { %>
+                            <option value="<%= model.id %>" <%= Number(car.dong_xe_id) === Number(model.id) ? 'selected' : '' %>><%= model.ten_dong %></option>
+                        <% }) %>
+                    </select>
+                </label>
+
+                <label>Tên xe
+                    <input name="ten_xe" value="<%= car.ten_xe || '' %>" required>
+                </label>
+
+                <label>Đường dẫn
+                    <input name="duong_dan" value="<%= car.duong_dan || '' %>" required>
+                </label>
+
+                <label>Phiên bản
+                    <input name="phien_ban" value="<%= car.phien_ban || '' %>">
+                </label>
+
+                <label>Năm sản xuất
+                    <input name="nam_san_xuat" type="number" value="<%= car.nam_san_xuat || '' %>">
+                </label>
+
+                <label>Giá bán
+                    <input name="gia_ban" type="number" value="<%= Number(car.gia_ban || 0) %>" required>
+                </label>
+
+                <label>Động cơ
+                    <input name="dong_co" value="<%= car.dong_co || '' %>">
+                </label>
+
+                <label>Hộp số
+                    <input name="hop_so" value="<%= car.hop_so || '' %>">
+                </label>
+
+                <label>Nhiên liệu
+                    <select name="nhien_lieu">
+                        <option value="xang" <%= car.nhien_lieu === 'xang' ? 'selected' : '' %>>Xăng</option>
+                        <option value="dau" <%= car.nhien_lieu === 'dau' ? 'selected' : '' %>>Dầu</option>
+                        <option value="dien" <%= car.nhien_lieu === 'dien' ? 'selected' : '' %>>Điện</option>
+                        <option value="hybrid" <%= car.nhien_lieu === 'hybrid' ? 'selected' : '' %>>Hybrid</option>
+                    </select>
+                </label>
+
+                <label>Số chỗ ngồi
+                    <input name="so_cho_ngoi" type="number" value="<%= car.so_cho_ngoi || '' %>">
+                </label>
+
+                <label>Xuất xứ
+                    <input name="xuat_xu" value="<%= car.xuat_xu || '' %>">
+                </label>
+
+                <label>Bảo hành
+                    <input name="bao_hanh" value="<%= car.bao_hanh || '' %>">
+                </label>
+
+                <label>Số lượng tồn
+                    <input name="so_luong_ton" type="number" value="<%= car.so_luong_ton || 0 %>">
+                </label>
+
+                <label>Trạng thái
+                    <select name="trang_thai">
+                        <option value="con_hang" <%= car.trang_thai === 'con_hang' ? 'selected' : '' %>>Còn hàng</option>
+                        <option value="het_hang" <%= car.trang_thai === 'het_hang' ? 'selected' : '' %>>Hết hàng</option>
+                        <option value="an" <%= car.trang_thai === 'an' ? 'selected' : '' %>>Ẩn</option>
+                    </select>
+                </label>
+
+                <label>Ảnh đại diện
+                    <input name="anh_dai_dien" value="<%= car.duong_dan_anh || '' %>" placeholder="Ví dụ: c300-1.jpg">
+                </label>
+
+                <label class="wide-field">Mô tả ngắn
+                    <input name="mo_ta_ngan" value="<%= car.mo_ta_ngan || '' %>">
+                </label>
+
+                <label class="wide-field">Mô tả chi tiết
+                    <textarea name="mo_ta_chi_tiet" rows="5"><%= car.mo_ta_chi_tiet || '' %></textarea>
+                </label>
+
+                <div class="image-preview wide-field">
+                    <span>Ảnh hiện tại</span>
+                    <img src="/images/<%= car.duong_dan_anh || 'no-car.jpg' %>" alt="<%= car.ten_xe %>">
+                    <p>File ảnh phải nằm trong thư mục <strong>public/images</strong>.</p>
+                </div>
+
+                <button type="submit">Lưu thay đổi</button>
+            </form>
+        </section>
+    </main>
+</div>
+</body>
+</html>

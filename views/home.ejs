@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/showroom.css">
+</head>
+<body>
+<%- include('partials/site-nav') %>
+
+<main>
+    <section class="hero-home">
+        <img src="/images/ford-everest.jpg" alt="Showroom ô tô">
+        <div class="hero-copy">
+            <h1>Sẵn sàng cho hành trình mới</h1>
+            <p>Khám phá xe SUV, bán tải và các gói tư vấn mua xe phù hợp cho gia đình hoặc doanh nghiệp.</p>
+            <div class="hero-actions">
+                <a href="/xe" class="primary-btn">Chọn xe</a>
+                <a href="/dang-ky-lai-thu" class="secondary-btn">Đăng ký lái thử</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-wrap">
+        <div class="section-heading">
+            <p class="eyebrow">Toàn bộ xe</p>
+            <h2>Khám phá các dòng xe</h2>
+            <a href="/bang-gia">Xem bảng giá</a>
+        </div>
+
+        <div class="car-grid">
+            <% cars.slice(0, 6).forEach(car => { %>
+                <article class="vehicle-card">
+                    <img src="/images/<%= car.anh_dai_dien || 'ford-everest.jpg' %>" alt="<%= car.ten_xe %>">
+                    <div class="vehicle-content">
+                        <p><%= car.ten_hang %> · <%= car.ten_loai %></p>
+                        <h3><%= car.ten_xe %></h3>
+                        <strong>Từ <%= formatPrice(car.gia_ban) %></strong>
+                        <div class="card-actions">
+                            <a href="/xe/<%= car.duong_dan %>">Xem thêm</a>
+                            <a href="/bao-gia?xe_id=<%= car.id %>">Báo giá</a>
+                        </div>
+                    </div>
+                </article>
+            <% }) %>
+        </div>
+    </section>
+
+    <section class="buying-band">
+        <div>
+            <p class="eyebrow">Mua xe</p>
+            <h2>Bắt đầu sở hữu chiếc xe bạn mong muốn</h2>
+        </div>
+        <div class="quick-actions">
+            <a href="/lien-he">Tìm đại lý</a>
+            <a href="/bao-gia">Nhận báo giá</a>
+            <a href="/dang-ky-lai-thu">Đăng ký lái thử</a>
+        </div>
+    </section>
+
+    <section class="section-wrap service-preview">
+        <div class="media-panel">
+            <img src="/images/ford-everest.jpg" alt="Dịch vụ showroom">
+        </div>
+        <div class="text-panel">
+            <p class="eyebrow">Dịch vụ & Bảo dưỡng</p>
+            <h2>Chăm sóc xe sau bán hàng</h2>
+            <p>Đặt lịch bảo dưỡng, nhận tư vấn phụ tùng, kiểm tra xe và hỗ trợ khách hàng sau khi mua xe.</p>
+            <a href="/dich-vu" class="primary-btn">Xem dịch vụ</a>
+        </div>
+    </section>
+
+    <section class="section-wrap">
+        <div class="section-heading">
+            <p class="eyebrow">Tin tức mới nhất</p>
+            <h2>Điều gì đang diễn ra</h2>
+            <a href="/tin-tuc">Xem toàn bộ tin</a>
+        </div>
+
+        <div class="news-grid">
+            <% if (news && news.length > 0) { %>
+                <% news.forEach(item => { %>
+                    <article class="news-card">
+                        <img src="/images/<%= item.anh_dai_dien || 'ford-everest.jpg' %>" alt="<%= item.tieu_de %>">
+                        <h3><%= item.tieu_de %></h3>
+                        <p><%= (item.noi_dung || '').slice(0, 120) %></p>
+                    </article>
+                <% }) %>
+            <% } else { %>
+                <article class="news-card">
+                    <img src="/images/ford-everest.jpg" alt="Ưu đãi showroom">
+                    <h3>Ưu đãi lái thử và báo giá trong tháng</h3>
+                    <p>Liên hệ showroom để nhận tư vấn phiên bản, giá lăn bánh và chương trình hỗ trợ tài chính.</p>
+                </article>
+                <article class="news-card">
+                    <img src="/images/ford-everest.jpg" alt="Dịch vụ bảo dưỡng">
+                    <h3>Dịch vụ bảo dưỡng định kỳ</h3>
+                    <p>Đội ngũ kỹ thuật hỗ trợ kiểm tra xe, bảo dưỡng nhanh và tư vấn phụ tùng chính hãng.</p>
+                </article>
+                <article class="news-card">
+                    <img src="/images/ford-everest.jpg" alt="Tư vấn xe">
+                    <h3>Tư vấn chọn xe phù hợp</h3>
+                    <p>So sánh các dòng xe theo nhu cầu gia đình, công việc, tài chính và trải nghiệm lái.</p>
+                </article>
+            <% } %>
+        </div>
+    </section>
+</main>
+
+<%- include('partials/site-footer') %>
+<script src="/javascripts/home.js"></script>
+</body>
+</html>
