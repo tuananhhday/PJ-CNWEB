@@ -32,7 +32,10 @@
       } else {
           // Fallback to legacy split or feature-based logic
           const exteriorFeatures = productFeatures.filter((feature) => String(feature.nhom || '').toLowerCase().includes('ngoai'));
-          const interiorFeatures = productFeatures.filter((feature) => String(feature.nhom || '').toLowerCase().includes('noi'));
+          const interiorFeatures = productFeatures.filter((feature) => {
+              const nh = String(feature.nhom || '').toLowerCase();
+              return nh.includes('noi') && !nh.includes('noi_bat');
+          });
           const galleryMid = Math.max(1, Math.ceil(galleryImages.length / 2));
           
           exteriorImages = exteriorFeatures.length 
@@ -189,6 +192,7 @@
         <% 
           const getNormalizedGroupName = (rawName) => {
               const lower = String(rawName || '').toLowerCase().trim();
+              if (lower === 'noi_bat' || lower.includes('noi_bat')) return 'Nổi bật';
               if (lower.includes('ngoai')) return 'Ngoại thất';
               if (lower.includes('noi')) return 'Nội thất';
               if (lower.includes('van') || lower.includes('dong_co') || lower.includes('van_hanh')) return 'Vận hành';
