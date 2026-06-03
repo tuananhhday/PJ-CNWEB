@@ -74,6 +74,39 @@ exports.getRequests = async (req, res) => {
         const quoteRequests = sortRequestsForAdmin(quotes);
         const testDriveRequests = sortRequestsForAdmin(testDrives);
 
+        // Fetch absolute statistics for requests from database
+        const [quoteStats] = await dbp.query(`
+            SELECT trang_thai, COUNT(*) AS count
+            FROM yeu_cau_bao_gia
+            GROUP BY trang_thai
+        `);
+        const [driveStats] = await dbp.query(`
+            SELECT trang_thai, COUNT(*) AS count
+            FROM lich_lai_thu
+            GROUP BY trang_thai
+        `);
+
+        const stats = {
+            total: 0,
+            moi: 0,
+            dang_xu_ly: 0,
+            hoan_tat: 0,
+            huy: 0
+        };
+
+        const addCount = (row) => {
+            const status = row.trang_thai;
+            const count = Number(row.count);
+            stats.total += count;
+            if (status === 'moi') stats.moi += count;
+            else if (status === 'dang_xu_ly') stats.dang_xu_ly += count;
+            else if (status === 'hoan_tat') stats.hoan_tat += count;
+            else if (status === 'huy') stats.huy += count;
+        };
+
+        quoteStats.forEach(addCount);
+        driveStats.forEach(addCount);
+
         res.render('admin/requests', {
             title: 'Quản lý yêu cầu khách hàng',
             requests: [...quoteRequests, ...testDriveRequests],
@@ -81,6 +114,7 @@ exports.getRequests = async (req, res) => {
             testDriveRequests,
             filter,
             search,
+            stats,
             formatDateTime: parser.formatDateTime,
             success: req.query.success || null,
             error: req.query.error || null
