@@ -28,7 +28,13 @@ server-*.log
 # Environment variables (chứa mật khẩu - KHÔNG đẩy lên Git)
 .env
 
-# File rác
+# File rác / tạm
 extracted_step_*.ejs
 *.err.log
 *.out.log
+
+# File nén (không cần thiết trong repo)
+*.rar
+*.zip
+*.7z
+*.tar.gz
