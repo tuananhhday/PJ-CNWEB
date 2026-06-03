@@ -238,6 +238,7 @@ exports.addPanel = async (req, res) => {
             INSERT INTO panel_anh (duong_dan_anh, thu_tu, trang_thai)
             VALUES (?, ?, ?)
         `, [duong_dan_anh, thu_tu || 0, trang_thai || 'hien']);
+        await parser.cleanupOrphanImages();
         res.redirect('/admin/panel?success=Da them anh panel');
     } catch (err) {
         console.log('Loi them panel:', err);
@@ -259,6 +260,7 @@ exports.editPanel = async (req, res) => {
             SET duong_dan_anh = ?, thu_tu = ?, trang_thai = ?
             WHERE id = ?
         `, [duong_dan_anh, thu_tu || 0, trang_thai || 'hien', req.params.id]);
+        await parser.cleanupOrphanImages();
         res.redirect('/admin/panel?success=Da cap nhat panel');
     } catch (err) {
         console.log('Loi sua panel:', err);
@@ -270,6 +272,7 @@ exports.deletePanel = async (req, res) => {
     try {
         await dbInit.ensurePanelTable();
         await dbp.query('DELETE FROM panel_anh WHERE id = ?', [req.params.id]);
+        await parser.cleanupOrphanImages();
         res.redirect('/admin/panel?success=Da xoa panel');
     } catch (err) {
         console.log('Loi xoa panel:', err);
@@ -462,6 +465,7 @@ exports.addNews = async (req, res) => {
             parser.isChecked(req.body.ghim) ? 1 : 0,
             trang_thai || 'hien'
         ]);
+        await parser.cleanupOrphanImages();
         parser.redirectWithMessage(res, '/admin/tin-tuc', 'success', 'Đã đăng bài viết mới.');
     } catch (err) {
         console.log('Lỗi thêm tin tức:', err);
@@ -499,6 +503,7 @@ exports.editNews = async (req, res) => {
             trang_thai || 'hien',
             req.params.id
         ]);
+        await parser.cleanupOrphanImages();
         parser.redirectWithMessage(res, '/admin/tin-tuc', 'success', 'Đã cập nhật bài viết.');
     } catch (err) {
         console.log('Lỗi sửa tin tức:', err);
@@ -512,6 +517,7 @@ exports.deleteNews = async (req, res) => {
         await dbp.query('DELETE FROM binh_luan_tin WHERE tin_tuc_id = ?', [req.params.id]);
         await dbp.query('DELETE FROM like_tin WHERE tin_tuc_id = ?', [req.params.id]);
         await dbp.query('DELETE FROM tin_tuc WHERE id = ?', [req.params.id]);
+        await parser.cleanupOrphanImages();
         parser.redirectWithMessage(res, '/admin/tin-tuc', 'success', 'Đã xóa bài viết.');
     } catch (err) {
         console.log('Lỗi xóa tin tức:', err);
@@ -675,6 +681,7 @@ exports.addCar = async (req, res) => {
         }
 
         await conn.commit();
+        await parser.cleanupOrphanImages();
         res.redirect('/admin/xe?success=Da them xe moi');
     } catch (err) {
         if (conn) await conn.rollback();
@@ -905,6 +912,7 @@ exports.editCar = async (req, res) => {
         }
 
         await conn.commit();
+        await parser.cleanupOrphanImages();
         res.redirect('/admin/xe?success=Da cap nhat thong tin xe');
     } catch (err) {
         if (conn) await conn.rollback();
@@ -930,6 +938,7 @@ exports.deleteCar = async (req, res) => {
         await conn.query('DELETE FROM xe WHERE id = ?', [req.params.id]);
 
         await conn.commit();
+        await parser.cleanupOrphanImages();
         res.redirect('/admin/xe?success=Da xoa xe');
     } catch (err) {
         if (conn) await conn.rollback();
@@ -974,6 +983,7 @@ exports.addAnh360Set = async (req, res) => {
             'INSERT INTO bo_anh_360 (ten_bo_anh, danh_sach_anh) VALUES (?, ?)',
             [ten_bo_anh.trim(), danh_sach_anh || '']
         );
+        await parser.cleanupOrphanImages();
         parser.redirectWithMessage(res, '/admin/anh-360', 'success', 'Da tao bo anh 360 moi.');
     } catch (err) {
         console.log('Loi them bo anh 360:', err);
@@ -995,6 +1005,7 @@ exports.editAnh360Set = async (req, res) => {
             'UPDATE bo_anh_360 SET ten_bo_anh = ?, danh_sach_anh = ? WHERE id = ?',
             [ten_bo_anh.trim(), danh_sach_anh || '', req.params.id]
         );
+        await parser.cleanupOrphanImages();
         parser.redirectWithMessage(res, '/admin/anh-360', 'success', 'Da cap nhat bo anh 360.');
     } catch (err) {
         console.log('Loi sua bo anh 360:', err);
@@ -1006,6 +1017,7 @@ exports.deleteAnh360Set = async (req, res) => {
     try {
         await dbInit.ensureBo360SetsTable();
         await dbp.query('DELETE FROM bo_anh_360 WHERE id = ?', [req.params.id]);
+        await parser.cleanupOrphanImages();
         parser.redirectWithMessage(res, '/admin/anh-360', 'success', 'Da xoa bo anh 360.');
     } catch (err) {
         console.log('Loi xoa bo anh 360:', err);

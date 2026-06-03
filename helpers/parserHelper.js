@@ -1,5 +1,6 @@
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 const db = require('../config/database');
 const dbp = db.promise();
 
@@ -29,17 +30,16 @@ function listImageFiles() {
     }
 }
 
-function sanitizeFileName(fileName) {
+function sanitizeFileName(fileName, buffer) {
     const ext = path.extname(fileName).toLowerCase();
-    const base = path.basename(fileName, ext)
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-zA-Z0-9_-]+/g, '-')
-        .replace(/^-+|-+$/g, '')
-        .toLowerCase() || 'image';
-
-    const randomStr = Math.random().toString(36).substring(2, 6);
-    return `${Date.now()}-${randomStr}-${base}${ext}`;
+    let hashName;
+    if (buffer && buffer.length) {
+        hashName = crypto.createHash('md5').update(buffer).digest('hex');
+    } else {
+        const randomStr = Math.random().toString(36).substring(2, 6);
+        hashName = `${Date.now()}-${randomStr}`;
+    }
+    return `${hashName}${ext}`;
 }
 
 function splitBuffer(buffer, delimiter) {
@@ -95,12 +95,15 @@ function parseMultipartForm(req) {
                 if (fileNameMatch) {
                     const originalName = fileNameMatch[1];
                     if (!originalName || !value.length) return;
-                    const savedName = sanitizeFileName(originalName);
+                    const savedName = sanitizeFileName(originalName, value);
                     // Tạo thư mục nếu chưa tồn tại
                     if (!fs.existsSync(imageDir)) {
                         fs.mkdirSync(imageDir, { recursive: true });
                     }
-                    fs.writeFileSync(path.join(imageDir, savedName), value);
+                    const destPath = path.join(imageDir, savedName);
+                    if (!fs.existsSync(destPath)) {
+                        fs.writeFileSync(destPath, value);
+                    }
                     if (body[fieldName]) {
                         body[fieldName] = Array.isArray(body[fieldName])
                             ? [...body[fieldName], savedName]
@@ -328,6 +331,67 @@ async function getUniqueSlug(tableName, baseSlug, currentId = null) {
     }
 }
 
+async function cleanupOrphanImages() {
+    try {
+        const referenced = new Set();
+
+        const addRefs = (rows, colName) => {
+            rows.forEach(r => {
+                if (r[colName]) {
+                    referenced.add(path.basename(r[colName]).trim());
+                }
+            });
+        };
+
+        const [anhXe] = await dbp.query('SELECT duong_dan_anh FROM anh_xe');
+        addRefs(anhXe, 'duong_dan_anh');
+
+        const [anh360] = await dbp.query('SELECT duong_dan_anh FROM anh_xe_360');
+        addRefs(anh360, 'duong_dan_anh');
+
+        const [dacDiem] = await dbp.query('SELECT anh FROM dac_diem_xe');
+        addRefs(dacDiem, 'anh');
+
+        const [mauXe] = await dbp.query('SELECT anh_mau FROM mau_xe');
+        addRefs(mauXe, 'anh_mau');
+
+        const [tinTuc] = await dbp.query('SELECT anh_dai_dien FROM tin_tuc');
+        addRefs(tinTuc, 'anh_dai_dien');
+
+        const [panel] = await dbp.query('SELECT duong_dan_anh FROM panel_anh');
+        addRefs(panel, 'duong_dan_anh');
+
+        const [bo360] = await dbp.query('SELECT danh_sach_anh FROM bo_anh_360');
+        bo360.forEach(r => {
+            if (r.danh_sach_anh) {
+                r.danh_sach_anh.split(',').forEach(f => {
+                    const clean = f.trim();
+                    if (clean) referenced.add(path.basename(clean));
+                });
+            }
+        });
+
+        const imageDir = path.join(__dirname, '..', 'public', 'images');
+        if (!fs.existsSync(imageDir)) return;
+
+        const files = fs.readdirSync(imageDir);
+        for (const file of files) {
+            const fullPath = path.join(imageDir, file);
+            if (fs.statSync(fullPath).isDirectory()) continue;
+
+            const isHashed = /^[a-fA-F0-9]{32}\.[a-zA-Z0-9]+$/.test(file);
+            const isTimestamped = /^\d{13}-/.test(file);
+
+            if (!referenced.has(file) && (isHashed || isTimestamped)) {
+                fs.unlinkSync(fullPath);
+                console.log(`[Deduplication] Deleted orphan file: ${file}`);
+            }
+        }
+    } catch (err) {
+        console.error('Error in cleanupOrphanImages:', err);
+    }
+}
+
 module.exports = {
     formatPrice,
     listImageFiles,
@@ -350,5 +414,6 @@ module.exports = {
     isChecked,
     formatDateTime,
     redirectWithMessage,
-    getUniqueSlug
+    getUniqueSlug,
+    cleanupOrphanImages
 };
