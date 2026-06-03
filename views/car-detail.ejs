@@ -178,8 +178,9 @@
 
     <section class="kia-product-section kia-overview" id="dac-diem">
         <div>
+            <span class="overview-watermark"><%= (car.ten_xe || '').slice(0, 1) %></span>
             <h2><%= car.ten_xe %></h2>
-            <p><%= car.mo_ta_chi_tiet || 'Nội dung giới thiệu chi tiết đang được cập nhật.' %></p>
+            <p><%= car.mo_ta_chi_tiet || car.mo_ta_ngan || 'Nội dung giới thiệu chi tiết đang được cập nhật.' %></p>
         </div>
         <img src="/images/<%= heroImage %>" alt="<%= car.ten_xe %>">
     </section>

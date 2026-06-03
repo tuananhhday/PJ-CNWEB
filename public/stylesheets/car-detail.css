@@ -267,14 +267,24 @@
     margin-bottom: 48px;
 }
 
-.kia-overview span {
+.kia-overview > div {
+    position: relative;
+}
+
+.kia-overview .overview-watermark {
     font-family: var(--font-title);
-    font-size: 64px;
+    font-size: 180px;
     font-weight: 900;
     line-height: 1;
-    color: var(--primary-glow);
+    color: rgba(0, 0, 0, 0.035);
     display: block;
-    margin-bottom: -16px;
+    position: absolute;
+    top: -55px;
+    left: -10px;
+    z-index: 0;
+    pointer-events: none;
+    user-select: none;
+    text-transform: uppercase;
 }
 
 .kia-overview h2 {
@@ -282,12 +292,16 @@
     font-size: 32px;
     font-weight: 800;
     margin-bottom: 16px;
+    position: relative;
+    z-index: 1;
 }
 
 .kia-overview p {
     color: var(--text-muted);
     font-size: 15px;
     line-height: 1.6;
+    position: relative;
+    z-index: 1;
 }
 
 .kia-overview img {
