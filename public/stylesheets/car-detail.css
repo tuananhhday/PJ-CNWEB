@@ -821,8 +821,13 @@
 @media (max-width: 960px) {
     .kia-product-hero {
         grid-template-columns: 1fr;
-        padding: 32px;
+        padding: 32px 24px;
         gap: 32px;
+        background: #f8fafc !important; /* Force solid light background on mobile, overrides the desktop linear-gradient */
+    }
+    
+    .kia-product-hero img {
+        max-height: 280px; /* Limit image size on mobile so it fits nicely */
     }
     
     .kia-overview {
@@ -833,5 +838,33 @@
     
     .kia-spec-table {
         grid-template-columns: 1fr;
+    }
+
+    /* Horizontal scroll for sticky tabs on mobile to prevent wrapping/overflow */
+    .kia-product-tabs {
+        justify-content: flex-start !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        padding: 12px 16px !important;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        top: 70px; /* align with sticky header */
+    }
+    .kia-product-tabs::-webkit-scrollbar {
+        display: none !important; /* Hide scrollbar for native app-like appearance */
+    }
+    .kia-product-tabs a {
+        padding: 10px 16px !important;
+        flex-shrink: 0 !important;
+        display: inline-block !important;
+    }
+
+    /* Stack features list and showcase vertically on mobile */
+    .feature-split-layout {
+        grid-template-columns: 1fr !important;
+        gap: 24px !important;
+    }
+    .feature-image-wrapper {
+        height: 240px !important; /* Reduce preview image size on mobile */
     }
 }

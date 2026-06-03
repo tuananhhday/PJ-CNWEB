@@ -4574,6 +4574,11 @@ body {
         max-height: none;
         padding-right: 0;
         border-right: 0;
+        order: 2; /* Put list below map on mobile */
+    }
+
+    .dealer-directory-map {
+        order: 1; /* Put map on top on mobile */
     }
 
     .dealer-directory-search {
