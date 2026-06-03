@@ -3889,15 +3889,94 @@ body {
     line-height: 1.2;
 }
 
-.featured-copy a {
+.featured-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.btn-detail,
+.btn-quote-featured,
+.btn-drive-featured {
     min-height: 46px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0 18px;
+    padding: 0 20px;
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border-radius: var(--radius-sm);
+    transition: var(--transition-smooth);
+    cursor: pointer;
+    text-decoration: none;
+}
+
+/* Detail Button */
+.btn-detail {
     background: #06121e;
     color: #fff;
-    font-weight: 800;
+    border: 1px solid #06121e;
+}
+
+.btn-detail:hover {
+    background: #111827;
+    border-color: #111827;
+    transform: translateY(-2px);
+}
+
+/* Dark theme support for Detail Button */
+[data-theme="dark"] .btn-detail {
+    background: #f8fafc !important;
+    color: #0b0f19 !important;
+    border-color: #f8fafc !important;
+}
+
+[data-theme="dark"] .btn-detail:hover {
+    background: #e2e8f0 !important;
+    border-color: #e2e8f0 !important;
+}
+
+/* Quote Button */
+.btn-quote-featured {
+    background: var(--primary);
+    color: #fff;
+    border: 1px solid var(--primary);
+    gap: 6px;
+}
+
+.btn-quote-featured:hover {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+}
+
+/* Drive Button */
+.btn-drive-featured {
+    background: transparent;
+    color: #06121e;
+    border: 1.5px solid rgba(6, 18, 30, 0.15);
+    gap: 6px;
+}
+
+.btn-drive-featured:hover {
+    background: rgba(6, 18, 30, 0.04);
+    border-color: #06121e;
+    transform: translateY(-2px);
+}
+
+/* Dark theme support for Drive Button */
+[data-theme="dark"] .btn-drive-featured {
+    color: #f8fafc !important;
+    border-color: rgba(248, 250, 252, 0.3) !important;
+}
+
+[data-theme="dark"] .btn-drive-featured:hover {
+    background: rgba(248, 250, 252, 0.08) !important;
+    border-color: #f8fafc !important;
 }
 
 .featured-media {
@@ -4000,101 +4079,196 @@ body {
 @media (max-width: 980px) {
     .featured-cars {
         min-height: 0;
-        padding: 48px 24px 64px;
+        padding: 48px 24px 80px;
+        background: #f8fafc;
     }
 
     .featured-tabs {
-        margin-bottom: 42px;
+        margin-bottom: 32px;
+    }
+
+    /* TẮT hoàn toàn nền xanh chéo trên mobile */
+    .featured-stage::after {
+        display: none;
     }
 
     .featured-stage {
-        min-height: 760px;
+        min-height: auto;
+        position: relative;
     }
 
-    .featured-stage::after {
-        top: 330px;
-        right: -160px;
-        bottom: -64px;
-        width: 110vw;
-        clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%);
-    }
-
+    /* Card xe: ẩn hoàn toàn khi không active */
     .featured-car {
+        display: none;
+        position: static;
+        inset: auto;
         grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
         align-items: start;
+        opacity: 1;
+        transform: none;
+        pointer-events: auto;
+        visibility: visible;
+        width: 100%;
     }
 
-    .featured-copy {
-        max-width: 720px;
+    /* Chỉ hiện card đang active */
+    .featured-car.is-active {
+        display: grid;
     }
 
+    /* ẢNH XE lên trước — đặt ở row 1 */
     .featured-media {
-        min-height: 360px;
+        order: -1;
+        min-height: 240px;
         align-items: center;
+        padding-top: 0;
+        padding-bottom: 16px;
+        background: linear-gradient(135deg, #06121e 0%, #0a1726 64%, #101c2d 100%);
+        border-radius: 16px;
+        margin-bottom: 24px;
+        position: relative;
     }
 
     .featured-media img {
-        width: min(720px, 92vw);
+        width: min(480px, 85vw);
+        max-height: 240px;
+        filter: drop-shadow(0 12px 20px rgba(0,0,0,0.35));
     }
 
+    /* Thông số trên ảnh — góc trên phải */
     .featured-specs {
-        top: 20px;
-        right: 24px;
+        position: absolute;
+        top: 12px;
+        right: 16px;
+        left: auto;
+        font-size: 12px;
+        gap: 10px;
+        max-width: 160px;
+    }
+
+    .featured-specs span {
+        grid-template-columns: 18px 1fr;
+        gap: 6px;
+    }
+
+    .featured-specs span::before {
+        width: 18px;
+        height: 18px;
+    }
+
+    /* TEXT + NÚT ở dưới */
+    .featured-copy {
+        max-width: 100%;
+        order: 1;
+    }
+
+    .featured-copy span {
+        color: #0a66c2;
+    }
+
+    .featured-copy h2 {
+        color: #06121e;
+        font-size: clamp(28px, 7vw, 42px);
+    }
+
+    .featured-copy p {
+        font-size: 15px;
+        color: #475569;
+    }
+
+    .featured-copy strong {
+        color: #06121e;
+        font-size: clamp(22px, 5vw, 32px);
+    }
+
+    .featured-copy em {
+        font-size: 16px;
+        color: #475569;
+        margin-bottom: 20px;
+    }
+
+    /* Nút bấm xếp ngang */
+    .featured-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 16px;
+    }
+
+    /* Controls ← → */
+    .featured-controls {
+        position: static;
+        transform: none;
+        left: auto;
+        bottom: auto;
+        justify-content: center;
+        margin-top: 24px;
+        padding-bottom: 0;
     }
 }
 
 @media (max-width: 620px) {
     .featured-cars {
-        padding: 36px 18px 54px;
+        padding: 32px 16px 64px;
     }
 
     .featured-tabs {
         width: 100%;
-        gap: 10px;
-        margin-bottom: 34px;
+        gap: 8px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
     }
 
     .featured-tabs button {
-        min-height: 60px;
-        padding: 0 12px;
-        font-size: 15px;
-    }
-
-    .featured-stage {
-        min-height: 700px;
-    }
-
-    .featured-stage::after {
-        top: 390px;
-    }
-
-    .featured-copy h2 {
-        font-size: 34px;
-    }
-
-    .featured-copy strong {
-        font-size: 26px;
-    }
-
-    .featured-copy em {
-        font-size: 22px;
+        min-height: 44px;
+        padding: 0 14px;
+        font-size: 14px;
+        flex: 1 1 auto;
     }
 
     .featured-media {
-        min-height: 300px;
-        padding-top: 90px;
+        min-height: 200px;
+        border-radius: 12px;
+    }
+
+    .featured-media img {
+        width: min(340px, 88vw);
+        max-height: 200px;
     }
 
     .featured-specs {
         top: 10px;
-        left: 18px;
-        right: 18px;
-        font-size: 13px;
+        right: 12px;
+        font-size: 11px;
+        max-width: 130px;
     }
 
-    .featured-controls {
-        left: 0;
-        transform: none;
+    .featured-copy h2 {
+        font-size: clamp(24px, 8vw, 36px);
+    }
+
+    .featured-copy strong {
+        font-size: clamp(18px, 5.5vw, 26px);
+    }
+
+    .featured-copy em {
+        font-size: 14px;
+    }
+
+    /* Nút bấm: full width từng cái */
+    .btn-detail,
+    .btn-quote-featured,
+    .btn-drive-featured {
+        flex: 1 1 calc(50% - 5px);
+        min-height: 42px;
+        font-size: 12px;
+        padding: 0 12px;
+        justify-content: center;
+    }
+
+    .btn-detail {
+        flex: 1 1 100%;
     }
 }
 
@@ -6051,29 +6225,6 @@ body {
     font-size: 14px;
 }
 
-/* CSS Mobile cho Search */
-@media (max-width: 768px) {
-    .nav-search-trigger {
-        height: auto;
-        padding: 16px 0;
-        border-bottom: 1px solid #f1f5f9;
-        justify-content: flex-start;
-        width: 100%;
-    }
-    
-    .nav-search-wrapper {
-        flex-direction: column;
-        align-items: stretch;
-        width: 100%;
-    }
-    
-    .nav-search-overlay {
-        position: static;
-        width: 100%;
-        box-shadow: none;
-        border: none;
-        padding: 12px 0 0 0;
-        opacity: 1;
 .nav-search-trigger {
     background: transparent;
     border: none;
@@ -6436,4 +6587,45 @@ body {
     height: 100%;
     color: #5b6675;
     font-size: 14px;
+}
+
+/* =============================================================================
+   DARK MODE: FEATURED CARS MOBILE OVERRIDES
+   ============================================================================= */
+@media (max-width: 980px) {
+    [data-theme="dark"] .featured-cars {
+        background: var(--bg-main) !important;
+    }
+
+    [data-theme="dark"] .featured-copy h2,
+    [data-theme="dark"] .featured-copy strong {
+        color: var(--text-dark) !important;
+    }
+
+    [data-theme="dark"] .featured-copy p,
+    [data-theme="dark"] .featured-copy em {
+        color: var(--text-muted) !important;
+    }
+
+    [data-theme="dark"] .featured-copy span {
+        color: var(--primary) !important;
+    }
+
+    [data-theme="dark"] .featured-tabs {
+        background: var(--bg-card) !important;
+        border-color: var(--border-color) !important;
+    }
+
+    [data-theme="dark"] .featured-tabs button {
+        color: var(--text-dark) !important;
+    }
+
+    [data-theme="dark"] .featured-controls {
+        color: var(--text-dark) !important;
+    }
+
+    [data-theme="dark"] .featured-controls button {
+        background: var(--bg-surface-soft) !important;
+        color: var(--text-dark) !important;
+    }
 }
