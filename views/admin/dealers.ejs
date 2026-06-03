@@ -39,125 +39,167 @@
         <% } %>
 
         <form class="admin-form" action="/admin/dai-ly/them" method="post">
-            <h2>Thêm đại lý bán xe</h2>
-            <div class="admin-form-grid">
-                <label>
-                    Tên đại lý*
-                    <input name="ten_dai_ly" required placeholder="Showroom Double Anh Hà Nội">
-                </label>
-                <label>
-                    Đường dẫn
-                    <input name="duong_dan" placeholder="showroom-double-anh-ha-noi">
-                    <small>Bỏ trống để hệ thống tự tạo.</small>
-                </label>
-                <label>
-                    Thành phố*
-                    <input name="thanh_pho" required placeholder="Hà Nội">
-                </label>
-                <label>
-                    Vùng miền
-                    <input name="vung_mien" placeholder="Miền Bắc">
-                </label>
-                <label>
-                    Khu vực
-                    <input name="khu_vuc" placeholder="Hà Nội">
-                </label>
-                <label>
-                    Loại đại lý
-                    <input name="loai_dai_ly" placeholder="Đại lý bán xe">
-                </label>
-                <label>
-                    Số điện thoại
-                    <input name="so_dien_thoai" placeholder="0900 000 000">
-                </label>
-                <label>
-                    Email
-                    <input name="email" type="email" placeholder="sales@doubleanh.vn">
-                </label>
-                <label>
-                    Website
-                    <input name="website" placeholder="https://doubleanh.vn">
-                </label>
-                <label>
-                    Địa chỉ showroom*
-                    <input name="dia_chi" required placeholder="12 Trần Duy Hưng, Cầu Giấy">
-                </label>
-                <label>
-                    Link Google Maps
-                    <input name="google_map_url" placeholder="https://maps.google.com/...">
-                </label>
-                <label>
-                    Link nhúng bản đồ
-                    <input name="map_embed_url" placeholder="https://www.google.com/maps?...&output=embed">
-                </label>
-                <label>
-                    Giờ làm việc
-                    <input name="gio_lam_viec" placeholder="08:00 - 19:00, Thứ 2 đến Chủ nhật">
-                </label>
-                <label>
-                    Thứ tự
-                    <input name="thu_tu" type="number" value="0">
-                </label>
-                <label>
-                    Trạng thái
-                    <select name="trang_thai">
-                        <option value="hien">Hiện</option>
-                        <option value="an">Ẩn</option>
-                    </select>
-                </label>
+            <h2>Thêm đại lý bán xe mới</h2>
+            <div class="dealer-form-sections">
+                <div class="dealer-form-group-section">
+                    <h3>Thông tin cơ bản</h3>
+                    <label>
+                        Tên đại lý*
+                        <input name="ten_dai_ly" required placeholder="Ví dụ: Showroom Double Anh Hà Nội">
+                    </label>
+                    <label>
+                        Đường dẫn (Slug)
+                        <input name="duong_dan" placeholder="Ví dụ: showroom-double-anh-ha-noi">
+                        <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 4px;">Bỏ trống để hệ thống tự động tạo theo tên đại lý.</span>
+                    </label>
+                    <label>
+                        Loại đại lý
+                        <input name="loai_dai_ly" placeholder="Ví dụ: Đại lý bán lẻ / Showroom 3S">
+                    </label>
+                    <div class="form-row-2">
+                        <label>
+                            Thứ tự hiển thị
+                            <input name="thu_tu" type="number" value="0">
+                        </label>
+                        <label>
+                            Trạng thái
+                            <select name="trang_thai">
+                                <option value="hien">Hiển thị</option>
+                                <option value="an">Ẩn</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="dealer-form-group-section">
+                    <h3>Thông tin liên hệ & Giờ làm việc</h3>
+                    <label>
+                        Số điện thoại
+                        <input name="so_dien_thoai" placeholder="Ví dụ: 0900 000 000">
+                    </label>
+                    <label>
+                        Email liên hệ
+                        <input name="email" type="email" placeholder="Ví dụ: contact@doubleanh.vn">
+                    </label>
+                    <label>
+                        Website đại lý
+                        <input name="website" placeholder="Ví dụ: www.doubleanh.vn">
+                    </label>
+                    <label>
+                        Giờ làm việc
+                        <input name="gio_lam_viec" placeholder="Ví dụ: 08:00 - 19:00, Thứ 2 đến Chủ nhật">
+                    </label>
+                </div>
+
+                <div class="dealer-form-group-section full-width">
+                    <h3>Địa chỉ & Bản đồ</h3>
+                    <div class="form-row-4">
+                        <label>
+                            Địa chỉ showroom*
+                            <input name="dia_chi" required placeholder="Ví dụ: 12 Trần Duy Hưng">
+                        </label>
+                        <label>
+                            Thành phố/Tỉnh*
+                            <input name="thanh_pho" required placeholder="Ví dụ: Hà Nội">
+                        </label>
+                        <label>
+                            Khu vực (Quận/Huyện)
+                            <input name="khu_vuc" placeholder="Ví dụ: Cầu Giấy">
+                        </label>
+                        <label>
+                            Vùng miền
+                            <input name="vung_mien" placeholder="Ví dụ: Miền Bắc">
+                        </label>
+                    </div>
+                    <div class="form-row-2">
+                        <label>
+                            Link chia sẻ bản đồ (Google Maps URL)
+                            <input name="google_map_url" placeholder="https://maps.google.com/...">
+                        </label>
+                        <label>
+                            Link mã nhúng bản đồ (src iframe)
+                            <input name="map_embed_url" placeholder="https://www.google.com/maps/embed?...">
+                        </label>
+                    </div>
+                </div>
             </div>
             <label>
                 Mô tả đại lý
-                <textarea name="mo_ta" rows="4" placeholder="Không gian trưng bày, tư vấn trả góp, đăng ký lái thử..."></textarea>
+                <textarea name="mo_ta" rows="4" placeholder="Nhập mô tả về thế mạnh, dịch vụ hỗ trợ của đại lý..."></textarea>
             </label>
-            <button type="submit">Thêm đại lý</button>
+            <button type="submit" class="btn primary">Thêm đại lý</button>
         </form>
 
         <div class="admin-table-wrap">
-            <h2>Sửa / xóa đại lý</h2>
+            <h2>Danh sách đại lý hiện có</h2>
             <% if (dealers && dealers.length) { %>
                 <div class="dealer-admin-list">
                     <% dealers.forEach((dealer) => { %>
-                        <article class="dealer-admin-item">
+                        <article class="dealer-admin-item" id="dealer-card-<%= dealer.id %>">
                             <div class="dealer-admin-summary">
-                                <strong><%= dealer.ten_dai_ly %></strong>
-                                <span><%= dealer.khu_vuc || dealer.thanh_pho %></span>
-                                <small><%= dealer.trang_thai === 'hien' ? 'Đang hiển thị' : 'Đang ẩn' %></small>
-                                <a href="/lien-he#dealer-<%= dealer.id %>">Xem trên web</a>
+                                <div class="dealer-summary-info">
+                                    <strong><%= dealer.ten_dai_ly %></strong>
+                                    <span>📍 <%= dealer.dia_chi || 'Chưa cập nhật địa chỉ' %>, <%= dealer.thanh_pho %></span>
+                                    <span>📞 <%= dealer.so_dien_thoai || 'Chưa có số điện thoại' %> | ✉️ <%= dealer.email || 'Chưa có email' %></span>
+                                    <span class="status-badge <%= dealer.trang_thai %>">
+                                        <%= dealer.trang_thai === 'hien' ? 'Đang hiển thị' : 'Đang ẩn' %>
+                                    </span>
+                                </div>
+                                <div class="dealer-summary-actions">
+                                    <button type="button" class="secondary-button edit-toggle-btn" data-id="<%= dealer.id %>">Chỉnh sửa</button>
+                                    <a class="secondary-button" href="/lien-he#dealer-<%= dealer.id %>" target="_blank">Xem trên web</a>
+                                    <form action="/admin/dai-ly/<%= dealer.id %>/xoa" method="post" style="display: inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa đại lý <%= dealer.ten_dai_ly %> không?')">
+                                        <button class="danger-button" type="submit">Xóa</button>
+                                    </form>
+                                </div>
                             </div>
 
-                            <form action="/admin/dai-ly/<%= dealer.id %>/sua" method="post">
-                                <div class="admin-form-grid">
-                                    <label>Tên đại lý*<input name="ten_dai_ly" required value="<%= dealer.ten_dai_ly || '' %>"></label>
-                                    <label>Đường dẫn<input name="duong_dan" value="<%= dealer.duong_dan || '' %>"></label>
-                                    <label>Thành phố*<input name="thanh_pho" required value="<%= dealer.thanh_pho || '' %>"></label>
-                                    <label>Vùng miền<input name="vung_mien" value="<%= dealer.vung_mien || '' %>"></label>
-                                    <label>Khu vực<input name="khu_vuc" value="<%= dealer.khu_vuc || '' %>"></label>
-                                    <label>Loại đại lý<input name="loai_dai_ly" value="<%= dealer.loai_dai_ly || '' %>"></label>
-                                    <label>Số điện thoại<input name="so_dien_thoai" value="<%= dealer.so_dien_thoai || '' %>"></label>
-                                    <label>Email<input name="email" type="email" value="<%= dealer.email || '' %>"></label>
-                                    <label>Website<input name="website" value="<%= dealer.website || '' %>"></label>
-                                    <label>Địa chỉ showroom*<input name="dia_chi" required value="<%= dealer.dia_chi || '' %>"></label>
-                                    <label>Link Google Maps<input name="google_map_url" value="<%= dealer.google_map_url || '' %>"></label>
-                                    <label>Link nhúng bản đồ<input name="map_embed_url" value="<%= dealer.map_embed_url || '' %>"></label>
-                                    <label>Giờ làm việc<input name="gio_lam_viec" value="<%= dealer.gio_lam_viec || '' %>"></label>
-                                    <label>Thứ tự<input name="thu_tu" type="number" value="<%= dealer.thu_tu || 0 %>"></label>
-                                    <label>
-                                        Trạng thái
-                                        <select name="trang_thai">
-                                            <option value="hien" <%= dealer.trang_thai === 'hien' ? 'selected' : '' %>>Hiện</option>
-                                            <option value="an" <%= dealer.trang_thai === 'an' ? 'selected' : '' %>>Ẩn</option>
-                                        </select>
-                                    </label>
-                                </div>
-                                <label>Mô tả<textarea name="mo_ta" rows="4"><%= dealer.mo_ta || '' %></textarea></label>
-                                <div class="panel-admin-actions">
-                                    <button type="submit">Lưu đại lý</button>
-                                </div>
-                            </form>
+                            <form action="/admin/dai-ly/<%= dealer.id %>/sua" method="post" class="dealer-edit-form">
+                                <div class="dealer-form-sections">
+                                    <div class="dealer-form-group-section">
+                                        <h3>Thông tin cơ bản</h3>
+                                        <label>Tên đại lý*<input name="ten_dai_ly" required value="<%= dealer.ten_dai_ly || '' %>"></label>
+                                        <label>Đường dẫn<input name="duong_dan" value="<%= dealer.duong_dan || '' %>"></label>
+                                        <label>Loại đại lý<input name="loai_dai_ly" value="<%= dealer.loai_dai_ly || '' %>"></label>
+                                        <div class="form-row-2">
+                                            <label>Thứ tự hiển thị<input name="thu_tu" type="number" value="<%= dealer.thu_tu || 0 %>"></label>
+                                            <label>
+                                                Trạng thái
+                                                <select name="trang_thai">
+                                                    <option value="hien" <%= dealer.trang_thai === 'hien' ? 'selected' : '' %>>Hiện</option>
+                                                    <option value="an" <%= dealer.trang_thai === 'an' ? 'selected' : '' %>>Ẩn</option>
+                                                </select>
+                                            </label>
+                                        </div>
+                                    </div>
 
-                            <form action="/admin/dai-ly/<%= dealer.id %>/xoa" method="post">
-                                <button class="danger-button" type="submit">Xóa</button>
+                                    <div class="dealer-form-group-section">
+                                        <h3>Thông tin liên hệ & Giờ làm việc</h3>
+                                        <label>Số điện thoại<input name="so_dien_thoai" value="<%= dealer.so_dien_thoai || '' %>"></label>
+                                        <label>Email liên hệ<input name="email" type="email" value="<%= dealer.email || '' %>"></label>
+                                        <label>Website đại lý<input name="website" value="<%= dealer.website || '' %>"></label>
+                                        <label>Giờ làm việc<input name="gio_lam_viec" value="<%= dealer.gio_lam_viec || '' %>"></label>
+                                    </div>
+
+                                    <div class="dealer-form-group-section full-width">
+                                        <h3>Địa chỉ & Bản đồ</h3>
+                                        <div class="form-row-4">
+                                            <label>Địa chỉ showroom*<input name="dia_chi" required value="<%= dealer.dia_chi || '' %>"></label>
+                                            <label>Thành phố/Tỉnh*<input name="thanh_pho" required value="<%= dealer.thanh_pho || '' %>"></label>
+                                            <label>Khu vực (Quận/Huyện)<input name="khu_vuc" value="<%= dealer.khu_vuc || '' %>"></label>
+                                            <label>Vùng miền<input name="vung_mien" value="<%= dealer.vung_mien || '' %>"></label>
+                                        </div>
+                                        <div class="form-row-2">
+                                            <label>Link Google Maps<input name="google_map_url" value="<%= dealer.google_map_url || '' %>"></label>
+                                            <label>Link nhúng bản đồ<input name="map_embed_url" value="<%= dealer.map_embed_url || '' %>"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <label>Mô tả đại lý<textarea name="mo_ta" rows="4"><%= dealer.mo_ta || '' %></textarea></label>
+                                <div class="panel-admin-actions">
+                                    <button type="submit" class="btn primary">Lưu thay đổi</button>
+                                    <button type="button" class="secondary-button cancel-edit-btn" data-id="<%= dealer.id %>">Hủy bỏ</button>
+                                </div>
                             </form>
                         </article>
                     <% }) %>
@@ -168,5 +210,55 @@
         </div>
     </section>
 </main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const editToggleBtns = document.querySelectorAll('.edit-toggle-btn');
+        const cancelEditBtns = document.querySelectorAll('.cancel-edit-btn');
+
+        editToggleBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const dealerId = btn.getAttribute('data-id');
+                const dealerCard = document.getElementById(`dealer-card-${dealerId}`);
+                
+                if (dealerCard) {
+                    const isOpening = !dealerCard.classList.contains('is-open');
+                    
+                    // Close other open cards to avoid cluttering the view
+                    document.querySelectorAll('.dealer-admin-item.is-open').forEach(card => {
+                        card.classList.remove('is-open');
+                        const otherId = card.id.replace('dealer-card-', '');
+                        const otherEditBtn = card.querySelector(`.edit-toggle-btn[data-id="${otherId}"]`);
+                        if (otherEditBtn) otherEditBtn.textContent = 'Chỉnh sửa';
+                    });
+
+                    if (isOpening) {
+                        dealerCard.classList.add('is-open');
+                        btn.textContent = 'Thu nhỏ';
+                        // Scroll cleanly to the expanded card
+                        setTimeout(() => {
+                            dealerCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 100);
+                    } else {
+                        dealerCard.classList.remove('is-open');
+                        btn.textContent = 'Chỉnh sửa';
+                    }
+                }
+            });
+        });
+
+        cancelEditBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const dealerId = btn.getAttribute('data-id');
+                const dealerCard = document.getElementById(`dealer-card-${dealerId}`);
+                if (dealerCard) {
+                    dealerCard.classList.remove('is-open');
+                    const editBtn = dealerCard.querySelector(`.edit-toggle-btn[data-id="${dealerId}"]`);
+                    if (editBtn) editBtn.textContent = 'Chỉnh sửa';
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>
