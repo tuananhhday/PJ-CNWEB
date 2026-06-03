@@ -1,48 +1,70 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Mobile Navigation Menu Toggle
+    // ── Mobile Navigation Drawer ──
     const navToggle = document.querySelector('.nav-toggle');
-    const navMenu = document.querySelector('.nav-menu');
-    const navActions = document.querySelector('.nav-actions');
+    const navMenu   = document.querySelector('.nav-menu');
     const siteHeader = document.querySelector('.site-header');
 
+    // Tạo backdrop (lớp phủ tối phía sau drawer)
+    const backdrop = document.createElement('div');
+    backdrop.className = 'nav-backdrop';
+    document.body.appendChild(backdrop);
+
+    // Tạo nút X đóng bên trong drawer
+    const closeBtn = document.createElement('button');
+    closeBtn.setAttribute('type', 'button');
+    closeBtn.setAttribute('aria-label', 'Đóng menu');
+    closeBtn.className = 'nav-close-btn';
+    closeBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>`;
+    if (navMenu) navMenu.prepend(closeBtn);
+
     function openMobileMenu() {
-        navToggle?.setAttribute('aria-expanded', 'true');
         navMenu?.classList.add('is-open');
-        navActions?.classList.add('is-open');
-        // Khoá cuộn trang khi menu mở
+        backdrop.classList.add('is-open');
+        navToggle?.setAttribute('aria-expanded', 'true');
         document.body.style.overflow = 'hidden';
     }
 
     function closeMobileMenu() {
-        navToggle?.setAttribute('aria-expanded', 'false');
         navMenu?.classList.remove('is-open');
-        navActions?.classList.remove('is-open');
-        // Cho phép cuộn lại
+        backdrop.classList.remove('is-open');
+        navToggle?.setAttribute('aria-expanded', 'false');
         document.body.style.overflow = '';
     }
 
+    // Nút ≡ mở/đóng
     navToggle?.addEventListener('click', () => {
         const isOpen = navToggle.getAttribute('aria-expanded') === 'true';
-        if (isOpen) {
-            closeMobileMenu();
-        } else {
-            openMobileMenu();
-        }
+        isOpen ? closeMobileMenu() : openMobileMenu();
     });
 
-    // Đóng menu khi nhấn phím Escape
+    // Nút X trong drawer đóng
+    closeBtn.addEventListener('click', closeMobileMenu);
+
+    // Backdrop click đóng
+    backdrop.addEventListener('click', closeMobileMenu);
+
+    // Phím Escape đóng
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && navMenu?.classList.contains('is-open')) {
             closeMobileMenu();
         }
     });
 
-    // Đóng menu khi click bên ngoài header (vùng overlay)
-    document.addEventListener('click', (e) => {
-        if (navMenu?.classList.contains('is-open') && siteHeader && !siteHeader.contains(e.target)) {
-            closeMobileMenu();
-        }
+    // Đóng khi click vào một link trong menu (chuyển trang)
+    navMenu?.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            // Chỉ đóng nếu link dẫn sang trang khác (href không phải #)
+            if (!link.getAttribute('href')?.startsWith('#')) {
+                closeMobileMenu();
+            }
+        });
     });
+
 
     const searchWrapper = document.getElementById('nav-search-wrapper');
     if (!searchWrapper) return;

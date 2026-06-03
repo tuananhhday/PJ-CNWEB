@@ -1,4 +1,10 @@
 <header class="site-header">
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
     <a class="skip-link" href="#main-content">Bỏ qua điều hướng</a>
     <nav class="site-nav" aria-label="Điều hướng chính">
         <a class="brand-mark" href="/trang-chu" aria-label="Trang chủ">
@@ -12,6 +18,7 @@
         </button>
 
         <div class="nav-menu" id="main-menu">
+            <div class="nav-drawer-title">Menu điều hướng</div>
             <div class="nav-item has-menu">
                 <a href="/danh-sach-xe">Dòng xe</a>
                 <div class="mega-menu">
@@ -81,6 +88,12 @@
             <a href="/lien-he">Đại lý</a>
             <a href="/admin/xe">Admin</a>
             
+            <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="Chuyển chế độ sáng/tối">
+                <svg class="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                <svg class="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <span class="theme-toggle-text" style="display: none; margin-left: 8px; font-weight: 500;">Chế độ tối</span>
+            </button>
+
             <div class="nav-search-wrapper" id="nav-search-wrapper">
                 <button class="nav-search-trigger" id="nav-search-trigger" type="button" aria-label="Tìm kiếm xe">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -103,3 +116,30 @@
         </div>
     </nav>
 </header>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeToggleText = themeToggle ? themeToggle.querySelector('.theme-toggle-text') : null;
+        
+        function updateToggleText(theme) {
+            if (themeToggleText) {
+                themeToggleText.textContent = theme === 'dark' ? 'Giao diện sáng' : 'Giao diện tối';
+            }
+        }
+        
+        // Initialize text based on current theme
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+        updateToggleText(currentTheme);
+
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                const activeTheme = document.documentElement.getAttribute('data-theme') || 'light';
+                const newTheme = activeTheme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                updateToggleText(newTheme);
+            });
+        }
+    });
+</script>

@@ -929,127 +929,224 @@ img {
     }
 }
 
+@keyframes mobileNavSlideIn {
+    from { opacity: 0; transform: translateX(100%); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes mobileNavBackdropIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
 @media (max-width: 768px) {
     .nav-toggle {
         display: flex;
     }
-    
-    /* Ẩn menu hoàn toàn bằng display:none — tránh conflict với opacity/visibility */
+
+    /* ── Backdrop để đóng menu khi click ngoài ── */
+    .nav-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 195;
+        animation: mobileNavBackdropIn 0.25s ease forwards;
+    }
+    .nav-backdrop.is-open {
+        display: block;
+    }
+
+    /* ── Drawer trượt từ phải ── */
     .nav-menu {
         display: none;
         position: fixed;
         top: 0;
-        left: 0;
         right: 0;
         bottom: 0;
-        /* Thêm padding-top bằng chiều cao header để menu không bị header che */
-        padding-top: 76px;
-        background: var(--bg-card);
+        left: auto;
+        width: min(320px, 85vw);
+        background: var(--bg-card, #ffffff);
         flex-direction: column;
         align-items: stretch;
-        padding-left: 24px;
-        padding-right: 24px;
-        padding-bottom: 24px;
+        padding: 0;
         gap: 0;
         overflow-y: auto;
         z-index: 200;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-        animation: none;
-    }
-    
-    /* Hiện menu khi JS add .is-open */
-    .nav-menu.is-open {
-        display: flex;
-        animation: mobileNavSlideIn 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-    }
-    
-    @keyframes mobileNavSlideIn {
-        from {
-            opacity: 0;
-            transform: translateY(-12px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    /* Link trong nav mobile */
-    .nav-menu > a, .nav-item > a {
-        height: auto;
-        padding: 16px 0;
-        border-bottom: 1px solid var(--border-color);
-        font-size: 16px;
-        font-weight: 600;
-        color: var(--text-dark);
-        display: flex;
-        align-items: center;
-    }
-    
-    .nav-menu > a:hover, .nav-item > a:hover {
-        color: var(--primary);
+        box-shadow: -4px 0 32px rgba(0, 0, 0, 0.2);
     }
 
-    /* Tắt hover dropdown trên mobile */
-    .nav-item:hover .mega-menu,
-    .nav-item:hover .dropdown-menu {
-        display: none !important;
-    }
-    
-    /* Ẩn mega menu lớn */
-    .nav-item .mega-menu {
-        display: none !important;
-    }
-    
-    .nav-item.has-menu {
+    .nav-menu.is-open {
         display: flex;
-        flex-direction: column;
-        align-items: stretch;
+        animation: mobileNavSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
-    
-    /* Dropdown nhỏ (Mua xe) — hiện thẳng không cần hover */
-    .nav-item.has-menu .dropdown-menu {
-        position: static !important;
-        display: flex !important;
-        flex-direction: column;
-        opacity: 1 !important;
-        visibility: visible !important;
-        pointer-events: auto !important;
-        transform: none !important;
-        box-shadow: none !important;
-        border: none !important;
-        padding: 4px 0 12px 16px !important;
-        background: transparent !important;
-        border-left: 2px solid var(--border-color) !important;
-        margin-left: 8px !important;
-        margin-top: 4px !important;
-        margin-bottom: 8px !important;
-        gap: 6px !important;
-        width: auto !important;
+
+    /* ── Danh sách link ── */
+    .nav-menu > a,
+    .nav-item > a {
+        height: 52px;
+        padding: 0 20px;
+        border-bottom: 1px solid var(--border-color, #e2e8f0);
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-dark, #0f172a);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+        transition: background 0.15s ease, color 0.15s ease;
     }
-    
-    .nav-item.has-menu .dropdown-menu a {
-        padding: 8px 0 !important;
-        border-bottom: none !important;
-        font-size: 14px !important;
-        color: var(--text-muted) !important;
-        height: auto !important;
-        font-weight: 500 !important;
+
+    .nav-menu > a:hover,
+    .nav-item > a:hover {
+        background: var(--bg-surface-soft, #f0f9ff);
+        color: var(--primary, #0284c7);
     }
-    
-    .nav-item.has-menu .dropdown-menu a:hover {
-        color: var(--primary) !important;
+
+    /* ── Ẩn tất cả dropdown/mega menu ── */
+    .nav-item:hover .mega-menu,
+    .nav-item:hover .dropdown-menu,
+    .nav-item .mega-menu,
+    .nav-item .dropdown-menu {
+        display: none !important;
     }
-    
+
+    /* ── Mục có dropdown: chỉ hiển thị link cha ── */
+    .nav-item.has-menu {
+        display: block;
+    }
+
+    .nav-item.has-menu > a {
+        justify-content: space-between;
+    }
+
+    .nav-item.has-menu > a::after {
+        content: '›';
+        font-size: 20px;
+        font-weight: 400;
+        color: var(--text-muted, #64748b);
+        line-height: 1;
+    }
+
+    /* ── Theme toggle: nằm trong drawer ── */
+    .theme-toggle-btn {
+        height: 52px;
+        padding: 0 20px;
+        border-bottom: 1px solid var(--border-color, #e2e8f0);
+        border-radius: 0;
+        margin: 0;
+        width: 100%;
+        justify-content: flex-start;
+        gap: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-dark, #0f172a);
+    }
+
+    .theme-toggle-btn:hover {
+        background: var(--bg-surface-soft, #f0f9ff);
+    }
+
+    /* ── Search wrapper trong drawer ── */
+    .nav-search-wrapper {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border-color, #e2e8f0);
+    }
+
+    .nav-search-trigger {
+        height: auto;
+        padding: 0;
+        width: 100%;
+        justify-content: flex-start;
+        gap: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text-dark, #0f172a);
+        border-bottom: none;
+    }
+
+    /* ── Nút X đóng drawer (được inject bởi JS) ── */
+    .nav-close-btn {
+        position: absolute;
+        top: 18px;
+        right: 16px;
+        width: 36px;
+        height: 36px;
+        border: 1px solid var(--border-color, #e2e8f0);
+        border-radius: 50%;
+        background: transparent;
+        color: var(--text-dark, #0f172a);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 201;
+        transition: background 0.15s ease;
+        flex-shrink: 0;
+    }
+
+    .nav-close-btn:hover {
+        background: var(--bg-surface-soft, #f0f9ff);
+        color: var(--primary, #0284c7);
+        border-color: var(--primary, #0284c7);
+    }
+
+    /* Đặt .nav-menu relative để nút X absolute hoạt động */
+    .nav-menu {
+        position: fixed !important;
+    }
+
+    /* ── Tiêu đề bên trong drawer (dùng ::before + label) ── */
+    .nav-menu .nav-drawer-title {
+        display: flex;
+        align-items: center;
+        height: 64px;
+        padding: 0 20px;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-dark, #0f172a);
+        border-bottom: 1px solid var(--border-color, #e2e8f0);
+        flex-shrink: 0;
+    }
+
+    /* Footer của drawer */
     .footer-cta {
         flex-direction: column;
         align-items: flex-start;
     }
-    
+
     .footer-bottom {
         flex-direction: column;
         gap: 12px;
         text-align: center;
+    }
+
+    /* ── Dark mode drawer ── */
+    [data-theme="dark"] .nav-menu {
+        background: var(--bg-card) !important;
+    }
+
+    [data-theme="dark"] .nav-close-btn {
+        color: var(--text-dark) !important;
+        border-color: var(--border-color) !important;
+    }
+
+    [data-theme="dark"] .nav-close-btn:hover {
+        background: var(--bg-surface-soft) !important;
+    }
+
+    [data-theme="dark"] .nav-menu > a,
+    [data-theme="dark"] .nav-item > a,
+    [data-theme="dark"] .theme-toggle-btn {
+        color: var(--text-dark) !important;
+        border-bottom-color: var(--border-color) !important;
+    }
+
+    [data-theme="dark"] .nav-menu > a:hover,
+    [data-theme="dark"] .nav-item > a:hover,
+    [data-theme="dark"] .theme-toggle-btn:hover {
+        background: var(--bg-surface-soft) !important;
+        color: var(--primary) !important;
     }
 }
 
