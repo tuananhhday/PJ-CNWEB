@@ -317,6 +317,13 @@ img {
     gap: 8px;
 }
 
+/* Ẩn các phần tử chỉ dùng trong mobile drawer — trên desktop KHÔNG hiển */
+.nav-drawer-title,
+.nav-close-btn,
+.nav-backdrop {
+    display: none !important;
+}
+
 .nav-menu > a, .nav-item > a {
     height: 76px;
     display: inline-flex;
@@ -944,9 +951,27 @@ img {
         display: flex;
     }
 
+    /* ── Khôi phục hiển thị cho các phần tử chỉ dùng trên mobile ── */
+    .nav-drawer-title {
+        display: flex !important;
+        align-items: center;
+        height: 64px;
+        padding: 0 56px 0 20px; /* padding-right để không bị nút X che */
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-dark, #0f172a);
+        border-bottom: 1px solid var(--border-color, #e2e8f0);
+        flex-shrink: 0;
+        letter-spacing: -0.01em;
+    }
+
+    .nav-close-btn {
+        display: flex !important;
+    }
+
     /* ── Backdrop để đóng menu khi click ngoài ── */
     .nav-backdrop {
-        display: none;
+        display: none !important;
         position: fixed;
         inset: 0;
         background: rgba(0, 0, 0, 0.45);
@@ -954,7 +979,7 @@ img {
         animation: mobileNavBackdropIn 0.25s ease forwards;
     }
     .nav-backdrop.is-open {
-        display: block;
+        display: block !important;
     }
 
     /* ── Drawer trượt từ phải ── */

@@ -332,6 +332,13 @@ img {
     gap: clamp(18px, 3vw, 34px);
 }
 
+/* Ẩn phần tử chỉ dùng trong mobile drawer — desktop KHÔNG hiển */
+.nav-drawer-title,
+.nav-close-btn,
+.nav-backdrop {
+    display: none !important;
+}
+
 .brand-mark {
     display: inline-flex;
     align-items: center;
@@ -1085,44 +1092,82 @@ img {
         margin-left: auto;
     }
 
-    /* Đồng bộ với base.css: menu là overlay full-screen */
+    /* Khôi phục hiển thị các phần tử chỉ dùng trên mobile */
+    .nav-drawer-title {
+        display: flex !important;
+        align-items: center;
+        height: 64px;
+        padding: 0 56px 0 20px;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--ink, #101820);
+        border-bottom: 1px solid var(--line, #d9e1ea);
+        flex-shrink: 0;
+    }
+
+    .nav-close-btn {
+        display: flex !important;
+    }
+
+    .nav-backdrop {
+        display: none !important;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        z-index: 195;
+    }
+    .nav-backdrop.is-open {
+        display: block !important;
+    }
+
+    /* Drawer trượt từ phải — đồng bộ với base.css */
     .nav-menu {
         display: none;
         position: fixed;
         top: 0;
-        left: 0;
         right: 0;
         bottom: 0;
-        padding-top: 68px;
-        background: var(--bg-card, #ffffff);
+        left: auto;
+        width: min(320px, 85vw);
+        background: var(--white, #ffffff);
         flex-direction: column;
         align-items: stretch;
-        padding-left: 24px;
-        padding-right: 24px;
-        padding-bottom: 24px;
+        padding: 0;
         gap: 0;
         overflow-y: auto;
         z-index: 200;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-        width: auto;
+        box-shadow: -4px 0 32px rgba(0, 0, 0, 0.2);
+        width: min(320px, 85vw);
     }
 
     .nav-menu.is-open {
         display: flex;
-        animation: mobileNavSlideIn 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        animation: mobileNavSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
 
     .nav-menu > a,
     .nav-item > a {
+        height: 52px;
         min-height: auto;
-        height: auto;
-        padding: 16px 0;
+        padding: 0 20px;
         border-bottom: 1px solid var(--line, #d9e1ea);
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 600;
         color: var(--ink, #101820);
         display: flex;
         align-items: center;
+        gap: 8px;
+    }
+
+    .nav-item.has-menu > a {
+        justify-content: space-between;
+    }
+
+    .nav-item.has-menu > a::after {
+        content: '›';
+        font-size: 20px;
+        font-weight: 400;
+        color: var(--muted, #5b6675);
     }
 
     .mega-menu,
