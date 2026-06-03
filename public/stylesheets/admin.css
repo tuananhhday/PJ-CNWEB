@@ -1980,5 +1980,49 @@
     box-shadow: var(--shadow-sm);
 }
 
+/* --- Filter Search Box --- */
+.filter-search-box {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: #ffffff;
+    overflow: hidden;
+    min-width: 280px;
+    height: 38px;
+    box-sizing: border-box;
+}
+
+.filter-search-box input {
+    border: 0;
+    background: transparent;
+    padding: 0 12px;
+    font-size: 13px;
+    flex: 1;
+    outline: none;
+    height: 100%;
+    font-family: var(--font-body);
+}
+
+.filter-search-box button {
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-muted);
+    transition: var(--transition-smooth);
+}
+
+.filter-search-box button:hover {
+    color: var(--primary);
+    background: rgba(0, 0, 0, 0.02);
+}
+
+
 
 

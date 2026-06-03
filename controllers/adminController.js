@@ -15,9 +15,24 @@ exports.getRequests = async (req, res) => {
             loai: String(req.query.loai || 'tat_ca'),
             trang_thai: String(req.query.trang_thai || 'tat_ca')
         };
+        const search = String(req.query.q || '').trim();
+
+        let searchWhere = '';
+        const searchParams = [];
+        if (search) {
+            searchWhere = 'AND (request_table.ho_ten LIKE ? OR request_table.email LIKE ? OR request_table.so_dien_thoai LIKE ?)';
+            searchParams.push(`%${search}%`, `%${search}%`, `%${search}%`);
+        }
+
         const statusWhere = filter.trang_thai !== 'tat_ca' ? 'AND request_table.trang_thai = ?' : '';
-        const quoteParams = filter.trang_thai !== 'tat_ca' ? [filter.trang_thai] : [];
-        const driveParams = filter.trang_thai !== 'tat_ca' ? [filter.trang_thai] : [];
+        
+        const quoteParams = [];
+        if (filter.trang_thai !== 'tat_ca') quoteParams.push(filter.trang_thai);
+        if (search) quoteParams.push(...searchParams);
+
+        const driveParams = [];
+        if (filter.trang_thai !== 'tat_ca') driveParams.push(filter.trang_thai);
+        if (search) driveParams.push(...searchParams);
 
         const [quotes] = filter.loai === 'lai_thu' ? [[]] : await dbp.query(`
             SELECT
@@ -29,7 +44,7 @@ exports.getRequests = async (req, res) => {
             FROM yeu_cau_bao_gia request_table
             LEFT JOIN xe ON request_table.xe_id = xe.id
             LEFT JOIN anh_xe ON xe.id = anh_xe.xe_id AND anh_xe.la_anh_dai_dien = TRUE
-            WHERE 1 = 1 ${statusWhere}
+            WHERE 1 = 1 ${statusWhere} ${searchWhere}
             ORDER BY request_table.ngay_tao DESC
         `, quoteParams);
 
@@ -43,7 +58,7 @@ exports.getRequests = async (req, res) => {
             FROM lich_lai_thu request_table
             LEFT JOIN xe ON request_table.xe_id = xe.id
             LEFT JOIN anh_xe ON xe.id = anh_xe.xe_id AND anh_xe.la_anh_dai_dien = TRUE
-            WHERE 1 = 1 ${statusWhere}
+            WHERE 1 = 1 ${statusWhere} ${searchWhere}
             ORDER BY request_table.ngay_tao DESC
         `, driveParams);
 
@@ -65,6 +80,7 @@ exports.getRequests = async (req, res) => {
             quoteRequests,
             testDriveRequests,
             filter,
+            search,
             formatDateTime: parser.formatDateTime,
             success: req.query.success || null,
             error: req.query.error || null
@@ -145,10 +161,12 @@ exports.updateRequest = async (req, res) => {
 
         const loaiFilter = req.query.loai || '';
         const trangThaiFilter = req.query.trang_thai || '';
+        const searchQuery = req.query.q || '';
         let redirectUrl = '/admin/yeu-cau';
         const queryParams = [];
         if (loaiFilter) queryParams.push(`loai=${loaiFilter}`);
         if (trangThaiFilter) queryParams.push(`trang_thai=${trangThaiFilter}`);
+        if (searchQuery) queryParams.push(`q=${encodeURIComponent(searchQuery)}`);
         if (queryParams.length > 0) {
             redirectUrl += `?${queryParams.join('&')}`;
         }
@@ -161,10 +179,12 @@ exports.updateRequest = async (req, res) => {
         console.log('Loi cap nhat yeu cau:', err);
         const loaiFilter = req.query.loai || '';
         const trangThaiFilter = req.query.trang_thai || '';
+        const searchQuery = req.query.q || '';
         let redirectUrl = '/admin/yeu-cau';
         const queryParams = [];
         if (loaiFilter) queryParams.push(`loai=${loaiFilter}`);
         if (trangThaiFilter) queryParams.push(`trang_thai=${trangThaiFilter}`);
+        if (searchQuery) queryParams.push(`q=${encodeURIComponent(searchQuery)}`);
         if (queryParams.length > 0) {
             redirectUrl += `?${queryParams.join('&')}`;
         }
@@ -181,10 +201,12 @@ exports.deleteRequest = async (req, res) => {
         
         const loaiFilter = req.query.loai || '';
         const trangThaiFilter = req.query.trang_thai || '';
+        const searchQuery = req.query.q || '';
         let redirectUrl = '/admin/yeu-cau';
         const queryParams = [];
         if (loaiFilter) queryParams.push(`loai=${loaiFilter}`);
         if (trangThaiFilter) queryParams.push(`trang_thai=${trangThaiFilter}`);
+        if (searchQuery) queryParams.push(`q=${encodeURIComponent(searchQuery)}`);
         if (queryParams.length > 0) {
             redirectUrl += `?${queryParams.join('&')}`;
         }
@@ -194,10 +216,12 @@ exports.deleteRequest = async (req, res) => {
         console.log('Loi xoa yeu cau:', err);
         const loaiFilter = req.query.loai || '';
         const trangThaiFilter = req.query.trang_thai || '';
+        const searchQuery = req.query.q || '';
         let redirectUrl = '/admin/yeu-cau';
         const queryParams = [];
         if (loaiFilter) queryParams.push(`loai=${loaiFilter}`);
         if (trangThaiFilter) queryParams.push(`trang_thai=${trangThaiFilter}`);
+        if (searchQuery) queryParams.push(`q=${encodeURIComponent(searchQuery)}`);
         if (queryParams.length > 0) {
             redirectUrl += `?${queryParams.join('&')}`;
         }

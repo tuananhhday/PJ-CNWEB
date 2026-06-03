@@ -108,15 +108,21 @@
 
             <!-- Segmented Control for Request Type -->
             <div class="request-type-tabs">
-                <a href="/admin/yeu-cau?loai=tat_ca&trang_thai=<%= filter.trang_thai %>" class="type-tab-btn <%= filter.loai === 'tat_ca' ? 'is-active' : '' %>">Tất cả yêu cầu</a>
-                <a href="/admin/yeu-cau?loai=bao_gia&trang_thai=<%= filter.trang_thai %>" class="type-tab-btn <%= filter.loai === 'bao_gia' ? 'is-active' : '' %>">Yêu cầu báo giá</a>
-                <a href="/admin/yeu-cau?loai=lai_thu&trang_thai=<%= filter.trang_thai %>" class="type-tab-btn <%= filter.loai === 'lai_thu' ? 'is-active' : '' %>">Lịch lái thử</a>
+                <a href="/admin/yeu-cau?loai=tat_ca&trang_thai=<%= filter.trang_thai %>&q=<%= encodeURIComponent(search) %>" class="type-tab-btn <%= filter.loai === 'tat_ca' ? 'is-active' : '' %>">Tất cả yêu cầu</a>
+                <a href="/admin/yeu-cau?loai=bao_gia&trang_thai=<%= filter.trang_thai %>&q=<%= encodeURIComponent(search) %>" class="type-tab-btn <%= filter.loai === 'bao_gia' ? 'is-active' : '' %>">Yêu cầu báo giá</a>
+                <a href="/admin/yeu-cau?loai=lai_thu&trang_thai=<%= filter.trang_thai %>&q=<%= encodeURIComponent(search) %>" class="type-tab-btn <%= filter.loai === 'lai_thu' ? 'is-active' : '' %>">Lịch lái thử</a>
             </div>
 
             <!-- Unified Filters Bar -->
             <form class="admin-request-filter" action="/admin/yeu-cau" method="get">
                 <input type="hidden" name="loai" value="<%= filter.loai %>">
-                <label>
+                
+                <div class="filter-search-box">
+                    <input type="text" name="q" placeholder="Tìm tên, email, SĐT khách..." value="<%= search || '' %>">
+                    <button type="submit" title="Tìm kiếm">🔍</button>
+                </div>
+
+                <label style="margin-left: auto;">
                     Lọc theo trạng thái
                     <select name="trang_thai" onchange="this.form.submit()">
                         <option value="tat_ca" <%= filter.trang_thai === 'tat_ca' ? 'selected' : '' %>>Tất cả trạng thái</option>
@@ -276,7 +282,8 @@
                                                 </div>
 
                                                 <!-- Status update & note box -->
-                                                <form class="request-process-box" action="/admin/yeu-cau/<%= item.loai_yeu_cau === 'lai_thu' ? 'lai-thu' : 'bao-gia' %>/<%= item.id %>/cap-nhat?loai=<%= filter.loai %>&trang_thai=<%= filter.trang_thai %>" method="post">
+                                                <!-- Status update & note box -->
+                                                <form class="request-process-box" action="/admin/yeu-cau/<%= item.loai_yeu_cau === 'lai_thu' ? 'lai-thu' : 'bao-gia' %>/<%= item.id %>/cap-nhat?loai=<%= filter.loai %>&trang_thai=<%= filter.trang_thai %>&q=<%= encodeURIComponent(search) %>" method="post">
                                                     <label>
                                                         Trạng thái xử lý mới
                                                         <select name="trang_thai">
@@ -300,7 +307,7 @@
 
                                                 <!-- Delete button -->
                                                 <div class="request-bottom-actions">
-                                                    <form action="/admin/yeu-cau/<%= item.loai_yeu_cau === 'lai_thu' ? 'lai-thu' : 'bao-gia' %>/<%= item.id %>/xoa?loai=<%= filter.loai %>&trang_thai=<%= filter.trang_thai %>" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa yêu cầu của <%= item.ho_ten %>? Thao tác này sẽ xóa vĩnh viễn dữ liệu!');">
+                                                    <form action="/admin/yeu-cau/<%= item.loai_yeu_cau === 'lai_thu' ? 'lai-thu' : 'bao-gia' %>/<%= item.id %>/xoa?loai=<%= filter.loai %>&trang_thai=<%= filter.trang_thai %>&q=<%= encodeURIComponent(search) %>" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa yêu cầu của <%= item.ho_ten %>? Thao tác này sẽ xóa vĩnh viễn dữ liệu!');">
                                                         <button type="submit" class="danger-button">Xóa yêu cầu</button>
                                                     </form>
                                                 </div>
