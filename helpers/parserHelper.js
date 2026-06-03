@@ -22,7 +22,7 @@ function listImageFiles() {
     const imageDir = path.join(__dirname, '..', 'public', 'images');
     try {
         return fs.readdirSync(imageDir)
-            .filter((file) => /\.(jpg|jpeg|png|webp|gif)$/i.test(file))
+            .filter((file) => /\.(jpg|jpeg|png|webp|gif|mp4|webm|ogg|mov)$/i.test(file))
             .sort((a, b) => a.localeCompare(b));
     } catch (err) {
         console.log('Loi doc thu muc anh:', err);

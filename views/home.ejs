@@ -21,9 +21,14 @@
             <% displayPanels.forEach((panel, index) => { %>
                 <% const panelImage = panel.duong_dan_anh || 'no-car.jpg'; %>
                 <% const panelImageSrc = /^https?:\/\//i.test(panelImage) || panelImage.startsWith('/') ? panelImage : '/images/' + panelImage; %>
+                <% const isVideo = /\.(mp4|webm|ogg|mov)$/i.test(panelImage); %>
                 <article class="front-slide <%= index === 0 ? 'is-active' : '' %>" data-slide>
                     <div class="slide-media">
-                        <img src="<%= panelImageSrc %>" alt="Không gian trưng bày xe tại showroom">
+                        <% if (isVideo) { %>
+                            <video src="<%= panelImageSrc %>" autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+                        <% } else { %>
+                            <img src="<%= panelImageSrc %>" alt="Không gian trưng bày xe tại showroom">
+                        <% } %>
                         <div class="slide-overlay"></div>
                     </div>
                     
@@ -616,63 +621,6 @@
         </div>
     </section>
 
-    <!-- Customer Testimonials Section -->
-    <section class="home-testimonials-section" aria-label="Đánh giá từ khách hàng">
-        <div class="testimonials-heading">
-            <p>Trải nghiệm của khách hàng</p>
-            <h2>Khách hàng nói gì về Showroom Double Anh?</h2>
-            <span>Đóng góp và ý kiến thực tế của những chủ sở hữu xe tin tưởng lựa chọn dịch vụ của chúng tôi.</span>
-        </div>
-        <div class="testimonials-grid">
-            <div class="testimonial-card">
-                <div class="testimonial-rating">
-                    <% for(let i=0; i<5; i++) { %>
-                        <svg class="star-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                    <% } %>
-                </div>
-                <p class="testimonial-text">"Tôi rất hài lòng với chất lượng phục vụ tại showroom. Thủ tục mua chiếc Santa Fe trả góp diễn ra vô cùng chuyên nghiệp và nhanh chóng. Nhân viên hỗ trợ nhiệt tình từ khâu chọn xe đến đăng ký biển số."</p>
-                <div class="testimonial-user">
-                    <div class="user-avatar text-avatar">H</div>
-                    <div>
-                        <span class="user-name">Nguyễn Văn Hùng</span>
-                        <span class="user-info">Chủ xe Hyundai Santa Fe · <small class="verified-tag">✓ Đã mua xe</small></span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="testimonial-card">
-                <div class="testimonial-rating">
-                    <% for(let i=0; i<5; i++) { %>
-                        <svg class="star-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                    <% } %>
-                </div>
-                <p class="testimonial-text">"Đăng ký lái thử xe Creta tại nhà cực kỳ tiện lợi cho gia đình tôi. Xe được giao đúng giờ, sạch sẽ, bạn tư vấn kỹ thuật giải thích rất cặn kẽ và điềm đạm. Chắc chắn tôi sẽ giới thiệu bạn bè tới đây mua xe."</p>
-                <div class="testimonial-user">
-                    <div class="user-avatar text-avatar">M</div>
-                    <div>
-                        <span class="user-name">Trần Thị Mai</span>
-                        <span class="user-info">Chủ xe Hyundai Creta · <small class="verified-tag">✓ Đã mua xe</small></span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="testimonial-card">
-                <div class="testimonial-rating">
-                    <% for(let i=0; i<5; i++) { %>
-                        <svg class="star-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                    <% } %>
-                </div>
-                <p class="testimonial-text">"Chính sách bảo hành và cứu hộ 24/7 của showroom khiến tôi vô cùng an tâm khi lái xe đi tỉnh xa. Đợt xe tôi gặp sự cố điện nhẹ lúc nửa đêm đã được đội cứu hộ hỗ trợ xử lý ngay lập tức."</p>
-                <div class="testimonial-user">
-                    <div class="user-avatar text-avatar">N</div>
-                    <div>
-                        <span class="user-name">Lê Hoàng Nam</span>
-                        <span class="user-info">Chủ xe Hyundai Tucson · <small class="verified-tag">✓ Đã mua xe</small></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 </main>
 
 <%- include('partials/site-footer') %>

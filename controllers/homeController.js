@@ -4,7 +4,6 @@ const dbInit = require('../services/dbInit');
 const parser = require('../helpers/parserHelper');
 
 async function getDealers(onlyVisible = true, filters = {}) {
-    await dbInit.ensureDealerTable();
     const where = [];
     const params = [];
 
@@ -47,7 +46,6 @@ function getUniqueDealerValues(dealers, key) {
 }
 
 async function getNewsPosts(onlyVisible = true, searchQuery = '') {
-    await dbInit.ensureNewsTables();
     let whereClause = onlyVisible ? "WHERE tin_tuc.trang_thai = 'hien'" : "WHERE 1=1";
     const params = [];
     if (searchQuery) {
@@ -67,7 +65,6 @@ async function getNewsPosts(onlyVisible = true, searchQuery = '') {
 }
 
 async function getNewsPostBySlug(slug) {
-    await dbInit.ensureNewsTables();
     const [posts] = await dbp.query(`
         SELECT
             tin_tuc.*,
@@ -90,7 +87,6 @@ async function getNewsPostBySlug(slug) {
 }
 
 async function getPanels(onlyVisible = true) {
-    await dbInit.ensurePanelTable();
     const [panels] = await dbp.query(`
         SELECT *
         FROM panel_anh
@@ -331,14 +327,12 @@ exports.getCarDetail = async (req, res) => {
         const [specs] = await dbp.query('SELECT ten_thong_so, gia_tri FROM thong_so_ky_thuat WHERE xe_id = ? ORDER BY id ASC', [car.id]);
         const [colors] = await dbp.query('SELECT ten_mau, ma_mau, anh_mau, gia_them, anh_360 FROM mau_xe WHERE xe_id = ? ORDER BY id ASC', [car.id]);
         const [images] = await dbp.query('SELECT duong_dan_anh, nhom_anh, chu_thich FROM anh_xe WHERE xe_id = ? ORDER BY thu_tu ASC', [car.id]);
-        await dbInit.ensureCarDetailTables();
         const [rotateImages] = await dbp.query('SELECT duong_dan_anh, nhom_360 FROM anh_xe_360 WHERE xe_id = ? ORDER BY thu_tu ASC, id ASC', [car.id]);
         const [features] = await dbp.query('SELECT * FROM dac_diem_xe WHERE xe_id = ? ORDER BY thu_tu ASC, id ASC', [car.id]);
 
         // Load global 360 sets to resolve color's anh_360 ID -> actual image list
         let bo360SetsMap = {};
         try {
-            await dbInit.ensureBo360SetsTable();
             const [bo360Sets] = await dbp.query('SELECT id, ten_bo_anh, danh_sach_anh FROM bo_anh_360');
             bo360Sets.forEach(s => { bo360SetsMap[String(s.id)] = s; bo360SetsMap[s.ten_bo_anh] = s; });
         } catch (e) { /* table may not exist yet */ }
@@ -415,7 +409,6 @@ exports.postQuote = async (req, res) => {
     }
 
     try {
-        await dbInit.ensureCustomerRequestTables();
         await dbp.query(`
             INSERT INTO yeu_cau_bao_gia
                 (xe_id, ho_ten, email, so_dien_thoai, thanh_pho, noi_dung, dong_y_tiep_thi)
@@ -484,7 +477,6 @@ exports.postTestDrive = async (req, res) => {
     }
 
     try {
-        await dbInit.ensureCustomerRequestTables();
         await dbp.query(`
             INSERT INTO lich_lai_thu
                 (xe_id, ho_ten, email, so_dien_thoai, thanh_pho, dai_ly, ngay_muon_lai, gio_muon_lai, dong_y_tiep_thi)

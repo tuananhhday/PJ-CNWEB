@@ -1,9 +1,30 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const db = require('./config/database');
 const indexRouter = require('./routes/index');
 const adminRouter = require('./routes/admin');
+const dbInit = require('./services/dbInit');
+
+// Khởi tạo database một lần duy nhất khi khởi chạy server
+async function initDatabase() {
+    try {
+        console.log('🔄 Đang kiểm tra và đồng bộ cấu trúc database...');
+        await dbInit.ensureDealerTable();
+        await dbInit.ensureCar360Table();
+        await dbInit.ensureCarDetailTables();
+        await dbInit.ensureVehicleTypeOptions();
+        await dbInit.ensureCustomerRequestTables();
+        await dbInit.ensureNewsTables();
+        await dbInit.ensurePanelTable();
+        await dbInit.ensureBo360SetsTable();
+        console.log('✅ Khởi tạo và đồng bộ database thành công!');
+    } catch (err) {
+        console.error('❌ Lỗi khởi tạo database:', err);
+    }
+}
+initDatabase();
 
 const app = express();
 
@@ -27,9 +48,21 @@ app.use((req, res, next) => {
     next();
 });
 
-// Middleware lấy danh mục phân loại xe và xe có sẵn cho Mega Menu toàn cục
+// Middleware lấy danh mục phân loại xe và xe có sẵn cho Mega Menu toàn cục (sử dụng cache 1 phút)
 const dbp = db.promise();
+let cachedNavCarTypes = null;
+let cachedNavCars = null;
+let lastCacheFetch = 0;
+const CACHE_TTL = 60000; // Cache 60 giây
+
 app.use(async (req, res, next) => {
+    const now = Date.now();
+    if (cachedNavCarTypes && cachedNavCars && (now - lastCacheFetch < CACHE_TTL)) {
+        res.locals.navCarTypes = cachedNavCarTypes;
+        res.locals.navCars = cachedNavCars;
+        return next();
+    }
+
     try {
         const [cars] = await dbp.query(`
             SELECT 
@@ -56,12 +89,16 @@ app.use(async (req, res, next) => {
             navCarTypes[typeName].push(car);
         });
         
+        cachedNavCarTypes = navCarTypes;
+        cachedNavCars = cars;
+        lastCacheFetch = now;
+
         res.locals.navCarTypes = navCarTypes;
         res.locals.navCars = cars;
     } catch (err) {
         console.log('Loi lay du lieu menu dong xe:', err);
-        res.locals.navCarTypes = {};
-        res.locals.navCars = [];
+        res.locals.navCarTypes = cachedNavCarTypes || {};
+        res.locals.navCars = cachedNavCars || [];
     }
     next();
 });

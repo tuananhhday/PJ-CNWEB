@@ -10,7 +10,6 @@ exports.redirectToXe = (req, res) => {
 
 exports.getRequests = async (req, res) => {
     try {
-        await dbInit.ensureCustomerRequestTables();
         const filter = {
             loai: String(req.query.loai || 'tat_ca'),
             trang_thai: String(req.query.trang_thai || 'tat_ca')
@@ -34,33 +33,49 @@ exports.getRequests = async (req, res) => {
         if (filter.trang_thai !== 'tat_ca') driveParams.push(filter.trang_thai);
         if (search) driveParams.push(...searchParams);
 
-        const [quotes] = filter.loai === 'lai_thu' ? [[]] : await dbp.query(`
-            SELECT
-                request_table.*,
-                'bao_gia' AS loai_yeu_cau,
-                xe.ten_xe,
-                xe.duong_dan,
-                COALESCE(anh_xe.duong_dan_anh, 'no-car.jpg') AS anh_dai_dien
-            FROM yeu_cau_bao_gia request_table
-            LEFT JOIN xe ON request_table.xe_id = xe.id
-            LEFT JOIN anh_xe ON xe.id = anh_xe.xe_id AND anh_xe.la_anh_dai_dien = TRUE
-            WHERE 1 = 1 ${statusWhere} ${searchWhere}
-            ORDER BY request_table.ngay_tao DESC
-        `, quoteParams);
+        const [quotesResult, testDrivesResult, quoteStatsResult, driveStatsResult] = await Promise.all([
+            filter.loai === 'lai_thu' ? [[]] : dbp.query(`
+                SELECT
+                    request_table.*,
+                    'bao_gia' AS loai_yeu_cau,
+                    xe.ten_xe,
+                    xe.duong_dan,
+                    COALESCE(anh_xe.duong_dan_anh, 'no-car.jpg') AS anh_dai_dien
+                FROM yeu_cau_bao_gia request_table
+                LEFT JOIN xe ON request_table.xe_id = xe.id
+                LEFT JOIN anh_xe ON xe.id = anh_xe.xe_id AND anh_xe.la_anh_dai_dien = TRUE
+                WHERE 1 = 1 ${statusWhere} ${searchWhere}
+                ORDER BY request_table.ngay_tao DESC
+            `, quoteParams),
+            filter.loai === 'bao_gia' ? [[]] : dbp.query(`
+                SELECT
+                    request_table.*,
+                    'lai_thu' AS loai_yeu_cau,
+                    xe.ten_xe,
+                    xe.duong_dan,
+                    COALESCE(anh_xe.duong_dan_anh, 'no-car.jpg') AS anh_dai_dien
+                FROM lich_lai_thu request_table
+                LEFT JOIN xe ON request_table.xe_id = xe.id
+                LEFT JOIN anh_xe ON xe.id = anh_xe.xe_id AND anh_xe.la_anh_dai_dien = TRUE
+                WHERE 1 = 1 ${statusWhere} ${searchWhere}
+                ORDER BY request_table.ngay_tao DESC
+            `, driveParams),
+            dbp.query(`
+                SELECT trang_thai, COUNT(*) AS count
+                FROM yeu_cau_bao_gia
+                GROUP BY trang_thai
+            `),
+            dbp.query(`
+                SELECT trang_thai, COUNT(*) AS count
+                FROM lich_lai_thu
+                GROUP BY trang_thai
+            `)
+        ]);
 
-        const [testDrives] = filter.loai === 'bao_gia' ? [[]] : await dbp.query(`
-            SELECT
-                request_table.*,
-                'lai_thu' AS loai_yeu_cau,
-                xe.ten_xe,
-                xe.duong_dan,
-                COALESCE(anh_xe.duong_dan_anh, 'no-car.jpg') AS anh_dai_dien
-            FROM lich_lai_thu request_table
-            LEFT JOIN xe ON request_table.xe_id = xe.id
-            LEFT JOIN anh_xe ON xe.id = anh_xe.xe_id AND anh_xe.la_anh_dai_dien = TRUE
-            WHERE 1 = 1 ${statusWhere} ${searchWhere}
-            ORDER BY request_table.ngay_tao DESC
-        `, driveParams);
+        const quotes = filter.loai === 'lai_thu' ? [] : quotesResult[0];
+        const testDrives = filter.loai === 'bao_gia' ? [] : testDrivesResult[0];
+        const quoteStats = quoteStatsResult[0];
+        const driveStats = driveStatsResult[0];
 
         const sortRequestsForAdmin = (items) => {
             const activeStatuses = ['moi', 'dang_xu_ly'];
@@ -73,18 +88,6 @@ exports.getRequests = async (req, res) => {
         };
         const quoteRequests = sortRequestsForAdmin(quotes);
         const testDriveRequests = sortRequestsForAdmin(testDrives);
-
-        // Fetch absolute statistics for requests from database
-        const [quoteStats] = await dbp.query(`
-            SELECT trang_thai, COUNT(*) AS count
-            FROM yeu_cau_bao_gia
-            GROUP BY trang_thai
-        `);
-        const [driveStats] = await dbp.query(`
-            SELECT trang_thai, COUNT(*) AS count
-            FROM lich_lai_thu
-            GROUP BY trang_thai
-        `);
 
         const stats = {
             total: 0,
@@ -265,29 +268,35 @@ exports.deleteRequest = async (req, res) => {
 
 exports.getCars = async (req, res) => {
     try {
-        await dbInit.ensureCarDetailTables();
-        await dbInit.ensureVehicleTypeOptions();
-        const [cars] = await dbp.query(`
-            SELECT
-                xe.*,
-                dong_xe.ten_dong,
-                hang_xe.ten_hang,
-                loai_xe.ten_loai,
-                COALESCE(anh_xe.duong_dan_anh, 'no-car.jpg') AS anh_dai_dien
-            FROM xe
-            INNER JOIN dong_xe ON xe.dong_xe_id = dong_xe.id
-            INNER JOIN hang_xe ON dong_xe.hang_xe_id = hang_xe.id
-            INNER JOIN loai_xe ON dong_xe.loai_xe_id = loai_xe.id
-            LEFT JOIN anh_xe ON xe.id = anh_xe.xe_id AND anh_xe.la_anh_dai_dien = TRUE
-            ORDER BY xe.id DESC
-        `);
-        const [models] = await dbp.query(`
-            SELECT MIN(dong_xe.id) AS id, loai_xe.ten_loai
-            FROM dong_xe
-            INNER JOIN loai_xe ON dong_xe.loai_xe_id = loai_xe.id
-            GROUP BY loai_xe.ten_loai
-            ORDER BY FIELD(loai_xe.ten_loai, 'Sedan', 'SUV', 'Crossover', 'Hatchback', 'MPV', 'Pickup', 'Coupe', 'Convertible'), loai_xe.ten_loai ASC
-        `);
+        const [carsResult, modelsResult, bo360SetsResult] = await Promise.all([
+            dbp.query(`
+                SELECT
+                    xe.*,
+                    dong_xe.ten_dong,
+                    hang_xe.ten_hang,
+                    loai_xe.ten_loai,
+                    COALESCE(anh_xe.duong_dan_anh, 'no-car.jpg') AS anh_dai_dien
+                FROM xe
+                INNER JOIN dong_xe ON xe.dong_xe_id = dong_xe.id
+                INNER JOIN hang_xe ON dong_xe.hang_xe_id = hang_xe.id
+                INNER JOIN loai_xe ON dong_xe.loai_xe_id = loai_xe.id
+                LEFT JOIN anh_xe ON xe.id = anh_xe.xe_id AND anh_xe.la_anh_dai_dien = TRUE
+                ORDER BY xe.id DESC
+            `),
+            dbp.query(`
+                SELECT MIN(dong_xe.id) AS id, loai_xe.ten_loai
+                FROM dong_xe
+                INNER JOIN loai_xe ON dong_xe.loai_xe_id = loai_xe.id
+                GROUP BY loai_xe.ten_loai
+                ORDER BY FIELD(loai_xe.ten_loai, 'Sedan', 'SUV', 'Crossover', 'Hatchback', 'MPV', 'Pickup', 'Coupe', 'Convertible'), loai_xe.ten_loai ASC
+            `),
+            dbp.query('SELECT id, ten_bo_anh, danh_sach_anh FROM bo_anh_360 ORDER BY ten_bo_anh ASC')
+        ]);
+
+        const cars = carsResult[0];
+        const models = modelsResult[0];
+        const bo360Sets = bo360SetsResult[0];
+
         const carIds = cars.map((car) => car.id);
         let specsByCar = {};
         let colorsByCar = {};
@@ -296,11 +305,19 @@ exports.getCars = async (req, res) => {
         let rotateImagesByCar = {};
 
         if (carIds.length) {
-            const [specRows] = await dbp.query('SELECT * FROM thong_so_ky_thuat WHERE xe_id IN (?) ORDER BY id ASC', [carIds]);
-            const [colorRows] = await dbp.query('SELECT * FROM mau_xe WHERE xe_id IN (?) ORDER BY id ASC', [carIds]);
-            const [featureRows] = await dbp.query('SELECT * FROM dac_diem_xe WHERE xe_id IN (?) ORDER BY thu_tu ASC, id ASC', [carIds]);
-            const [imageRows] = await dbp.query('SELECT * FROM anh_xe WHERE xe_id IN (?) ORDER BY thu_tu ASC, id ASC', [carIds]);
-            const [rotateImageRows] = await dbp.query('SELECT * FROM anh_xe_360 WHERE xe_id IN (?) ORDER BY thu_tu ASC, id ASC', [carIds]);
+            const [specRes, colorRes, featureRes, imageRes, rotateImageRes] = await Promise.all([
+                dbp.query('SELECT * FROM thong_so_ky_thuat WHERE xe_id IN (?) ORDER BY id ASC', [carIds]),
+                dbp.query('SELECT * FROM mau_xe WHERE xe_id IN (?) ORDER BY id ASC', [carIds]),
+                dbp.query('SELECT * FROM dac_diem_xe WHERE xe_id IN (?) ORDER BY thu_tu ASC, id ASC', [carIds]),
+                dbp.query('SELECT * FROM anh_xe WHERE xe_id IN (?) ORDER BY thu_tu ASC, id ASC', [carIds]),
+                dbp.query('SELECT * FROM anh_xe_360 WHERE xe_id IN (?) ORDER BY thu_tu ASC, id ASC', [carIds])
+            ]);
+
+            const specRows = specRes[0];
+            const colorRows = colorRes[0];
+            const featureRows = featureRes[0];
+            const imageRows = imageRes[0];
+            const rotateImageRows = rotateImageRes[0];
 
             specsByCar = specRows.reduce((map, item) => {
                 map[item.xe_id] = map[item.xe_id] || [];
@@ -328,9 +345,6 @@ exports.getCars = async (req, res) => {
                 return map;
             }, {});
         }
-
-        await dbInit.ensureBo360SetsTable();
-        const [bo360Sets] = await dbp.query('SELECT id, ten_bo_anh, danh_sach_anh FROM bo_anh_360 ORDER BY ten_bo_anh ASC');
 
         res.render('admin/cars', {
             title: 'Quan ly xe',
@@ -375,15 +389,15 @@ exports.getPanels = async (req, res) => {
 };
 
 exports.addPanel = async (req, res) => {
-    if ((req.headers['content-type'] || '').includes('multipart/form-data')) {
-        req.body = await parser.parseMultipartForm(req);
-    }
-
-    let { duong_dan_anh, duong_dan_anh_text, thu_tu, trang_thai } = req.body;
-    duong_dan_anh = duong_dan_anh || duong_dan_anh_text;
-    if (!duong_dan_anh) return res.redirect('/admin/panel?error=Vui long chon hoac nhap anh panel');
-
     try {
+        if ((req.headers['content-type'] || '').includes('multipart/form-data')) {
+            req.body = await parser.parseMultipartForm(req);
+        }
+
+        let { duong_dan_anh, duong_dan_anh_text, thu_tu, trang_thai } = req.body;
+        duong_dan_anh = duong_dan_anh || duong_dan_anh_text;
+        if (!duong_dan_anh) return res.redirect('/admin/panel?error=Vui long chon hoac nhap anh panel');
+
         await dbInit.ensurePanelTable();
         await dbp.query(`
             INSERT INTO panel_anh (duong_dan_anh, thu_tu, trang_thai)
@@ -398,13 +412,13 @@ exports.addPanel = async (req, res) => {
 };
 
 exports.editPanel = async (req, res) => {
-    if ((req.headers['content-type'] || '').includes('multipart/form-data')) {
-        req.body = await parser.parseMultipartForm(req);
-    }
-
-    let { duong_dan_anh, duong_dan_anh_text, current_image, thu_tu, trang_thai } = req.body;
-    duong_dan_anh = duong_dan_anh || duong_dan_anh_text || current_image;
     try {
+        if ((req.headers['content-type'] || '').includes('multipart/form-data')) {
+            req.body = await parser.parseMultipartForm(req);
+        }
+
+        let { duong_dan_anh, duong_dan_anh_text, current_image, thu_tu, trang_thai } = req.body;
+        duong_dan_anh = duong_dan_anh || duong_dan_anh_text || current_image;
         await dbInit.ensurePanelTable();
         await dbp.query(`
             UPDATE panel_anh
@@ -589,16 +603,16 @@ exports.getNews = async (req, res) => {
 };
 
 exports.addNews = async (req, res) => {
-    if ((req.headers['content-type'] || '').includes('multipart/form-data')) {
-        req.body = await parser.parseMultipartForm(req);
-    }
-
-    const { tieu_de, duong_dan, noi_dung, anh_dai_dien, tac_gia, trang_thai, mau_nen } = req.body;
-    if (!tieu_de || !noi_dung) {
-        return parser.redirectWithMessage(res, '/admin/tin-tuc', 'error', 'Vui lòng nhập tiêu đề và nội dung bài viết.');
-    }
-
     try {
+        if ((req.headers['content-type'] || '').includes('multipart/form-data')) {
+            req.body = await parser.parseMultipartForm(req);
+        }
+
+        const { tieu_de, duong_dan, noi_dung, anh_dai_dien, tac_gia, trang_thai, mau_nen } = req.body;
+        if (!tieu_de || !noi_dung) {
+            return parser.redirectWithMessage(res, '/admin/tin-tuc', 'error', 'Vui lòng nhập tiêu đề và nội dung bài viết.');
+        }
+
         await dbInit.ensureNewsTables();
         const slug = await parser.getUniqueSlug('tin_tuc', duong_dan || tieu_de);
         await dbp.query(`
@@ -625,16 +639,16 @@ exports.addNews = async (req, res) => {
 };
 
 exports.editNews = async (req, res) => {
-    if ((req.headers['content-type'] || '').includes('multipart/form-data')) {
-        req.body = await parser.parseMultipartForm(req);
-    }
-
-    const { tieu_de, duong_dan, noi_dung, anh_dai_dien, current_image, tac_gia, trang_thai, mau_nen } = req.body;
-    if (!tieu_de || !noi_dung) {
-        return parser.redirectWithMessage(res, '/admin/tin-tuc', 'error', 'Vui lòng nhập đủ tiêu đề và nội dung khi sửa bài viết.');
-    }
-
     try {
+        if ((req.headers['content-type'] || '').includes('multipart/form-data')) {
+            req.body = await parser.parseMultipartForm(req);
+        }
+
+        const { tieu_de, duong_dan, noi_dung, anh_dai_dien, current_image, tac_gia, trang_thai, mau_nen } = req.body;
+        if (!tieu_de || !noi_dung) {
+            return parser.redirectWithMessage(res, '/admin/tin-tuc', 'error', 'Vui lòng nhập đủ tiêu đề và nội dung khi sửa bài viết.');
+        }
+
         await dbInit.ensureNewsTables();
         const slug = await parser.getUniqueSlug('tin_tuc', duong_dan || tieu_de, req.params.id);
         await dbp.query(`
@@ -688,51 +702,51 @@ exports.hideComment = async (req, res) => {
 };
 
 exports.addCar = async (req, res) => {
-    if ((req.headers['content-type'] || '').includes('multipart/form-data')) {
-        req.body = await parser.parseMultipartForm(req);
-    }
-
-    let {
-        dong_xe_id,
-        ten_xe,
-        duong_dan,
-        phien_ban,
-        nam_san_xuat,
-        gia_ban,
-        gia_niem_yet,
-        slogan,
-        mo_ta_ngan,
-        mo_ta_chi_tiet,
-        ebook_url,
-        brochure_url,
-        dong_co,
-        hop_so,
-        nhien_lieu,
-        so_cho_ngoi,
-        xuat_xu,
-        bao_hanh,
-        so_luong_ton,
-        anh_dai_dien,
-        anh_ngoai_that,
-        anh_noi_that,
-        danh_sach_anh,
-        anh_360,
-        danh_sach_mau,
-        thong_so
-    } = req.body;
-
-    // Build combined thong_so from section fields
-    const thong_so_combined = parser.buildSpecsFromSections(req.body) || thong_so;
-
-    if (!dong_xe_id || !ten_xe || !gia_ban) {
-        return res.redirect('/admin/xe?error=Vui long nhap dong xe, ten xe va gia ban');
-    }
-
-    const baseSlugSource = duong_dan || (phien_ban ? `${ten_xe}-${phien_ban}` : ten_xe);
-    const slug = await parser.getUniqueSlug('xe', baseSlugSource);
-
     let conn = null;
     try {
+        if ((req.headers['content-type'] || '').includes('multipart/form-data')) {
+            req.body = await parser.parseMultipartForm(req);
+        }
+
+        let {
+            dong_xe_id,
+            ten_xe,
+            duong_dan,
+            phien_ban,
+            nam_san_xuat,
+            gia_ban,
+            gia_niem_yet,
+            slogan,
+            mo_ta_ngan,
+            mo_ta_chi_tiet,
+            ebook_url,
+            brochure_url,
+            dong_co,
+            hop_so,
+            nhien_lieu,
+            so_cho_ngoi,
+            xuat_xu,
+            bao_hanh,
+            so_luong_ton,
+            anh_dai_dien,
+            anh_ngoai_that,
+            anh_noi_that,
+            danh_sach_anh,
+            anh_360,
+            danh_sach_mau,
+            thong_so
+        } = req.body;
+
+        // Build combined thong_so from section fields
+        const thong_so_combined = parser.buildSpecsFromSections(req.body) || thong_so;
+
+        if (!dong_xe_id || !ten_xe || !gia_ban) {
+            return res.redirect('/admin/xe?error=Vui long nhap dong xe, ten xe va gia ban');
+        }
+
+        const baseSlugSource = duong_dan || (phien_ban ? `${ten_xe}-${phien_ban}` : ten_xe);
+        const slug = await parser.getUniqueSlug('xe', baseSlugSource);
+
         await dbInit.ensureCarDetailTables();
         conn = await dbp.getConnection();
         await conn.beginTransaction();
@@ -844,56 +858,56 @@ exports.addCar = async (req, res) => {
 };
 
 exports.editCar = async (req, res) => {
-    if ((req.headers['content-type'] || '').includes('multipart/form-data')) {
-        req.body = await parser.parseMultipartForm(req);
-    }
-
-    let {
-        dong_xe_id,
-        ten_xe,
-        duong_dan,
-        phien_ban,
-        nam_san_xuat,
-        gia_ban,
-        gia_niem_yet,
-        slogan,
-        mo_ta_ngan,
-        mo_ta_chi_tiet,
-        ebook_url,
-        brochure_url,
-        dong_co,
-        hop_so,
-        nhien_lieu,
-        so_cho_ngoi,
-        xuat_xu,
-        bao_hanh,
-        so_luong_ton,
-        trang_thai,
-        anh_dai_dien,
-        anh_ngoai_that,
-        anh_noi_that,
-        danh_sach_anh,
-        current_image,
-        anh_360,
-        danh_sach_mau,
-        thong_so,
-        dac_diem,
-        replace_lists,
-        replace_images
-    } = req.body;
-
-    // Build combined thong_so from section fields
-    const thong_so_combined = parser.buildSpecsFromSections(req.body) || thong_so;
-
-    if (!dong_xe_id || !ten_xe || !gia_ban) {
-        return res.redirect('/admin/xe?error=Vui long nhap du thong tin bat buoc khi sua xe');
-    }
-
-    const baseSlugSource = duong_dan || (phien_ban ? `${ten_xe}-${phien_ban}` : ten_xe);
-    const slug = await parser.getUniqueSlug('xe', baseSlugSource, req.params.id);
-
     let conn = null;
     try {
+        if ((req.headers['content-type'] || '').includes('multipart/form-data')) {
+            req.body = await parser.parseMultipartForm(req);
+        }
+
+        let {
+            dong_xe_id,
+            ten_xe,
+            duong_dan,
+            phien_ban,
+            nam_san_xuat,
+            gia_ban,
+            gia_niem_yet,
+            slogan,
+            mo_ta_ngan,
+            mo_ta_chi_tiet,
+            ebook_url,
+            brochure_url,
+            dong_co,
+            hop_so,
+            nhien_lieu,
+            so_cho_ngoi,
+            xuat_xu,
+            bao_hanh,
+            so_luong_ton,
+            trang_thai,
+            anh_dai_dien,
+            anh_ngoai_that,
+            anh_noi_that,
+            danh_sach_anh,
+            current_image,
+            anh_360,
+            danh_sach_mau,
+            thong_so,
+            dac_diem,
+            replace_lists,
+            replace_images
+        } = req.body;
+
+        // Build combined thong_so from section fields
+        const thong_so_combined = parser.buildSpecsFromSections(req.body) || thong_so;
+
+        if (!dong_xe_id || !ten_xe || !gia_ban) {
+            return res.redirect('/admin/xe?error=Vui long nhap du thong tin bat buoc khi sua xe');
+        }
+
+        const baseSlugSource = duong_dan || (phien_ban ? `${ten_xe}-${phien_ban}` : ten_xe);
+        const slug = await parser.getUniqueSlug('xe', baseSlugSource, req.params.id);
+
         await dbInit.ensureCarDetailTables();
         conn = await dbp.getConnection();
         await conn.beginTransaction();
@@ -1104,7 +1118,6 @@ exports.deleteCar = async (req, res) => {
 
 exports.getAnh360 = async (req, res) => {
     try {
-        await dbInit.ensureBo360SetsTable();
         const [sets] = await dbp.query('SELECT * FROM bo_anh_360 ORDER BY ngay_cap_nhat DESC');
         const imageFiles = parser.listImageFiles();
         res.render('admin/anh360', {
@@ -1121,14 +1134,14 @@ exports.getAnh360 = async (req, res) => {
 };
 
 exports.addAnh360Set = async (req, res) => {
-    if ((req.headers['content-type'] || '').includes('multipart/form-data')) {
-        req.body = await parser.parseMultipartForm(req);
-    }
-    const { ten_bo_anh, danh_sach_anh } = req.body;
-    if (!ten_bo_anh || !ten_bo_anh.trim()) {
-        return parser.redirectWithMessage(res, '/admin/anh-360', 'error', 'Vui long nhap ten bo anh.');
-    }
     try {
+        if ((req.headers['content-type'] || '').includes('multipart/form-data')) {
+            req.body = await parser.parseMultipartForm(req);
+        }
+        const { ten_bo_anh, danh_sach_anh } = req.body;
+        if (!ten_bo_anh || !ten_bo_anh.trim()) {
+            return parser.redirectWithMessage(res, '/admin/anh-360', 'error', 'Vui long nhap ten bo anh.');
+        }
         await dbInit.ensureBo360SetsTable();
         await dbp.query(
             'INSERT INTO bo_anh_360 (ten_bo_anh, danh_sach_anh) VALUES (?, ?)',
@@ -1143,14 +1156,14 @@ exports.addAnh360Set = async (req, res) => {
 };
 
 exports.editAnh360Set = async (req, res) => {
-    if ((req.headers['content-type'] || '').includes('multipart/form-data')) {
-        req.body = await parser.parseMultipartForm(req);
-    }
-    const { ten_bo_anh, danh_sach_anh } = req.body;
-    if (!ten_bo_anh || !ten_bo_anh.trim()) {
-        return parser.redirectWithMessage(res, '/admin/anh-360', 'error', 'Vui long nhap ten bo anh.');
-    }
     try {
+        if ((req.headers['content-type'] || '').includes('multipart/form-data')) {
+            req.body = await parser.parseMultipartForm(req);
+        }
+        const { ten_bo_anh, danh_sach_anh } = req.body;
+        if (!ten_bo_anh || !ten_bo_anh.trim()) {
+            return parser.redirectWithMessage(res, '/admin/anh-360', 'error', 'Vui long nhap ten bo anh.');
+        }
         await dbInit.ensureBo360SetsTable();
         await dbp.query(
             'UPDATE bo_anh_360 SET ten_bo_anh = ?, danh_sach_anh = ? WHERE id = ?',
@@ -1178,7 +1191,6 @@ exports.deleteAnh360Set = async (req, res) => {
 
 exports.getAnh360ApiAll = async (req, res) => {
     try {
-        await dbInit.ensureBo360SetsTable();
         const [sets] = await dbp.query('SELECT id, ten_bo_anh, danh_sach_anh FROM bo_anh_360 ORDER BY ten_bo_anh ASC');
         res.json(sets);
     } catch (err) {

@@ -3,12 +3,465 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title || 'Admin' %></title>
+    <title><%= title || 'Quản lý Panel' %></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/stylesheets/base.css">
     <link rel="stylesheet" href="/stylesheets/admin.css">
+    <style>
+        /* Scoped styles for panels page */
+        .panels-dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .premium-form-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 28px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 40px;
+        }
+
+        .premium-form-card h2 {
+            font-size: 18px;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .modern-form-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 32px;
+        }
+
+        @media (max-width: 768px) {
+            .modern-form-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+        }
+
+        .form-group-left {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-group-right {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* Upload zone styling */
+        .upload-zone {
+            border: 2px dashed #cbd5e1;
+            border-radius: var(--radius-sm);
+            padding: 24px;
+            text-align: center;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 180px;
+            position: relative;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--primary);
+            background: rgba(2, 132, 199, 0.02);
+        }
+
+        .upload-zone.has-preview {
+            border-style: solid;
+        }
+
+        .upload-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .upload-text {
+            font-size: 13.5px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .file-input-hidden {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-preview-img {
+            max-width: 100%;
+            max-height: 160px;
+            object-fit: contain;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-sm);
+            margin-top: 8px;
+            z-index: 10;
+        }
+
+        .upload-preview-img.hidden {
+            display: none;
+        }
+
+        /* Modern Labels and inputs */
+        .modern-label {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .modern-label input, 
+        .modern-label select {
+            min-height: 42px;
+            border: 1px solid #cbd5e1;
+            border-radius: var(--radius-sm);
+            padding: 0 14px;
+            font-size: 14px;
+            outline: none;
+            background: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .modern-label input:focus, 
+        .modern-label select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-glow);
+        }
+
+        .modern-label small {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-top: 2px;
+            line-height: 1.4;
+        }
+
+        .btn-primary-modern {
+            background: var(--primary);
+            color: #ffffff;
+            border: 0;
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            align-self: flex-start;
+            box-shadow: 0 4px 6px rgba(2, 132, 199, 0.15);
+            margin-top: 8px;
+        }
+
+        .btn-primary-modern:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 12px rgba(2, 132, 199, 0.25);
+        }
+
+        /* Gallery Section Layout */
+        .gallery-section-title {
+            font-family: var(--font-title);
+            font-size: 18px;
+            font-weight: 700;
+            margin: 32px 0 20px;
+            color: var(--text-dark);
+            border-left: 4px solid var(--primary);
+            padding-left: 10px;
+        }
+
+        .panel-gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 28px;
+        }
+
+        /* Premium Gallery Card */
+        .panel-gallery-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            aspect-ratio: 16 / 9;
+        }
+
+        .panel-gallery-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+
+        .panel-card-image-wrap {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel-card-image-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.5s ease;
+        }
+
+        .panel-gallery-card:hover .panel-card-image-wrap img {
+            transform: scale(1.04);
+        }
+
+        /* Overlay & Badges */
+        .panel-card-badges {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            display: flex;
+            gap: 8px;
+            z-index: 20;
+        }
+
+        .badge-order {
+            background: rgba(15, 23, 42, 0.85);
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            backdrop-filter: blur(4px);
+        }
+
+        .badge-status {
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            backdrop-filter: blur(4px);
+            color: #ffffff;
+        }
+
+        .badge-status.hien {
+            background: rgba(22, 163, 74, 0.85);
+        }
+
+        .badge-status.an {
+            background: rgba(100, 116, 139, 0.85);
+        }
+
+        /* Hover Action Controls overlay */
+        .panel-card-hover-actions {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 30;
+            backdrop-filter: blur(2px);
+        }
+
+        .panel-gallery-card:hover .panel-card-hover-actions {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .btn-edit, .btn-delete {
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 0;
+            transition: all 0.2s ease;
+        }
+
+        .btn-edit {
+            background: #ffffff;
+            color: var(--text-dark);
+        }
+
+        .btn-edit:hover {
+            background: var(--primary);
+            color: #ffffff;
+            transform: scale(1.05);
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+
+        /* Premium Glassmorphic Modal */
+        .admin-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+        }
+
+        .admin-modal.is-active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .admin-modal-content {
+            background: #ffffff;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-premium);
+            width: 90%;
+            max-width: 650px;
+            padding: 32px;
+            position: relative;
+            transform: scale(0.9);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .admin-modal.is-active .admin-modal-content {
+            transform: scale(1);
+        }
+
+        .close-modal-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+            line-height: 1;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .close-modal-btn:hover {
+            background: #f1f5f9;
+            color: var(--text-dark);
+        }
+
+        .admin-modal-content h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        .modal-form-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 600px) {
+            .modal-form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .image-preview-container {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            background: #f8fafc;
+        }
+
+        .image-preview-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .fields-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 18px;
+        }
+
+        .btn-save {
+            background: var(--primary);
+            color: #ffffff;
+            border: 0;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-save:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-cancel {
+            background: #f1f5f9;
+            color: var(--text-dark);
+            border: 0;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-cancel:hover {
+            background: #e2e8f0;
+        }
+    </style>
 </head>
 <body>
 <main class="admin-page">
@@ -25,84 +478,274 @@
     <section class="admin-content">
         <div class="admin-heading">
             <div>
-                <p>Admin</p>
-                <h1>Quản lý nội dung</h1>
+                <p>Admin Console</p>
+                <h1>Quản lý Panel ảnh trang chủ</h1>
             </div>
-            <a href="/trang-chu">Mở trang chủ</a>
+            <a href="/trang-chu" class="btn-secondary-cta" style="border:1px solid var(--border-color); color:var(--text-dark); border-radius:6px; padding: 8px 16px; font-size:13px;">Quay lại trang chủ</a>
         </div>
 
-        <% if (success) { %>
-            <div class="admin-alert success"><%= success %></div>
-        <% } %>
-        <% if (error) { %>
-            <div class="admin-alert error"><%= error %></div>
-        <% } %>
+        <div class="panels-dashboard-container">
+            <% if (success) { %>
+                <div class="admin-alert success"><%= success %></div>
+            <% } %>
+            <% if (error) { %>
+                <div class="admin-alert error"><%= error %></div>
+            <% } %>
 
-        <div class="admin-table-wrap">
-            <h2>Quản lý panel ảnh trang chủ</h2>
-            <form class="admin-form panel-admin-form" action="/admin/panel/them" method="post" enctype="multipart/form-data">
-                <div class="admin-form-grid">
-                    <label>
-                        Ảnh panel
-                        <input name="duong_dan_anh" type="file" accept="image/*">
-                        <small>Chọn ảnh từ máy, không cần nhập đường dẫn.</small>
-                    </label>
-                    <label>
-                        Đường dẫn ảnh
-                        <input name="duong_dan_anh_text" placeholder="ten-anh.jpg hoặc /images/ten-anh.jpg">
-                        <small>Admin có thể nhập đường dẫn thay cho upload file.</small>
-                    </label>
-                    <label>
-                        Thứ tự
-                        <input name="thu_tu" type="number" value="0">
-                    </label>
-                    <label>
-                        Trạng thái
-                        <select name="trang_thai">
-                            <option value="hien">Hiện</option>
-                            <option value="an">Ẩn</option>
-                        </select>
-                    </label>
-                </div>
-                <button type="submit">Thêm panel</button>
-            </form>
+            <!-- Add Panel Form Card -->
+            <div class="premium-form-card">
+                <h2>Thêm ảnh panel mới</h2>
+                <form class="panel-admin-form" action="/admin/panel/them" method="post" enctype="multipart/form-data">
+                    <div class="modern-form-grid">
+                        <div class="form-group-left">
+                            <div class="upload-zone" id="upload-zone-add">
+                                <div class="upload-icon">📁</div>
+                                <p class="upload-text">Kéo thả File (Ảnh/Video) hoặc Click để tải lên</p>
+                                <input name="duong_dan_anh" type="file" accept="image/*,video/*" class="file-input-hidden" id="file-input-add">
+                                <img id="preview-img-add" class="upload-preview-img hidden" src="" alt="Preview" style="max-height: 160px; object-fit: contain;">
+                                <video id="preview-video-add" class="upload-preview-img hidden" src="" controls muted style="max-height: 160px; object-fit: contain; width: 100%;"></video>
+                            </div>
+                        </div>
 
+                        <div class="form-group-right">
+                            <label class="modern-label">
+                                Đường dẫn ảnh (Text)
+                                <input name="duong_dan_anh_text" placeholder="Ví dụ: panel-xyz.jpg">
+                                <small>Nhập tên file nếu đã có sẵn trong /images hoặc muốn chỉ định tên khác.</small>
+                            </label>
+
+                            <label class="modern-label">
+                                Thứ tự hiển thị
+                                <input name="thu_tu" type="number" value="0" min="0">
+                                <small>Số nhỏ hơn sẽ ưu tiên xếp trước trên slider.</small>
+                            </label>
+
+                            <label class="modern-label">
+                                Trạng thái hoạt động
+                                <select name="trang_thai">
+                                    <option value="hien">Hiển thị (Hiện)</option>
+                                    <option value="an">Tạm ẩn (Ẩn)</option>
+                                </select>
+                            </label>
+
+                            <button type="submit" class="btn-primary-modern">Thêm panel mới</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Existing Panels Grid Section -->
+            <h2 class="gallery-section-title">Danh sách ảnh panel hiện tại</h2>
+            
             <% if (panels && panels.length) { %>
-                <div class="panel-admin-list">
+                <div class="panel-gallery-grid">
                     <% panels.forEach((panel) => { %>
-                        <article class="panel-admin-item">
-                            <% const adminPanelImage = panel.duong_dan_anh || 'no-car.jpg'; %>
-                            <% const adminPanelImageSrc = /^https?:\/\//i.test(adminPanelImage) || adminPanelImage.startsWith('/') ? adminPanelImage : '/images/' + adminPanelImage; %>
-                            <img src="<%= adminPanelImageSrc %>" alt="Panel">
-                            <form action="/admin/panel/<%= panel.id %>/sua" method="post" enctype="multipart/form-data">
-                                <input type="hidden" name="current_image" value="<%= panel.duong_dan_anh %>">
-                                <div class="admin-form-grid">
-                                    <label>Đổi ảnh<input name="duong_dan_anh" type="file" accept="image/*"><small>Bỏ trống nếu muốn giữ ảnh hiện tại.</small></label>
-                                    <label>Đường dẫn ảnh<input name="duong_dan_anh_text" value="<%= panel.duong_dan_anh || '' %>"><small>Nhập tên file hoặc đường dẫn ảnh mới.</small></label>
-                                    <label>Thứ tự<input name="thu_tu" type="number" value="<%= panel.thu_tu || 0 %>"></label>
-                                    <label>
-                                        Trạng thái
-                                        <select name="trang_thai">
-                                            <option value="hien" <%= panel.trang_thai === 'hien' ? 'selected' : '' %>>Hiện</option>
-                                            <option value="an" <%= panel.trang_thai === 'an' ? 'selected' : '' %>>Ẩn</option>
-                                        </select>
-                                    </label>
+                        <% const adminPanelImage = panel.duong_dan_anh || 'no-car.jpg'; %>
+                        <% const adminPanelImageSrc = /^https?:\/\//i.test(adminPanelImage) || adminPanelImage.startsWith('/') ? adminPanelImage : '/images/' + adminPanelImage; %>
+                        <% const isVideo = /\.(mp4|webm|ogg|mov)$/i.test(adminPanelImage); %>
+                        
+                        <div class="panel-gallery-card">
+                            <div class="panel-card-image-wrap">
+                                <% if (isVideo) { %>
+                                    <video src="<%= adminPanelImageSrc %>" muted playsinline loop autoplay style="width: 100%; height: 100%; object-fit: cover;"></video>
+                                <% } else { %>
+                                    <img src="<%= adminPanelImageSrc %>" alt="Panel">
+                                <% } %>
+                                
+                                <div class="panel-card-badges">
+                                    <span class="badge-order">Vị trí: #<%= panel.thu_tu || 0 %></span>
+                                    <span class="badge-status <%= panel.trang_thai %>">
+                                        <%= panel.trang_thai === 'hien' ? 'Đang hiện' : 'Đang ẩn' %>
+                                    </span>
                                 </div>
-                                <div class="panel-admin-actions">
-                                    <button type="submit">Sửa panel</button>
+                                
+                                <div class="panel-card-hover-actions">
+                                    <button type="button" class="btn-edit" 
+                                            data-id="<%= panel.id %>"
+                                            data-image-src="<%= adminPanelImageSrc %>"
+                                            data-image-val="<%= panel.duong_dan_anh %>"
+                                            data-order="<%= panel.thu_tu || 0 %>"
+                                            data-status="<%= panel.trang_thai %>">
+                                        Sửa
+                                    </button>
+                                    <form action="/admin/panel/<%= panel.id %>/xoa" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa ảnh panel này không?');">
+                                        <button type="submit" class="btn-delete">Xóa</button>
+                                    </form>
                                 </div>
-                            </form>
-                            <form action="/admin/panel/<%= panel.id %>/xoa" method="post">
-                                <button class="danger-button" type="submit">Xóa panel</button>
-                            </form>
-                        </article>
+                            </div>
+                        </div>
                     <% }) %>
                 </div>
             <% } else { %>
-                <p class="empty-state">Chưa có panel nào. Hãy thêm ảnh panel ở form phía trên.</p>
+                <div class="premium-form-card" style="text-align: center; padding: 48px 24px;">
+                    <p style="color: var(--text-muted); font-size: 14px; margin: 0;">Chưa có ảnh panel nào được thêm. Hãy sử dụng form phía trên để bắt đầu thêm ảnh.</p>
+                </div>
             <% } %>
         </div>
     </section>
 </main>
+
+<!-- Edit Panel Glassmorphic Modal -->
+<div id="edit-panel-modal" class="admin-modal">
+    <div class="admin-modal-content">
+        <span class="close-modal-btn">&times;</span>
+        <h2>Chỉnh sửa ảnh Panel</h2>
+        <form id="edit-panel-form" action="" method="post" enctype="multipart/form-data">
+            <input type="hidden" id="edit-current-image" name="current_image" value="">
+            
+            <div class="modal-form-grid">
+                <div class="image-preview-container" style="position: relative;">
+                    <img id="edit-preview-img" src="/images/no-car.jpg" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">
+                    <video id="edit-preview-video" src="" muted controls class="hidden" style="width: 100%; height: 100%; object-fit: cover;"></video>
+                </div>
+                
+                <div class="fields-container">
+                    <label class="modern-label">
+                        Đổi File mới từ máy (Ảnh/Video)
+                        <input name="duong_dan_anh" type="file" accept="image/*,video/*" id="edit-file-input">
+                        <small>Bỏ trống nếu muốn giữ nguyên file hiện tại.</small>
+                    </label>
+
+                    <label class="modern-label">
+                        Đường dẫn ảnh (Text)
+                        <input name="duong_dan_anh_text" id="edit-url-input">
+                        <small>Nhập tên file mới hoặc để trống.</small>
+                    </label>
+
+                    <label class="modern-label">
+                        Thứ tự hiển thị
+                        <input name="thu_tu" type="number" id="edit-order-input" min="0">
+                    </label>
+
+                    <label class="modern-label">
+                        Trạng thái hoạt động
+                        <select name="trang_thai" id="edit-status-select">
+                            <option value="hien">Hiển thị (Hiện)</option>
+                            <option value="an">Tạm ẩn (Ẩn)</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button type="submit" class="btn-save">Lưu thay đổi</button>
+                <button type="button" class="btn-cancel close-modal-btn">Hủy bỏ</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Preview logic for "Add panel"
+        const fileInputAdd = document.getElementById('file-input-add');
+        const previewImgAdd = document.getElementById('preview-img-add');
+        const previewVideoAdd = document.getElementById('preview-video-add');
+        const uploadZoneAdd = document.getElementById('upload-zone-add');
+        
+        fileInputAdd.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const isVideoFile = file.type.startsWith('video/');
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    if (isVideoFile) {
+                        previewImgAdd.classList.add('hidden');
+                        previewVideoAdd.src = event.target.result;
+                        previewVideoAdd.classList.remove('hidden');
+                    } else {
+                        previewVideoAdd.classList.add('hidden');
+                        previewImgAdd.src = event.target.result;
+                        previewImgAdd.classList.remove('hidden');
+                    }
+                    uploadZoneAdd.classList.add('has-preview');
+                    
+                    // Hide icon and text inside upload zone when preview is active
+                    const textEl = uploadZoneAdd.querySelector('.upload-text');
+                    const iconEl = uploadZoneAdd.querySelector('.upload-icon');
+                    if (textEl) textEl.style.display = 'none';
+                    if (iconEl) iconEl.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Edit Modal controls
+        const modal = document.getElementById('edit-panel-modal');
+        const editForm = document.getElementById('edit-panel-form');
+        const editPreviewImg = document.getElementById('edit-preview-img');
+        const editPreviewVideo = document.getElementById('edit-preview-video');
+        const editCurrentImg = document.getElementById('edit-current-image');
+        const editUrlInput = document.getElementById('edit-url-input');
+        const editOrderInput = document.getElementById('edit-order-input');
+        const editStatusSelect = document.getElementById('edit-status-select');
+        const editFileInput = document.getElementById('edit-file-input');
+
+        document.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                const imgSrc = btn.getAttribute('data-image-src');
+                const imgVal = btn.getAttribute('data-image-val');
+                const order = btn.getAttribute('data-order');
+                const status = btn.getAttribute('data-status');
+                
+                editForm.action = `/admin/panel/${id}/sua`;
+                
+                const isVideoVal = /\.(mp4|webm|ogg|mov)$/i.test(imgVal || '');
+                if (isVideoVal) {
+                    editPreviewImg.classList.add('hidden');
+                    editPreviewVideo.src = imgSrc;
+                    editPreviewVideo.classList.remove('hidden');
+                } else {
+                    editPreviewVideo.classList.add('hidden');
+                    editPreviewImg.src = imgSrc;
+                    editPreviewImg.classList.remove('hidden');
+                }
+                
+                editCurrentImg.value = imgVal;
+                editUrlInput.value = imgVal || '';
+                editOrderInput.value = order;
+                editStatusSelect.value = status;
+                
+                modal.classList.add('is-active');
+            });
+        });
+
+        // Close modal triggers
+        document.querySelectorAll('.close-modal-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                modal.classList.remove('is-active');
+            });
+        });
+
+        // Click outside backdrop to close
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('is-active');
+            }
+        });
+
+        // Preview in Edit Modal when choosing a new file
+        editFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const isVideoFile = file.type.startsWith('video/');
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    if (isVideoFile) {
+                        editPreviewImg.classList.add('hidden');
+                        editPreviewVideo.src = event.target.result;
+                        editPreviewVideo.classList.remove('hidden');
+                    } else {
+                        editPreviewVideo.classList.add('hidden');
+                        editPreviewImg.src = event.target.result;
+                        editPreviewImg.classList.remove('hidden');
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+</script>
 </body>
 </html>
