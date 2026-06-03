@@ -9,8 +9,8 @@ const db = mysql.createPool({
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
-    // Neu MySQL chay cong khac, them bien moi truong DB_PORT.
-    // port: process.env.DB_PORT || 3306
+    // Railway MySQL thường dùng port khác, đọc từ biến môi trường DB_PORT
+    port: parseInt(process.env.DB_PORT) || 3306
 });
 
 // Test the pool connection
