@@ -98,19 +98,102 @@ Dự án ưu tiên sử dụng hiệu ứng chuyển động thuần bằng CSS 
 
 ---
 
-## 5. Hướng Dẫn Vận Hành & Khởi Chạy Cục Bộ
-Để khởi chạy dự án tại máy cá nhân của bạn, hãy thực hiện các bước sau:
+## 5. Hướng Dẫn Cài Đặt & Chạy Dự Án
 
-1.  **Cấu hình cơ sở dữ liệu**:
-    *   Đảm bảo bạn đã cài đặt MySQL Server và đang chạy.
-    *   Tạo một cơ sở dữ liệu tên là `showroom_oto` (hoặc cấu hình thông số kết nối tại tệp [database.js](file:///c:/Users/ADMIN/PJCNPM/config/database.js)).
-2.  **Khởi chạy máy chủ**:
-    *   Mở Terminal tại thư mục dự án và chạy lệnh:
-        ```bash
-        npm start
-        ```
-    *   Hệ thống sẽ tự động khởi tạo các bảng dữ liệu động cần thiết và gieo dữ liệu kiểm thử (dealers, tin tức đầu tiên) vào MySQL.
-3.  **Kiểm tra kết nối**:
-    *   Truy cập đường dẫn kiểm tra kết nối database: `http://localhost:3000/test-db`.
-    *   Truy cập trang chủ hệ thống tại: `http://localhost:3000/trang-chu`.
-    *   Truy cập trang quản trị tại: `http://localhost:3000/admin`.
+> ⚡ Làm theo đúng thứ tự các bước dưới đây để chạy được đầy đủ dữ liệu, không bị ra "bản trống".
+
+### Yêu cầu hệ thống
+- **Node.js** >= 16
+- **MySQL** >= 8.0 (hoặc MariaDB >= 10.4)
+- **npm**
+
+---
+
+### Bước 1: Clone dự án về máy
+
+```bash
+git clone https://github.com/tuananhhday/PJ-CNWEB.git
+cd PJ-CNWEB
+```
+
+### Bước 2: Cài đặt dependencies
+
+```bash
+npm install
+```
+
+### Bước 3: Import database (⚠️ quan trọng - bước này cho ra đúng dữ liệu)
+
+Mở **phpMyAdmin** (`http://localhost/phpmyadmin`) hoặc dùng terminal:
+
+**Cách A – phpMyAdmin:**
+1. Tạo database tên `showroom_oto` (charset: `utf8mb4`)
+2. Chọn database `showroom_oto` → tab **Import**
+3. Chọn file `database/showroom_oto.sql` → **Go**
+
+**Cách B – Terminal/Command Prompt:**
+```bash
+# Tạo database trước
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS showroom_oto CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+
+# Import dữ liệu
+mysql -u root -p showroom_oto < database/showroom_oto.sql
+```
+
+### Bước 4: Cấu hình kết nối database
+
+Tạo file `.env` từ file mẫu:
+
+```bash
+copy .env.example .env
+```
+
+Mở file `.env` và điền thông tin MySQL của bạn:
+
+```env
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=      ← điền password MySQL của bạn vào đây
+DB_NAME=showroom_oto
+PORT=3000
+```
+
+> Nếu MySQL của bạn không có password, để trống `DB_PASSWORD=`
+
+### Bước 5: Khởi chạy server
+
+```bash
+npm start
+```
+
+Truy cập trang web tại:
+- 🏠 **Trang chủ**: `http://localhost:3000/trang-chu`
+- 🔧 **Trang quản trị**: `http://localhost:3000/admin`
+- 🔍 **Kiểm tra DB**: `http://localhost:3000/test-db`
+
+---
+
+### Tài khoản đăng nhập Admin (mặc định)
+
+| Tài khoản | Mật khẩu |
+|-----------|----------|
+| `admin`   | `admin123` |
+
+---
+
+### Cấu trúc thư mục
+
+```
+PJ-CNWEB/
+├── app.js                  # Entry point
+├── database/
+│   └── showroom_oto.sql    # ← File database đầy đủ dữ liệu
+├── .env.example            # Mẫu cấu hình biến môi trường
+├── controllers/            # Logic xử lý request
+├── routes/                 # Định tuyến URL
+├── views/                  # Template EJS
+├── public/                 # CSS, JS, hình ảnh
+├── services/               # Khởi tạo database tự động
+└── config/
+    └── database.js         # Kết nối MySQL
+```

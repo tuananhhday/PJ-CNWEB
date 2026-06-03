@@ -24,3 +24,11 @@ jspm_packages/
 server.err.log
 server.out.log
 server-*.log
+
+# Environment variables (chứa mật khẩu - KHÔNG đẩy lên Git)
+.env
+
+# File rác
+extracted_step_*.ejs
+*.err.log
+*.out.log
