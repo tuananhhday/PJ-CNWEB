@@ -161,6 +161,64 @@
         </div>
     </section>
 
+    <!-- Why Choose Us / Services Section -->
+    <section class="home-features-section" aria-label="Dịch vụ nổi bật">
+        <div class="features-heading">
+            <p>Tiện ích & Dịch vụ</p>
+            <h2>Ưu thế vượt trội của Showroom Double Anh</h2>
+            <span>Đồng hành cùng khách hàng từ khâu chọn xe đến dịch vụ bảo dưỡng trọn đời sản phẩm.</span>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <!-- Steering Wheel SVG -->
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="2" x2="12" y2="22"></line>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                </div>
+                <h3>Lái thử tận nhà</h3>
+                <p>Đăng ký trực tuyến nhanh chóng, chúng tôi hỗ trợ giao xe lái thử đến tận nhà hoàn toàn miễn phí.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <!-- Credit Card SVG -->
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                        <line x1="1" y1="10" x2="23" y2="10"></line>
+                    </svg>
+                </div>
+                <h3>Trả góp ưu đãi</h3>
+                <p>Liên kết với nhiều ngân hàng uy tín, hỗ trợ vay mua xe đến 80% giá trị xe, giải ngân nhanh trong 2 giờ.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <!-- Shield SVG -->
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                </div>
+                <h3>Bảo hành 5 năm</h3>
+                <p>Yên tâm tuyệt đối với chính sách bảo hành chính hãng lên tới 5 năm hoặc 150.000 km cùng phụ tùng chính phẩm.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <!-- Help/Wrench SVG -->
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                    </svg>
+                </div>
+                <h3>Cứu hộ khẩn cấp 24/7</h3>
+                <p>Đội ngũ hỗ trợ kỹ thuật và cứu hộ đường bộ chuyên nghiệp sẵn sàng trợ giúp bạn 24h mỗi ngày ở bất cứ đâu.</p>
+            </div>
+        </div>
+    </section>
+
     <style>
         /* Scoped styling to fix distorted images in the homepage news section */
         .home-news-section {
@@ -555,6 +613,64 @@
             <% } else { %>
                 <p class="empty-state">Chưa có tin tức nào khác.</p>
             <% } %>
+        </div>
+    </section>
+
+    <!-- Customer Testimonials Section -->
+    <section class="home-testimonials-section" aria-label="Đánh giá từ khách hàng">
+        <div class="testimonials-heading">
+            <p>Trải nghiệm của khách hàng</p>
+            <h2>Khách hàng nói gì về Showroom Double Anh?</h2>
+            <span>Đóng góp và ý kiến thực tế của những chủ sở hữu xe tin tưởng lựa chọn dịch vụ của chúng tôi.</span>
+        </div>
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <div class="testimonial-rating">
+                    <% for(let i=0; i<5; i++) { %>
+                        <svg class="star-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    <% } %>
+                </div>
+                <p class="testimonial-text">"Tôi rất hài lòng với chất lượng phục vụ tại showroom. Thủ tục mua chiếc Santa Fe trả góp diễn ra vô cùng chuyên nghiệp và nhanh chóng. Nhân viên hỗ trợ nhiệt tình từ khâu chọn xe đến đăng ký biển số."</p>
+                <div class="testimonial-user">
+                    <div class="user-avatar text-avatar">H</div>
+                    <div>
+                        <span class="user-name">Nguyễn Văn Hùng</span>
+                        <span class="user-info">Chủ xe Hyundai Santa Fe · <small class="verified-tag">✓ Đã mua xe</small></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="testimonial-card">
+                <div class="testimonial-rating">
+                    <% for(let i=0; i<5; i++) { %>
+                        <svg class="star-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    <% } %>
+                </div>
+                <p class="testimonial-text">"Đăng ký lái thử xe Creta tại nhà cực kỳ tiện lợi cho gia đình tôi. Xe được giao đúng giờ, sạch sẽ, bạn tư vấn kỹ thuật giải thích rất cặn kẽ và điềm đạm. Chắc chắn tôi sẽ giới thiệu bạn bè tới đây mua xe."</p>
+                <div class="testimonial-user">
+                    <div class="user-avatar text-avatar">M</div>
+                    <div>
+                        <span class="user-name">Trần Thị Mai</span>
+                        <span class="user-info">Chủ xe Hyundai Creta · <small class="verified-tag">✓ Đã mua xe</small></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="testimonial-card">
+                <div class="testimonial-rating">
+                    <% for(let i=0; i<5; i++) { %>
+                        <svg class="star-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    <% } %>
+                </div>
+                <p class="testimonial-text">"Chính sách bảo hành và cứu hộ 24/7 của showroom khiến tôi vô cùng an tâm khi lái xe đi tỉnh xa. Đợt xe tôi gặp sự cố điện nhẹ lúc nửa đêm đã được đội cứu hộ hỗ trợ xử lý ngay lập tức."</p>
+                <div class="testimonial-user">
+                    <div class="user-avatar text-avatar">N</div>
+                    <div>
+                        <span class="user-name">Lê Hoàng Nam</span>
+                        <span class="user-info">Chủ xe Hyundai Tucson · <small class="verified-tag">✓ Đã mua xe</small></span>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 </main>
