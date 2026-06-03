@@ -1,96 +1,2117 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
+    <title>
+        <%= title || 'Admin' %>
+    </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/stylesheets/base.css">
     <link rel="stylesheet" href="/stylesheets/admin.css">
 </head>
+
 <body>
-<div class="admin-layout">
-    <%- include('partials/nav') %>
+    <% const vehicleTypeLabel={ Pickup: 'Xe bán tải' , Convertible: 'Xe mui trần' }; const
+        displayVehicleType=(typeName)=> vehicleTypeLabel[typeName] || typeName;
+        const vehicleTypeOrder = ['Sedan', 'SUV', 'Crossover', 'Hatchback', 'MPV', 'Pickup', 'Coupe', 'Convertible'];
+        const modelMap = new Map();
+        (models || []).forEach((model) => {
+        const typeName = model.ten_loai || model.ten_dong || 'Khác';
+        if (!modelMap.has(typeName)) modelMap.set(typeName, { ...model, ten_loai: typeName });
+        });
+        const uniqueModels = Array.from(modelMap.values()).sort((a, b) => {
+        const aIndex = vehicleTypeOrder.indexOf(a.ten_loai);
+        const bIndex = vehicleTypeOrder.indexOf(b.ten_loai);
+        if (aIndex !== -1 || bIndex !== -1) {
+        return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
+        }
+        return String(a.ten_loai).localeCompare(String(b.ten_loai));
+        });
+        %>
+        <script>
+            const allImageFiles = <% - JSON.stringify(imageFiles || []) %>;
+            const allBo360Sets = <% - JSON.stringify(bo360Sets || []) %>;
+        </script>
+        <main class="admin-page">
+            <aside class="admin-sidebar">
+                <a class="admin-brand" href="/trang-chu">Showroom</a>
+                <a href="/admin/dai-ly">Quản lý đại lý</a>
+                <a href="/admin/tin-tuc">Quản lý tin tức</a>
+                <a class="is-active" href="/admin/xe">Quản lý xe</a>
+                <a href="/admin/anh-360">📸 Bộ ảnh 360°</a>
+                <a href="/admin/yeu-cau">Báo giá / Lái thử</a>
+                <a href="/admin/panel">Quản lý panel</a>
+                <a href="/trang-chu">Xem trang chủ</a>
+            </aside>
 
-    <main class="admin-main">
-        <header class="admin-top">
-            <div>
-                <p>Kho xe</p>
-                <h1>Quản lý xe</h1>
-            </div>
-        </header>
+            <section class="admin-content">
+                <div class="admin-heading">
+                    <div>
+                        <p>Admin</p>
+                        <h1>Quản lý nội dung</h1>
+                    </div>
+                    <a href="/trang-chu">Mở trang chủ</a>
+                </div>
 
-        <% if (success) { %><div class="admin-alert"><%= success %></div><% } %>
+                <% if (success) { %>
+                    <div class="admin-alert success">
+                        <%= success %>
+                    </div>
+                    <% } %>
+                        <% if (error) { %>
+                            <div class="admin-alert error">
+                                <%= error %>
+                            </div>
+                            <% } %>
 
-        <section class="admin-card">
-            <h2>Thêm xe mới</h2>
-            <form class="admin-form grid-form" action="/admin/xe/them" method="POST">
-                <select name="dong_xe_id" required>
-                    <option value="">Chọn dòng xe</option>
-                    <% models.forEach(model => { %>
-                        <option value="<%= model.id %>"><%= model.ten_dong %></option>
-                    <% }) %>
-                </select>
-                <input name="ten_xe" placeholder="Tên xe" required>
-                <input name="duong_dan" placeholder="duong-dan-xe" required>
-                <input name="phien_ban" placeholder="Phiên bản">
-                <input name="nam_san_xuat" type="number" placeholder="Năm sản xuất">
-                <input name="gia_ban" type="number" placeholder="Giá bán" required>
-                <input name="dong_co" placeholder="Động cơ">
-                <input name="hop_so" placeholder="Hộp số">
-                <select name="nhien_lieu">
-                    <option value="xang">Xăng</option>
-                    <option value="dau">Dầu</option>
-                    <option value="dien">Điện</option>
-                    <option value="hybrid">Hybrid</option>
-                </select>
-                <input name="so_cho_ngoi" type="number" placeholder="Số chỗ">
-                <input name="so_luong_ton" type="number" placeholder="Tồn kho">
-                <input name="anh_dai_dien" placeholder="Ảnh đại diện, ví dụ: tucson-1.jpg">
-                <input name="mo_ta_ngan" placeholder="Mô tả ngắn">
-                <button type="submit">Thêm xe</button>
-            </form>
-        </section>
+                                <form class="admin-form car-live-editor" action="/admin/xe/them" method="post"
+                                    enctype="multipart/form-data" data-preview-url="/xe">
+                                    <h2>Thêm thông tin xe</h2>
+                                    <div class="car-editor-fields">
 
-        <section class="admin-card">
-            <h2>Danh sách xe</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Xe</th>
-                        <th>Ảnh</th>
-                        <th>Hãng/Dòng</th>
-                        <th>Giá</th>
-                        <th>Trạng thái</th>
-                        <th>Cập nhật</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% cars.forEach(car => { %>
-                        <tr>
-                            <td><strong><%= car.ten_xe %></strong><br><small><%= car.duong_dan %></small></td>
-                            <td>
-                                <img class="admin-thumb" src="/images/<%= car.duong_dan_anh || 'no-car.jpg' %>" alt="<%= car.ten_xe %>">
-                                <small><%= car.duong_dan_anh || 'Chưa có ảnh' %></small>
-                            </td>
-                            <td><%= car.ten_hang %> / <%= car.ten_dong %></td>
-                            <td><%= formatPrice(car.gia_ban) %></td>
-                            <td><%= car.trang_thai %></td>
-                            <td>
-                                <a class="admin-link" href="/admin/xe/<%= car.id %>/sua">Sửa</a>
-                                <form action="/admin/xe/<%= car.id %>/trang-thai" method="POST" class="inline-form">
-                                    <select name="trang_thai">
-                                        <option value="con_hang" <%= car.trang_thai === 'con_hang' ? 'selected' : '' %>>Còn hàng</option>
-                                        <option value="het_hang" <%= car.trang_thai === 'het_hang' ? 'selected' : '' %>>Hết hàng</option>
-                                        <option value="an" <%= car.trang_thai === 'an' ? 'selected' : '' %>>Ẩn</option>
-                                    </select>
-                                    <button>Lưu</button>
+                                        <!-- Nhóm 1: Thông tin cơ bản -->
+                                        <div class="form-group-card"
+                                            style="margin-bottom: 24px; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px; background: #ffffff; box-shadow: var(--shadow-sm);">
+                                            <h3
+                                                style="font-size: 15px; font-weight: 700; color: var(--text-dark); margin: 0 0 20px 0; border-bottom: 1.5px solid var(--primary-glow); padding-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                                                📄 Thông tin cơ bản
+                                            </h3>
+                                            <div class="admin-form-grid">
+                                                <label>
+                                                    Kiểu dáng xe
+                                                    <select name="dong_xe_id" required>
+                                                        <option value="">Chọn kiểu dáng xe</option>
+                                                        <% uniqueModels.forEach((model)=> { %>
+                                                            <option value="<%= model.id %>">
+                                                                <%= displayVehicleType(model.ten_loai) %>
+                                                            </option>
+                                                            <% }) %>
+                                                    </select>
+                                                </label>
+                                                <label>
+                                                    Tên xe
+                                                    <input name="ten_xe" required placeholder="Ford Everest Platinum">
+                                                    <small
+                                                        style="color: var(--text-muted); font-weight: normal; margin-top: 4px; display: block; line-height: 1.4;">Mẹo:
+                                                        Nhập trùng tên xe (vd: <b>Ford Everest</b>) để hệ thống tự động
+                                                        gom chúng thành các phiên bản của nhau.</small>
+                                                </label>
+                                                <label>
+                                                    Phiên bản
+                                                    <input name="phien_ban" placeholder="Platinum">
+                                                    <small
+                                                        style="color: var(--text-muted); font-weight: normal; margin-top: 4px; display: block; line-height: 1.4;">Ví
+                                                        dụ: Sport, Titanium, Platinum. Mỗi phiên bản sẽ là một xe riêng
+                                                        biệt có giá và thông số riêng.</small>
+                                                </label>
+                                                <label>
+                                                    Năm sản xuất
+                                                    <input name="nam_san_xuat" type="number" placeholder="2026">
+                                                </label>
+                                                <label>
+                                                    Giá bán
+                                                    <input name="gia_ban" type="number" required
+                                                        placeholder="1545000000">
+                                                </label>
+                                                <label>
+                                                    Giá niêm yết
+                                                    <input name="gia_niem_yet" type="number" placeholder="1545000000">
+                                                </label>
+                                                <label>
+                                                    Số lượng tồn
+                                                    <input name="so_luong_ton" type="number" value="1">
+                                                </label>
+                                                <label>
+                                                    Xuất xứ
+                                                    <input name="xuat_xu" placeholder="Thái Lan">
+                                                </label>
+                                                <label style="grid-column: span 2;">
+                                                    Bảo hành
+                                                    <input name="bao_hanh" placeholder="3 năm hoặc 100.000 km">
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Nhóm 2: Thông số vận hành & mô tả -->
+                                        <div class="form-group-card"
+                                            style="margin-bottom: 24px; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px; background: #ffffff; box-shadow: var(--shadow-sm);">
+                                            <h3
+                                                style="font-size: 15px; font-weight: 700; color: var(--text-dark); margin: 0 0 20px 0; border-bottom: 1.5px solid var(--primary-glow); padding-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                                                ⚙️ Thông số vận hành & Mô tả
+                                            </h3>
+                                            <div class="admin-form-grid">
+                                                <label>
+                                                    Động cơ
+                                                    <input name="dong_co" placeholder="2.0L Turbo Diesel">
+                                                </label>
+                                                <label>
+                                                    Hộp số
+                                                    <input name="hop_so" placeholder="Tự động 10 cấp">
+                                                </label>
+                                                <label>
+                                                    Nhiên liệu
+                                                    <select name="nhien_lieu">
+                                                        <option value="xang">Xăng</option>
+                                                        <option value="dau">Dầu</option>
+                                                        <option value="dien">Điện</option>
+                                                        <option value="hybrid">Hybrid</option>
+                                                    </select>
+                                                </label>
+                                                <label>
+                                                    Số chỗ ngồi
+                                                    <input name="so_cho_ngoi" type="number" placeholder="7">
+                                                </label>
+                                                <label style="grid-column: span 2;">
+                                                    Slogan sản phẩm
+                                                    <input name="slogan" placeholder="Khẳng định vị thế dẫn đầu">
+                                                </label>
+                                                <label>
+                                                    Link E Book
+                                                    <input name="ebook_url" placeholder="https://...">
+                                                </label>
+                                                <label>
+                                                    Link E Brochure
+                                                    <input name="brochure_url" placeholder="https://...">
+                                                </label>
+                                                <label style="grid-column: span 2;">
+                                                    Mô tả ngắn
+                                                    <input name="mo_ta_ngan"
+                                                        placeholder="SUV 7 chỗ hạng sang, mạnh mẽ và hiện đại">
+                                                </label>
+                                                <label style="grid-column: span 2;">
+                                                    Mô tả chi tiết
+                                                    <textarea name="mo_ta_chi_tiet" rows="4"
+                                                        placeholder="Viết nội dung giới thiệu xe..."></textarea>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Nhóm 3: Thư viện & Ảnh 360 -->
+                                        <div class="form-group-card"
+                                            style="margin-bottom: 24px; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px; background: #ffffff; box-shadow: var(--shadow-sm);">
+                                            <h3
+                                                style="font-size: 15px; font-weight: 700; color: var(--text-dark); margin: 0 0 20px 0; border-bottom: 1.5px solid var(--primary-glow); padding-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                                                🖼️ Thư viện hình ảnh & Ảnh 360°
+                                            </h3>
+                                            <div class="admin-form-grid" style="margin-bottom: 20px;">
+                                                <label style="grid-column: span 2;">
+                                                    Ảnh đại diện
+                                                    <input name="anh_dai_dien" type="file" accept="image/*">
+                                                    <small>Chọn ảnh từ máy, hệ thống tự lưu vào thư mục images.</small>
+                                                </label>
+                                            </div>
+
+                                            <div id="add-car-images-exterior"
+                                                style="display: grid; gap: 16px; margin-bottom: 12px; padding: 16px; background: #f8fafc; border: 1px dashed var(--border-color); border-radius: var(--radius-sm);">
+                                                <label style="margin-bottom: 0;">
+                                                    Danh sách ảnh Ngoại thất
+                                                    <input name="anh_ngoai_that" type="file" accept="image/*" multiple>
+                                                    <small>Mẹo: Giữ phím Ctrl (hoặc Cmd) để chọn nhiều ảnh cùng lúc. Để
+                                                        thêm mô tả minh họa chi tiết từng ảnh (giống Ford Raptor), hãy
+                                                        dùng nút bấm "+ Thêm ô ảnh Ngoại thất" bên dưới để nhập ảnh và
+                                                        chữ minh họa độc lập.</small>
+                                                </label>
+                                                <label style="font-weight: normal; margin-top: -4px; margin-bottom: 0;">
+                                                    Chữ minh họa / chú thích (Ngoại thất)
+                                                    <input name="chu_thich_ngoai_that" type="text"
+                                                        placeholder="Nhập mô tả minh họa cho ảnh ngoại thất...">
+                                                </label>
+                                            </div>
+                                            <button type="button" class="btn secondary"
+                                                style="width: fit-content; margin-bottom: 24px;"
+                                                onclick="addFileInput('add-car-images-exterior', 'anh_ngoai_that', 'Ảnh ngoại thất')">+
+                                                Thêm ô ảnh Ngoại thất</button>
+
+                                            <div id="add-car-images-interior"
+                                                style="display: grid; gap: 16px; margin-bottom: 12px; padding: 16px; background: #f8fafc; border: 1px dashed var(--border-color); border-radius: var(--radius-sm);">
+                                                <label style="margin-bottom: 0;">
+                                                    Danh sách ảnh Nội thất
+                                                    <input name="anh_noi_that" type="file" accept="image/*" multiple>
+                                                    <small>Mẹo: Giữ phím Ctrl (hoặc Cmd) để chọn nhiều ảnh cùng lúc. Để
+                                                        thêm mô tả minh họa chi tiết từng ảnh (giống Ford Raptor), hãy
+                                                        dùng nút bấm "+ Thêm ô ảnh Nội thất" bên dưới để nhập ảnh và chữ
+                                                        minh họa độc lập.</small>
+                                                </label>
+                                                <label style="font-weight: normal; margin-top: -4px; margin-bottom: 0;">
+                                                    Chữ minh họa / chú thích (Nội thất)
+                                                    <input name="chu_thich_noi_that" type="text"
+                                                        placeholder="Nhập mô tả minh họa cho ảnh nội thất...">
+                                                </label>
+                                            </div>
+                                            <button type="button" class="btn secondary"
+                                                style="width: fit-content; margin-bottom: 24px;"
+                                                onclick="addFileInput('add-car-images-interior', 'anh_noi_that', 'Ảnh nội thất')">+
+                                                Thêm ô ảnh Nội thất</button>
+
+                                            <!-- Bộ ảnh 360 độ mặc định liên kết -->
+                                            <div class="default-360-inner-section"
+                                                style="border-top: 1px solid var(--border-color); padding-top: 20px; margin-top: 20px;">
+                                                <label
+                                                    style="font-weight: 700; font-size: 14px; color: var(--text-dark); display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                                    🔄 Bộ ảnh 360° mặc định của xe
+                                                    <a href="/admin/anh-360" target="_blank"
+                                                        style="font-size: 11px; font-weight: 600; color: var(--primary); text-decoration: none; background: #eef2ff; padding: 2px 8px; border-radius: 20px;">+
+                                                        Quản lý</a>
+                                                </label>
+                                                <p
+                                                    style="margin: 0 0 16px 0; font-size: 11px; color: var(--text-muted); font-weight: normal;">
+                                                    Bộ ảnh này sẽ dùng làm trình xoay 360 độ mặc định cho xe khi khách
+                                                    hàng chưa chọn màu sắc cụ thể.</p>
+
+                                                <div class="color-360-picker-container"
+                                                    style="display: flex; align-items: center; gap: 10px; max-width: 500px;">
+                                                    <input type="hidden" name="anh_360" class="color-360-input"
+                                                        value="">
+                                                    <div class="color-360-display-wrapper"
+                                                        style="flex: 1; display: flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 12px; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 13px; overflow: hidden; position: relative;">
+                                                        <span class="color-360-name-display"
+                                                            style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; color: var(--primary);">
+                                                            -- Chưa liên kết --
+                                                        </span>
+                                                        <img class="color-360-thumb-preview" src=""
+                                                            style="width: 44px; height: 30px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color); display: none;">
+                                                        <button type="button" class="btn-clear-360"
+                                                            style="background: none; border: none; color: #ef4444; font-size: 16px; font-weight: 700; cursor: pointer; padding: 0 6px; display: none;"
+                                                            title="Xóa liên kết">✕</button>
+                                                    </div>
+                                                    <button type="button" class="btn-choose-360 btn secondary"
+                                                        style="min-height: 38px; padding: 0 16px; font-size: 13px; font-weight: 700; margin: 0; cursor: pointer; flex-shrink: 0;">Chọn
+                                                        bộ ảnh</button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="spec-section-group">
+                                            <div class="spec-section-group-title">
+                                                🔧 Thông số kỹ thuật
+                                                <small
+                                                    style="font-weight:normal; font-size:12px; color:var(--text-muted);">Mỗi
+                                                    ô là một nhóm. Mỗi dòng: <b>Tên thông số: Giá trị</b> (có nhãn) hoặc
+                                                    <b>Tên thông số</b> (bullet điểm)</small>
+                                            </div>
+                                            <% (SPEC_SECTIONS || []).forEach((section)=> { %>
+                                                <label class="spec-section-field">
+                                                    <span class="spec-section-label-text">
+                                                        <%= section.name %>
+                                                    </span>
+                                                    <textarea name="<%= section.key %>" rows="3"
+                                                        placeholder="Nhập các thông số cho nhóm &quot;<%= section.name %>&quot;..."></textarea>
+                                                </label>
+                                                <% }) %>
+                                                    <label class="spec-section-field">
+                                                        <span class="spec-section-label-text">Thông số khác (nhóm tùy
+                                                            chỉnh)</span>
+                                                        <textarea name="spec_khac" rows="3"
+                                                            placeholder="[Tên nhóm tùy chỉnh]&#10;Thông số 1: Giá trị&#10;Thông số 2"></textarea>
+                                                    </label>
+                                        </div>
+
+                                        <!-- Trình soạn thảo Màu xe trực quan (Visual Color Editor) -->
+                                        <div class="visual-colors-section"
+                                            style="margin-bottom: 24px; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; background: #ffffff;">
+                                            <div
+                                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                                <div>
+                                                    <strong style="font-size: 14px; color: var(--text-dark);">🎨 Bảng
+                                                        màu xe trực quan</strong>
+                                                    <small
+                                                        style="display: block; color: var(--text-muted); font-size: 11px; margin-top: 4px; font-weight: normal;">Nhập
+                                                        tên màu, chọn mã màu bằng bảng màu, chọn ảnh xe tương ứng và giá
+                                                        bán thêm.</small>
+                                                </div>
+                                                <button type="button" class="btn secondary btn-add-color"
+                                                    style="min-height: 32px; padding: 0 12px; font-size: 12px; cursor: pointer;">+
+                                                    Thêm màu xe</button>
+                                            </div>
+                                            <div class="visual-colors-list"
+                                                style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px;">
+                                                <!-- Sẽ được thêm bằng Javascript -->
+                                            </div>
+                                            <textarea name="danh_sach_mau" style="display: none;"
+                                                placeholder="Trắng Snowflake | #f7f7f2 | ford-everest.jpg | 0"></textarea>
+                                        </div>
+
+
+
+                                        <!-- Trình soạn thảo Đặc điểm sản phẩm trực quan (Visual Feature Editor) -->
+                                        <div class="visual-features-section"
+                                            style="margin-bottom: 24px; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; background: #ffffff;">
+                                            <div
+                                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                                <div>
+                                                    <strong style="font-size: 14px; color: var(--text-dark);">✨ Đặc điểm
+                                                        nổi bật (Key Selling Points)</strong>
+                                                    <small
+                                                        style="display: block; color: var(--text-muted); font-size: 11px; margin-top: 4px; font-weight: normal;">Dùng
+                                                        để giới thiệu các tính năng, điểm nhấn nội ngoại thất nổi bật
+                                                        của xe bằng hình ảnh và mô tả ngoài trang chi tiết.</small>
+                                                </div>
+                                                <button type="button" class="btn secondary btn-add-feature"
+                                                    style="min-height: 32px; padding: 0 12px; font-size: 12px; cursor: pointer;">+
+                                                    Thêm đặc điểm</button>
+                                            </div>
+                                            <div class="visual-features-list"
+                                                style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 12px;">
+                                                <!-- Sẽ được thêm bằng Javascript -->
+                                            </div>
+                                            <textarea name="dac_diem" style="display: none;"
+                                                placeholder="ngoai_that | Kiểu dáng SUV | Thiết kế mạnh mẽ, hiện đại | carnival-exterior.jpg"></textarea>
+                                        </div>
+
+                                        <button type="submit">Thêm xe</button>
+                                    </div>
                                 </form>
-                            </td>
-                        </tr>
-                    <% }) %>
-                </tbody>
-            </table>
-        </section>
-    </main>
-</div>
+
+                                <div class="admin-table-wrap">
+                                    <h2>Sửa / xóa thông tin xe</h2>
+                                    <div class="car-admin-list-head">
+                                        <p>Chọn một xe trong danh sách để mở form chỉnh sửa hoặc xóa. Mỗi trang hiển thị
+                                            6 xe.</p>
+                                        <div class="car-admin-search-wrapper"
+                                            style="flex: 1; max-width: 320px; margin: 0 20px;">
+                                            <input type="text" id="car-search-input"
+                                                placeholder="Tìm kiếm nhanh xe (tên, kiểu dáng)..."
+                                                style="width: 100%; min-height: 36px; padding: 0 14px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 13px; outline: none; background: var(--bg-surface); transition: var(--transition-smooth);">
+                                        </div>
+                                        <div class="car-admin-pager">
+                                            <button type="button" data-car-page-prev>Trước</button>
+                                            <span data-car-page-status>1 / 1</span>
+                                            <button type="button" data-car-page-next>Sau</button>
+                                        </div>
+                                    </div>
+                                    <% if (cars && cars.length) { %>
+                                        <div class="car-edit-list" data-car-edit-list>
+                                            <% cars.forEach((car, index)=> { %>
+                                                <article class="car-edit-item" data-car-item
+                                                    data-car-index="<%= index %>">
+                                                    <button type="button" class="car-edit-preview" data-car-toggle>
+                                                        <img src="/images/<%= car.anh_dai_dien || 'no-car.jpg' %>"
+                                                            alt="<%= car.ten_xe %>">
+                                                        <strong>
+                                                            <%= car.ten_xe %>
+                                                                <%= car.phien_ban ? ' - ' + car.phien_ban : '' %>
+                                                        </strong>
+                                                        <span>
+                                                            <%= displayVehicleType(car.ten_loai) %>
+                                                        </span>
+                                                        <small>Bấm để chỉnh sửa</small>
+                                                    </button>
+
+                                                    <form class="car-live-editor car-edit-form"
+                                                        action="/admin/xe/<%= car.id %>/sua" method="post"
+                                                        enctype="multipart/form-data"
+                                                        data-preview-url="/xe/<%= car.duong_dan %>">
+                                                        <input type="hidden" name="current_image"
+                                                            value="<%= car.anh_dai_dien || '' %>">
+                                                        <div class="car-editor-fields">
+
+                                                            <!-- Nhóm 1: Thông tin cơ bản -->
+                                                            <div class="form-group-card"
+                                                                style="margin-bottom: 24px; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px; background: #ffffff; box-shadow: var(--shadow-sm);">
+                                                                <h3
+                                                                    style="font-size: 15px; font-weight: 700; color: var(--text-dark); margin: 0 0 20px 0; border-bottom: 1.5px solid var(--primary-glow); padding-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                                                                    📄 Thông tin cơ bản
+                                                                </h3>
+                                                                <div class="admin-form-grid">
+                                                                    <label>
+                                                                        Kiểu dáng xe
+                                                                        <select name="dong_xe_id" required>
+                                                                            <% uniqueModels.forEach((model)=> { %>
+                                                                                <option value="<%= model.id %>"
+                                                                                    <%=car.ten_loai===model.ten_loai
+                                                                                    ? 'selected' : '' %>><%=
+                                                                                        displayVehicleType(model.ten_loai)
+                                                                                        %>
+                                                                                </option>
+                                                                                <% }) %>
+                                                                        </select>
+                                                                    </label>
+                                                                    <label>
+                                                                        Tên xe
+                                                                        <input name="ten_xe" required
+                                                                            value="<%= car.ten_xe || '' %>">
+                                                                        <small
+                                                                            style="color: var(--text-muted); font-weight: normal; margin-top: 4px; display: block; line-height: 1.4;">Nhập
+                                                                            trùng tên xe với các bản khác để gom nhóm
+                                                                            chúng.</small>
+                                                                    </label>
+                                                                    <label>
+                                                                        Phiên bản
+                                                                        <input name="phien_ban"
+                                                                            value="<%= car.phien_ban || '' %>">
+                                                                        <small
+                                                                            style="color: var(--text-muted); font-weight: normal; margin-top: 4px; display: block; line-height: 1.4;">Ví
+                                                                            dụ: Sport, Titanium, Platinum.</small>
+                                                                    </label>
+                                                                    <label>
+                                                                        Năm sản xuất
+                                                                        <input name="nam_san_xuat" type="number"
+                                                                            value="<%= car.nam_san_xuat || '' %>">
+                                                                    </label>
+                                                                    <label>
+                                                                        Giá bán
+                                                                        <input name="gia_ban" type="number" required
+                                                                            value="<%= Number(car.gia_ban || 0) %>">
+                                                                    </label>
+                                                                    <label>
+                                                                        Giá niêm yết
+                                                                        <input name="gia_niem_yet" type="number"
+                                                                            value="<%= Number(car.gia_niem_yet || car.gia_ban || 0) %>">
+                                                                    </label>
+                                                                    <label>
+                                                                        Số lượng tồn
+                                                                        <input name="so_luong_ton" type="number"
+                                                                            value="<%= car.so_luong_ton || 0 %>">
+                                                                    </label>
+                                                                    <label>
+                                                                        Xuất xứ
+                                                                        <input name="xuat_xu"
+                                                                            value="<%= car.xuat_xu || '' %>">
+                                                                    </label>
+                                                                    <label>
+                                                                        Bảo hành
+                                                                        <input name="bao_hanh"
+                                                                            value="<%= car.bao_hanh || '' %>">
+                                                                    </label>
+                                                                    <label>
+                                                                        Trạng thái
+                                                                        <select name="trang_thai">
+                                                                            <option value="con_hang"
+                                                                                <%=car.trang_thai==='con_hang'
+                                                                                ? 'selected' : '' %>>Còn hàng</option>
+                                                                            <option value="het_hang"
+                                                                                <%=car.trang_thai==='het_hang'
+                                                                                ? 'selected' : '' %>>Hết hàng</option>
+                                                                            <option value="an" <%=car.trang_thai==='an'
+                                                                                ? 'selected' : '' %>>Ẩn</option>
+                                                                        </select>
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Nhóm 2: Thông số vận hành & mô tả -->
+                                                            <div class="form-group-card"
+                                                                style="margin-bottom: 24px; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px; background: #ffffff; box-shadow: var(--shadow-sm);">
+                                                                <h3
+                                                                    style="font-size: 15px; font-weight: 700; color: var(--text-dark); margin: 0 0 20px 0; border-bottom: 1.5px solid var(--primary-glow); padding-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                                                                    ⚙️ Thông số vận hành & Mô tả
+                                                                </h3>
+                                                                <div class="admin-form-grid">
+                                                                    <label>
+                                                                        Động cơ
+                                                                        <input name="dong_co"
+                                                                            value="<%= car.dong_co || '' %>">
+                                                                    </label>
+                                                                    <label>
+                                                                        Hộp số
+                                                                        <input name="hop_so"
+                                                                            value="<%= car.hop_so || '' %>">
+                                                                    </label>
+                                                                    <label>
+                                                                        Nhiên liệu
+                                                                        <select name="nhien_lieu">
+                                                                            <option value="xang"
+                                                                                <%=car.nhien_lieu==='xang' ? 'selected'
+                                                                                : '' %>>Xăng</option>
+                                                                            <option value="dau"
+                                                                                <%=car.nhien_lieu==='dau' ? 'selected'
+                                                                                : '' %>>Dầu</option>
+                                                                            <option value="dien"
+                                                                                <%=car.nhien_lieu==='dien' ? 'selected'
+                                                                                : '' %>>Điện</option>
+                                                                            <option value="hybrid"
+                                                                                <%=car.nhien_lieu==='hybrid'
+                                                                                ? 'selected' : '' %>>Hybrid</option>
+                                                                        </select>
+                                                                    </label>
+                                                                    <label>
+                                                                        Số chỗ ngồi
+                                                                        <input name="so_cho_ngoi" type="number"
+                                                                            value="<%= car.so_cho_ngoi || '' %>">
+                                                                    </label>
+                                                                    <label style="grid-column: span 2;">
+                                                                        Slogan sản phẩm
+                                                                        <input name="slogan"
+                                                                            value="<%= car.slogan || '' %>">
+                                                                    </label>
+                                                                    <label>
+                                                                        Link E Book
+                                                                        <input name="ebook_url"
+                                                                            value="<%= car.ebook_url || '' %>">
+                                                                    </label>
+                                                                    <label>
+                                                                        Link E Brochure
+                                                                        <input name="brochure_url"
+                                                                            value="<%= car.brochure_url || '' %>">
+                                                                    </label>
+                                                                    <label style="grid-column: span 2;">
+                                                                        Mô tả ngắn
+                                                                        <input name="mo_ta_ngan"
+                                                                            value="<%= car.mo_ta_ngan || '' %>">
+                                                                    </label>
+                                                                    <label style="grid-column: span 2;">
+                                                                        Mô tả chi tiết
+                                                                        <textarea name="mo_ta_chi_tiet"
+                                                                            rows="4"><%= car.mo_ta_chi_tiet || '' %></textarea>
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Nhóm 3: Thư viện & Ảnh 360 -->
+                                                            <div class="form-group-card"
+                                                                style="margin-bottom: 24px; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 24px; background: #ffffff; box-shadow: var(--shadow-sm);">
+                                                                <h3
+                                                                    style="font-size: 15px; font-weight: 700; color: var(--text-dark); margin: 0 0 20px 0; border-bottom: 1.5px solid var(--primary-glow); padding-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                                                                    🖼️ Thư viện hình ảnh & Ảnh 360°
+                                                                </h3>
+
+                                                                <div class="admin-form-grid"
+                                                                    style="margin-bottom: 20px;">
+                                                                    <label style="grid-column: span 2;">
+                                                                        Đổi ảnh đại diện
+                                                                        <input name="anh_dai_dien" type="file"
+                                                                            accept="image/*">
+                                                                        <small>Bỏ trống nếu muốn giữ ảnh hiện
+                                                                            tại.</small>
+                                                                    </label>
+                                                                </div>
+
+                                                                <% const carImages=(imagesByCar || {})[car.id] || [];
+                                                                    const existingExt=carImages.filter(img=>
+                                                                    img.nhom_anh ===
+                                                                    'ngoai_that');
+                                                                    const existingInt = carImages.filter(img =>
+                                                                    img.nhom_anh ===
+                                                                    'noi_that');
+                                                                    const existingGen = carImages.filter(img =>
+                                                                    img.nhom_anh ===
+                                                                    'chung' && !img.la_anh_dai_dien);
+                                                                    %>
+
+                                                                    <% if (existingExt.length || existingInt.length ||
+                                                                        existingGen.length) { %>
+                                                                        <div class="admin-current-gallery"
+                                                                            style="margin-bottom: 20px;">
+                                                                            <% if (existingExt.length) { %>
+                                                                                <div class="gallery-category-group"
+                                                                                    style="margin-bottom: 16px;">
+                                                                                    <strong>Ảnh Ngoại thất hiện tại
+                                                                                        (Nhập chữ
+                                                                                        minh họa bên dưới ảnh):</strong>
+                                                                                    <div class="gallery-thumbs-strip">
+                                                                                        <% existingExt.forEach(img=> {
+                                                                                            %>
+                                                                                            <div class="thumb-card-item"
+                                                                                                style="display: flex; flex-direction: column; gap: 6px; width: 140px;">
+                                                                                                <div class="thumb-container"
+                                                                                                    style="width: 140px; height: 90px; margin: 0;">
+                                                                                                    <img src="/images/<%= img.duong_dan_anh %>"
+                                                                                                        alt="Ngoại thất">
+                                                                                                </div>
+                                                                                                <input
+                                                                                                    name="chu_thich_anh_<%= img.id %>"
+                                                                                                    type="text"
+                                                                                                    placeholder="Thêm mô tả..."
+                                                                                                    value="<%= img.chu_thich || '' %>"
+                                                                                                    style="font-size: 11px; height: 28px; padding: 0 8px; width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-surface-soft);"
+                                                                                                    title="Chú thích ảnh Ngoại thất">
+                                                                                            </div>
+                                                                                            <% }) %>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <% } %>
+                                                                                    <% if (existingInt.length) { %>
+                                                                                        <div class="gallery-category-group"
+                                                                                            style="margin-bottom: 16px;">
+                                                                                            <strong>Ảnh Nội thất hiện
+                                                                                                tại (Nhập
+                                                                                                chữ minh họa bên dưới
+                                                                                                ảnh):</strong>
+                                                                                            <div
+                                                                                                class="gallery-thumbs-strip">
+                                                                                                <%
+                                                                                                    existingInt.forEach(img=>
+                                                                                                    {
+                                                                                                    %>
+                                                                                                    <div class="thumb-card-item"
+                                                                                                        style="display: flex; flex-direction: column; gap: 6px; width: 140px;">
+                                                                                                        <div class="thumb-container"
+                                                                                                            style="width: 140px; height: 90px; margin: 0;">
+                                                                                                            <img src="/images/<%= img.duong_dan_anh %>"
+                                                                                                                alt="Nội thất">
+                                                                                                        </div>
+                                                                                                        <input
+                                                                                                            name="chu_thich_anh_<%= img.id %>"
+                                                                                                            type="text"
+                                                                                                            placeholder="Thêm mô tả..."
+                                                                                                            value="<%= img.chu_thich || '' %>"
+                                                                                                            style="font-size: 11px; height: 28px; padding: 0 8px; width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-surface-soft);"
+                                                                                                            title="Chú thích ảnh Nội thất">
+                                                                                                    </div>
+                                                                                                    <% }) %>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <% } %>
+                                                                                            <% if (existingGen.length) {
+                                                                                                %>
+                                                                                                <div class="gallery-category-group"
+                                                                                                    style="margin-bottom: 16px;">
+                                                                                                    <strong>Ảnh phụ khác
+                                                                                                        hiện
+                                                                                                        tại:</strong>
+                                                                                                    <div
+                                                                                                        class="gallery-thumbs-strip">
+                                                                                                        <%
+                                                                                                            existingGen.forEach(img=>
+                                                                                                            { %>
+                                                                                                            <div class="thumb-card-item"
+                                                                                                                style="display: flex; flex-direction: column; gap: 6px; width: 140px;">
+                                                                                                                <div class="thumb-container"
+                                                                                                                    style="width: 140px; height: 90px; margin: 0;">
+                                                                                                                    <img src="/images/<%= img.duong_dan_anh %>"
+                                                                                                                        alt="Ảnh khác">
+                                                                                                                </div>
+                                                                                                                <input
+                                                                                                                    name="chu_thich_anh_<%= img.id %>"
+                                                                                                                    type="text"
+                                                                                                                    placeholder="Thêm mô tả..."
+                                                                                                                    value="<%= img.chu_thich || '' %>"
+                                                                                                                    style="font-size: 11px; height: 28px; padding: 0 8px; width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-surface-soft);"
+                                                                                                                    title="Chú thích ảnh phụ">
+                                                                                                            </div>
+                                                                                                            <% }) %>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <% } %>
+                                                                        </div>
+                                                                        <% } %>
+
+                                                                            <label class="admin-checkbox"
+                                                                                style="margin-bottom: 20px;">
+                                                                                <input name="replace_images"
+                                                                                    type="checkbox">
+                                                                                <span
+                                                                                    style="color: var(--danger-color); font-weight: 700;">Xóa
+                                                                                    hết ảnh gallery hiện tại và tải lại
+                                                                                    từ đầu
+                                                                                    (Nội thất & Ngoại thất)</span>
+                                                                            </label>
+
+                                                                            <div id="edit-car-images-exterior-<%= car.id %>"
+                                                                                style="display: grid; gap: 16px; margin-bottom: 12px; padding: 16px; background: #f8fafc; border: 1px dashed var(--border-color); border-radius: var(--radius-sm);">
+                                                                                <label style="margin-bottom: 0;">
+                                                                                    Bổ sung ảnh Ngoại thất
+                                                                                    <input name="anh_ngoai_that"
+                                                                                        type="file" accept="image/*"
+                                                                                        multiple>
+                                                                                    <small>Mẹo: Để bổ sung ảnh Ngoại
+                                                                                        thất có chữ
+                                                                                        minh họa chi tiết, hãy dùng nút
+                                                                                        "+ Thêm
+                                                                                        ô ảnh Ngoại thất" bên
+                                                                                        dưới.</small>
+                                                                                </label>
+                                                                                <label
+                                                                                    style="font-weight: normal; margin-top: -4px; margin-bottom: 0;">
+                                                                                    Chữ minh họa / chú thích (Ngoại thất
+                                                                                    mới)
+                                                                                    <input name="chu_thich_ngoai_that"
+                                                                                        type="text"
+                                                                                        placeholder="Nhập mô tả minh họa cho ảnh ngoại thất...">
+                                                                                </label>
+                                                                            </div>
+                                                                            <button type="button" class="btn secondary"
+                                                                                style="width: fit-content; margin-bottom: 24px;"
+                                                                                onclick="addFileInput('edit-car-images-exterior-<%= car.id %>', 'anh_ngoai_that', 'Ảnh ngoại thất')">+
+                                                                                Thêm ô ảnh Ngoại thất</button>
+
+                                                                            <div id="edit-car-images-interior-<%= car.id %>"
+                                                                                style="display: grid; gap: 16px; margin-bottom: 12px; padding: 16px; background: #f8fafc; border: 1px dashed var(--border-color); border-radius: var(--radius-sm);">
+                                                                                <label style="margin-bottom: 0;">
+                                                                                    Bổ sung ảnh Nội thất
+                                                                                    <input name="anh_noi_that"
+                                                                                        type="file" accept="image/*"
+                                                                                        multiple>
+                                                                                    <small>Mẹo: Để bổ sung ảnh Nội thất
+                                                                                        có chữ
+                                                                                        minh họa chi tiết, hãy dùng nút
+                                                                                        "+ Thêm
+                                                                                        ô ảnh Nội thất" bên
+                                                                                        dưới.</small>
+                                                                                </label>
+                                                                                <label
+                                                                                    style="font-weight: normal; margin-top: -4px; margin-bottom: 0;">
+                                                                                    Chữ minh họa / chú thích (Nội thất
+                                                                                    mới)
+                                                                                    <input name="chu_thich_noi_that"
+                                                                                        type="text"
+                                                                                        placeholder="Nhập mô tả minh họa cho ảnh nội thất...">
+                                                                                </label>
+                                                                            </div>
+                                                                            <button type="button" class="btn secondary"
+                                                                                style="width: fit-content; margin-bottom: 24px;"
+                                                                                onclick="addFileInput('edit-car-images-interior-<%= car.id %>', 'anh_noi_that', 'Ảnh nội thất')">+
+                                                                                Thêm ô ảnh Nội thất</button>
+
+                                                                            <div id="edit-car-images-<%= car.id %>"
+                                                                                style="display: grid; gap: 16px; margin-bottom: 12px; padding: 16px; background: #f8fafc; border: 1px dashed var(--border-color); border-radius: var(--radius-sm);">
+                                                                                <label style="margin-bottom: 0;">
+                                                                                    Thêm ảnh gallery khác
+                                                                                    <input name="danh_sach_anh"
+                                                                                        type="file" accept="image/*"
+                                                                                        multiple>
+                                                                                    <small>Có thể chọn nhiều ảnh cùng
+                                                                                        lúc để bổ
+                                                                                        sung vào thư viện ảnh
+                                                                                        xe.</small>
+                                                                                </label>
+                                                                            </div>
+                                                                            <button type="button" class="btn secondary"
+                                                                                style="width: fit-content; margin-bottom: 24px;"
+                                                                                onclick="addFileInput('edit-car-images-<%= car.id %>', 'danh_sach_anh', 'Ảnh khác')">+
+                                                                                Thêm ô tải ảnh phụ</button>
+
+                                                                            <!-- Bộ ảnh 360 độ mặc định liên kết -->
+                                                                            <% const defaultSet=(bo360Sets ||
+                                                                                []).find(s=>
+                                                                                String(s.id) === String(car.anh_360) ||
+                                                                                s.ten_bo_anh === car.anh_360);
+                                                                                const defaultSetName = defaultSet ?
+                                                                                defaultSet.ten_bo_anh : '';
+                                                                                let defaultFirstImg = '';
+                                                                                if (defaultSet &&
+                                                                                defaultSet.danh_sach_anh) {
+                                                                                const firstImg =
+                                                                                defaultSet.danh_sach_anh.split(',')[0].trim();
+                                                                                if (firstImg) defaultFirstImg =
+                                                                                '/images/' +
+                                                                                firstImg;
+                                                                                }
+                                                                                %>
+                                                                                <div class="default-360-inner-section"
+                                                                                    style="border-top: 1px solid var(--border-color); padding-top: 20px; margin-top: 20px;">
+                                                                                    <label
+                                                                                        style="font-weight: 700; font-size: 14px; color: var(--text-dark); display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                                                                        🔄 Bộ ảnh 360° mặc định của xe
+                                                                                        <a href="/admin/anh-360"
+                                                                                            target="_blank"
+                                                                                            style="font-size: 11px; font-weight: 600; color: var(--primary); text-decoration: none; background: #eef2ff; padding: 2px 8px; border-radius: 20px;">+
+                                                                                            Quản lý</a>
+                                                                                    </label>
+                                                                                    <p
+                                                                                        style="margin: 0 0 16px 0; font-size: 11px; color: var(--text-muted); font-weight: normal;">
+                                                                                        Bộ ảnh này sẽ dùng làm trình
+                                                                                        xoay 360 độ
+                                                                                        mặc định cho xe khi khách hàng
+                                                                                        chưa chọn
+                                                                                        màu sắc cụ thể.</p>
+
+                                                                                    <div class="color-360-picker-container"
+                                                                                        style="display: flex; align-items: center; gap: 10px; max-width: 500px;">
+                                                                                        <input type="hidden"
+                                                                                            name="anh_360"
+                                                                                            class="color-360-input"
+                                                                                            value="<%= car.anh_360 || '' %>">
+                                                                                        <div class="color-360-display-wrapper"
+                                                                                            style="flex: 1; display: flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 12px; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 13px; overflow: hidden; position: relative;">
+                                                                                            <span
+                                                                                                class="color-360-name-display"
+                                                                                                style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; color: var(--primary);">
+                                                                                                <%= defaultSetName
+                                                                                                    || '-- Chưa liên kết --'
+                                                                                                    %>
+                                                                                            </span>
+                                                                                            <img class="color-360-thumb-preview"
+                                                                                                src="<%= defaultFirstImg %>"
+                                                                                                style="width: 44px; height: 30px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color); display: <%= defaultFirstImg ? 'block' : 'none' %>;">
+                                                                                            <button type="button"
+                                                                                                class="btn-clear-360"
+                                                                                                style="background: none; border: none; color: #ef4444; font-size: 16px; font-weight: 700; cursor: pointer; padding: 0 6px; display: <%= car.anh_360 ? 'block' : 'none' %>;"
+                                                                                                title="Xóa liên kết">✕</button>
+                                                                                        </div>
+                                                                                        <button type="button"
+                                                                                            class="btn-choose-360 btn secondary"
+                                                                                            style="min-height: 38px; padding: 0 16px; font-size: 13px; font-weight: 700; margin: 0; cursor: pointer; flex-shrink: 0;">Chọn
+                                                                                            bộ ảnh</button>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                <label class="admin-checkbox">
+                                                                                    <input name="replace_lists"
+                                                                                        type="checkbox">
+                                                                                    <span>Cập nhật lại <strong>màu xe
+                                                                                            &amp; đặc
+                                                                                            điểm</strong> bên dưới
+                                                                                        <small
+                                                                                            style="font-weight:normal;">(Lưu
+                                                                                            ý:
+                                                                                            Thông số kỹ thuật luôn được
+                                                                                            cập nhật
+                                                                                            tự động khi bạn
+                                                                                            lưu)</small></span>
+                                                                                </label>
+                                                                                <!-- Trình soạn thảo Màu xe trực quan (Visual Color Editor) -->
+                                                                                <div class="visual-colors-section"
+                                                                                    style="margin-bottom: 24px; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; background: #ffffff; grid-column: span 2;">
+                                                                                    <div
+                                                                                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                                                                        <div>
+                                                                                            <strong
+                                                                                                style="font-size: 14px; color: var(--text-dark);">🎨
+                                                                                                Bảng màu xe trực
+                                                                                                quan</strong>
+                                                                                            <small
+                                                                                                style="display: block; color: var(--text-muted); font-size: 11px; margin-top: 4px; font-weight: normal;">Nhập
+                                                                                                tên màu, chọn mã màu
+                                                                                                bằng bảng
+                                                                                                màu, chọn ảnh xe tương
+                                                                                                ứng và
+                                                                                                giá bán thêm.</small>
+                                                                                        </div>
+                                                                                        <button type="button"
+                                                                                            class="btn secondary btn-add-color"
+                                                                                            style="min-height: 32px; padding: 0 12px; font-size: 12px; cursor: pointer;">+
+                                                                                            Thêm màu xe</button>
+                                                                                    </div>
+                                                                                    <div class="visual-colors-list"
+                                                                                        style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px;">
+                                                                                        <!-- Sẽ được thêm bằng Javascript -->
+                                                                                    </div>
+                                                                                    <textarea name="danh_sach_mau"
+                                                                                        style="display: none;"
+                                                                                        placeholder="Trắng Snowflake | #f7f7f2 | ford-everest.jpg | 0"><%= colorsToTextarea((colorsByCar || {})[car.id] || []) %></textarea>
+                                                                                </div>
+                                                                                <% const
+                                                                                    carSpecSections=specsToSections((specsByCar
+                                                                                    || {})[car.id] || []); %>
+                                                                                    <div class="spec-section-group">
+                                                                                        <div
+                                                                                            class="spec-section-group-title">
+                                                                                            🔧 Thông số kỹ thuật
+                                                                                            <small
+                                                                                                style="font-weight:normal; font-size:12px; color:var(--text-muted);">Mỗi
+                                                                                                ô là một nhóm. Mỗi dòng:
+                                                                                                <b>Tên:
+                                                                                                    Giá trị</b> (có
+                                                                                                nhãn) hoặc
+                                                                                                <b>Tên thông số</b>
+                                                                                                (bullet)</small>
+                                                                                        </div>
+                                                                                        <% (SPEC_SECTIONS ||
+                                                                                            []).forEach((section)=> { %>
+                                                                                            <label
+                                                                                                class="spec-section-field">
+                                                                                                <span
+                                                                                                    class="spec-section-label-text">
+                                                                                                    <%= section.name %>
+                                                                                                </span>
+                                                                                                <textarea
+                                                                                                    name="<%= section.key %>"
+                                                                                                    rows="3"><%= carSpecSections[section.key] || '' %></textarea>
+                                                                                            </label>
+                                                                                            <% }) %>
+                                                                                                <label
+                                                                                                    class="spec-section-field">
+                                                                                                    <span
+                                                                                                        class="spec-section-label-text">Thông
+                                                                                                        số khác (nhóm
+                                                                                                        tùy
+                                                                                                        chỉnh)</span>
+                                                                                                    <textarea
+                                                                                                        name="spec_khac"
+                                                                                                        rows="3"><%= carSpecSections.spec_khac || '' %></textarea>
+                                                                                                </label>
+                                                                                    </div>
+
+
+
+                                                                                    <!-- Trình soạn thảo Đặc điểm sản phẩm trực quan (Visual Feature Editor) -->
+                                                                                    <div class="visual-features-section"
+                                                                                        style="margin-bottom: 24px; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; background: #ffffff; grid-column: span 2;">
+                                                                                        <div
+                                                                                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                                                                            <div>
+                                                                                                <strong
+                                                                                                    style="font-size: 14px; color: var(--text-dark);">✨
+                                                                                                    Đặc điểm nổi bật
+                                                                                                    (Key
+                                                                                                    Selling
+                                                                                                    Points)</strong>
+                                                                                                <small
+                                                                                                    style="display: block; color: var(--text-muted); font-size: 11px; margin-top: 4px; font-weight: normal;">Dùng
+                                                                                                    để giới thiệu các
+                                                                                                    tính năng,
+                                                                                                    điểm nhấn nội ngoại
+                                                                                                    thất nổi
+                                                                                                    bật của xe bằng hình
+                                                                                                    ảnh và
+                                                                                                    mô tả ngoài trang
+                                                                                                    chi
+                                                                                                    tiết.</small>
+                                                                                            </div>
+                                                                                            <button type="button"
+                                                                                                class="btn secondary btn-add-feature"
+                                                                                                style="min-height: 32px; padding: 0 12px; font-size: 12px; cursor: pointer;">+
+                                                                                                Thêm đặc điểm</button>
+                                                                                        </div>
+                                                                                        <div class="visual-features-list"
+                                                                                            style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 12px;">
+                                                                                            <!-- Sẽ được thêm bằng Javascript -->
+                                                                                        </div>
+                                                                                        <textarea name="dac_diem"
+                                                                                            style="display: none;"
+                                                                                            placeholder="ngoai_that | Kiểu dáng SUV | Thiết kế mạnh mẽ, hiện đại | carnival-exterior.jpg"><%= featuresToTextarea((featuresByCar || {})[car.id] || []) %></textarea>
+                                                                                    </div>
+                                                                                    <div class="panel-admin-actions">
+                                                                                        <button type="submit">Lưu thay
+                                                                                            đổi</button>
+                                                                                    </div>
+                                                            </div>
+                                                    </form>
+
+                                                    <form action="/admin/xe/<%= car.id %>/xoa" method="post">
+                                                        <button class="danger-button" type="submit">Xóa xe</button>
+                                                    </form>
+                                                </article>
+                                                <% }) %>
+                                        </div>
+                                        <% } else { %>
+                                            <p class="empty-state">Chưa có xe nào.</p>
+                                            <% } %>
+                                </div>
+            </section>
+        </main>
+
+        <!-- Modal chọn bộ ảnh 360 độ -->
+        <div id="modal-picker-360"
+            style="display: none; position: fixed; inset: 0; z-index: 99999; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); align-items: center; justify-content: center; padding: 20px;">
+            <div
+                style="background: #ffffff; border-radius: 16px; width: 100%; max-width: 600px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); display: flex; flex-direction: column; max-height: 85vh; border: 1px solid var(--border-color); overflow: hidden;">
+                <!-- Header -->
+                <div
+                    style="padding: 20px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: #f8fafc;">
+                    <div>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #1e293b;">Chọn bộ ảnh 360° liên
+                            kết</h3>
+                        <p style="margin: 4px 0 0 0; font-size: 12px; color: var(--text-muted); font-weight: normal;">
+                            Chọn bộ ảnh từ danh sách bộ ảnh đã tạo</p>
+                    </div>
+                    <button type="button" id="modal-picker-close"
+                        style="background: none; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer; padding: 4px; line-height: 1;">✕</button>
+                </div>
+
+                <!-- Search bar -->
+                <div style="padding: 16px 24px; border-bottom: 1px solid var(--border-color);">
+                    <div style="position: relative;">
+                        <input type="text" id="modal-picker-search" placeholder="Tìm kiếm bộ ảnh theo tên..."
+                            style="width: 100%; min-height: 38px; padding: 0 14px 0 36px; border: 1.5px solid var(--border-color); border-radius: 8px; font-size: 13px; outline: none; transition: border-color 0.2s; box-sizing: border-box; background: #fff url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E&quot;) no-repeat 12px center;">
+                    </div>
+                </div>
+
+                <!-- Grid/List of sets -->
+                <div id="modal-picker-list"
+                    style="padding: 20px 24px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; background: #f8fafc;">
+                    <!-- Rendered by JS -->
+                </div>
+
+                <!-- Footer -->
+                <div
+                    style="padding: 16px 24px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: #ffffff;">
+                    <a href="/admin/anh-360" target="_blank"
+                        style="font-size: 13px; font-weight: 700; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                        ⚙️ Đi tới Quản lý bộ ảnh 360°
+                    </a>
+                    <button type="button" id="modal-picker-cancel" class="btn secondary"
+                        style="margin: 0; min-height: 36px; padding: 0 16px;">Đóng</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function addFileInput(containerId, inputName = 'danh_sach_anh', labelText = 'Ảnh khác') {
+                const container = document.getElementById(containerId);
+
+                // Create wrapper block for clean spacing
+                const wrapper = document.createElement('div');
+                wrapper.className = 'admin-dynamic-upload-block';
+                wrapper.style.display = 'grid';
+                wrapper.style.gap = '8px';
+                wrapper.style.padding = '12px';
+                wrapper.style.background = '#f8fafc';
+                wrapper.style.border = '1px dashed var(--border-color)';
+                wrapper.style.borderRadius = 'var(--radius-sm)';
+                wrapper.style.marginTop = '8px';
+                wrapper.style.marginBottom = '8px';
+
+                const fileLabel = document.createElement('label');
+                fileLabel.style.margin = '0';
+                fileLabel.innerHTML = `${labelText} <input name="${inputName}" type="file" accept="image/*" multiple>`;
+                wrapper.appendChild(fileLabel);
+
+                if (inputName === 'anh_ngoai_that' || inputName === 'anh_noi_that') {
+                    const captionInputName = inputName === 'anh_ngoai_that' ? 'chu_thich_ngoai_that' : 'chu_thich_noi_that';
+                    const captionLabel = document.createElement('label');
+                    captionLabel.style.margin = '0';
+                    captionLabel.style.fontWeight = 'normal';
+                    captionLabel.innerHTML = `Chữ minh họa / chú thích cho ảnh trên <input name="${captionInputName}" type="text" placeholder="Nhập mô tả minh họa..." style="margin-top: 4px;">`;
+                    wrapper.appendChild(captionLabel);
+                }
+
+                container.appendChild(wrapper);
+            }
+
+            function formatPreviewPrice(value) {
+                const number = Number(value || 0);
+                return number ? number.toLocaleString('vi-VN') + ' VND' : 'Giá đang cập nhật';
+            }
+
+            function getField(form, name) {
+                return form.querySelector(`[name="${name}"]`);
+            }
+
+            function getPreviewImage(form) {
+                const fileInput = form.querySelector('[name="anh_dai_dien"]');
+                if (fileInput && fileInput.files && fileInput.files[0]) {
+                    return URL.createObjectURL(fileInput.files[0]);
+                }
+
+                const currentImage = form.querySelector('[name="current_image"]')?.value;
+                if (currentImage) return `/images/${currentImage}`;
+
+                const cardImage = form.closest('.car-edit-item')?.querySelector('.car-edit-preview img')?.getAttribute('src');
+                return cardImage || '/images/no-car.jpg';
+            }
+
+            function parseLines(value, separator) {
+                return String(value || '')
+                    .split('\n')
+                    .map((line) => line.trim())
+                    .filter(Boolean)
+                    .map((line) => line.split(separator).map((part) => part.trim()));
+            }
+
+            function setupPreviewDrag(preview) {
+                const handle = preview.querySelector('.preview-drag-handle');
+                const resetBtn = preview.querySelector('.preview-drag-btn-reset');
+                if (!handle) return;
+
+                let isDragging = false;
+                let startX = 0;
+                let startY = 0;
+                let initialLeft = 0;
+                let initialTop = 0;
+
+                function resetPosition(e) {
+                    if (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    preview.classList.remove('is-floating', 'is-dragging');
+                    preview.style.position = '';
+                    preview.style.left = '';
+                    preview.style.top = '';
+                    preview.style.width = '';
+                    preview.style.transform = '';
+
+                    localStorage.removeItem('preview-floating');
+                    localStorage.removeItem('preview-left');
+                    localStorage.removeItem('preview-top');
+                }
+
+                resetBtn.addEventListener('click', resetPosition);
+                handle.addEventListener('dblclick', resetPosition);
+
+                // Load saved position if exists
+                if (localStorage.getItem('preview-floating') === 'true') {
+                    preview.classList.add('is-floating');
+                    preview.style.left = localStorage.getItem('preview-left') + 'px';
+                    preview.style.top = localStorage.getItem('preview-top') + 'px';
+                }
+
+                function onStart(x, y) {
+                    isDragging = true;
+                    preview.classList.add('is-floating', 'is-dragging');
+
+                    const rect = preview.getBoundingClientRect();
+                    startX = x;
+                    startY = y;
+                    initialLeft = rect.left;
+                    initialTop = rect.top;
+
+                    preview.style.left = initialLeft + 'px';
+                    preview.style.top = initialTop + 'px';
+                    preview.style.margin = '0';
+
+                    document.addEventListener('mousemove', onMove, { passive: false });
+                    document.addEventListener('mouseup', onEnd);
+                    document.addEventListener('touchmove', onTouchMove, { passive: false });
+                    document.addEventListener('touchend', onEnd);
+                }
+
+                function onMove(e) {
+                    if (!isDragging) return;
+                    e.preventDefault();
+
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+
+                    let newLeft = initialLeft + dx;
+                    let newTop = initialTop + dy;
+
+                    const rect = preview.getBoundingClientRect();
+                    const minX = 10;
+                    const minY = 10;
+                    const maxX = window.innerWidth - rect.width - 10;
+                    const maxY = window.innerHeight - rect.height - 10;
+
+                    newLeft = Math.max(minX, Math.min(newLeft, maxX));
+                    newTop = Math.max(minY, Math.min(newTop, maxY));
+
+                    preview.style.left = newLeft + 'px';
+                    preview.style.top = newTop + 'px';
+                }
+
+                function onTouchMove(e) {
+                    if (!isDragging) return;
+                    if (e.touches.length === 0) return;
+                    e.preventDefault();
+
+                    const touch = e.touches[0];
+                    const dx = touch.clientX - startX;
+                    const dy = touch.clientY - startY;
+
+                    let newLeft = initialLeft + dx;
+                    let newTop = initialTop + dy;
+
+                    const rect = preview.getBoundingClientRect();
+                    const minX = 10;
+                    const minY = 10;
+                    const maxX = window.innerWidth - rect.width - 10;
+                    const maxY = window.innerHeight - rect.height - 10;
+
+                    newLeft = Math.max(minX, Math.min(newLeft, maxX));
+                    newTop = Math.max(minY, Math.min(newTop, maxY));
+
+                    preview.style.left = newLeft + 'px';
+                    preview.style.top = newTop + 'px';
+                }
+
+                function onEnd() {
+                    if (!isDragging) return;
+                    isDragging = false;
+                    preview.classList.remove('is-dragging');
+
+                    const rect = preview.getBoundingClientRect();
+                    localStorage.setItem('preview-floating', 'true');
+                    localStorage.setItem('preview-left', rect.left);
+                    localStorage.setItem('preview-top', rect.top);
+
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onEnd);
+                    document.removeEventListener('touchmove', onTouchMove);
+                    document.removeEventListener('touchend', onEnd);
+                }
+
+                handle.addEventListener('mousedown', (e) => {
+                    if (e.target.closest('.preview-drag-btn-reset')) return;
+                    e.preventDefault();
+                    onStart(e.clientX, e.clientY);
+                });
+
+                handle.addEventListener('touchstart', (e) => {
+                    if (e.target.closest('.preview-drag-btn-reset')) return;
+                    if (e.touches.length === 0) return;
+                    const touch = e.touches[0];
+                    onStart(touch.clientX, touch.clientY);
+                });
+            }
+
+            function createCarPreview(form) {
+                const preview = document.createElement('aside');
+                preview.className = 'car-live-preview';
+
+                const previewUrl = form.dataset.previewUrl;
+                const isRealDetailPage = previewUrl && previewUrl !== '/xe';
+
+                preview.innerHTML = `
+            <!-- Drag Handle Bar -->
+            <div class="preview-drag-handle" title="Nhấp giữ để di chuyển bản xem trước tự do">
+                <span class="preview-drag-title">Bản xem trước live</span>
+                <button type="button" class="preview-drag-btn-reset" title="Đưa về vị trí mặc định bên phải">Neo lại</button>
+            </div>
+
+            <!-- Switcher Tabs -->
+            <div class="live-preview-switcher-tabs">
+                <button type="button" class="is-active" data-preview-tab="phone">Điện thoại</button>
+                <button type="button" data-preview-tab="detail">Bản chi tiết</button>
+                <button type="button" data-preview-tab="iframe">Trang thật</button>
+            </div>
+            
+            <!-- Tab Content 1: Phone view -->
+            <div class="live-preview-tab-content is-active" data-preview-content="phone">
+                <div class="car-live-phone">
+                    <img data-preview-img src="${getPreviewImage(form)}" alt="Ảnh xem trước">
+                    <div>
+                        <span data-preview-type>Thông tin xe</span>
+                        <h3 data-preview-name>Xe mới</h3>
+                        <p data-preview-slogan>Nhập slogan hoặc mô tả ngắn để xem trước.</p>
+                        <strong data-preview-price>Giá đang cập nhật</strong>
+                        <dl>
+                            <div><dt>Động cơ</dt><dd data-preview-engine>Đang cập nhật</dd></div>
+                            <div><dt>Hộp số</dt><dd data-preview-gear>Đang cập nhật</dd></div>
+                            <div><dt>Số chỗ</dt><dd data-preview-seats>Đang cập nhật</dd></div>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab Content 2: Detail showcase -->
+            <div class="live-preview-tab-content" data-preview-content="detail">
+                <div class="car-admin-detail-preview">
+                    <div class="car-admin-detail-preview__top">
+                        <span>Bản xem trước trang chi tiết</span>
+                        <strong>Dữ liệu cập nhật khi bạn nhập</strong>
+                    </div>
+                    <div class="car-admin-detail-preview__hero">
+                        <div>
+                            <span data-preview-type-detail>Thông tin xe</span>
+                            <h3 data-preview-name-detail>Xe mới</h3>
+                            <p data-preview-slogan-detail>Nhập slogan hoặc mô tả ngắn để xem trước.</p>
+                            <strong data-preview-price-detail>Giá đang cập nhật</strong>
+                            <div class="car-admin-detail-preview__actions">
+                                <button type="button">Nhận báo giá</button>
+                                <button type="button">Đặt lịch lái thử</button>
+                            </div>
+                        </div>
+                        <img data-preview-img-detail src="${getPreviewImage(form)}" alt="Ảnh xem trước chi tiết xe">
+                    </div>
+                    <div class="car-admin-detail-preview__tabs">
+                        <span>Tổng quan</span>
+                        <span>Thư viện ảnh</span>
+                        <span>Thông số kỹ thuật</span>
+                        <span>Màu sắc</span>
+                    </div>
+                    <div class="car-admin-detail-preview__specs">
+                        <div><small>Động cơ</small><b data-preview-engine-detail>Đang cập nhật</b></div>
+                        <div><small>Hộp số</small><b data-preview-gear-detail>Đang cập nhật</b></div>
+                        <div><small>Số chỗ</small><b data-preview-seats-detail>Đang cập nhật</b></div>
+                    </div>
+                    <div class="car-admin-detail-preview__section">
+                        <h4>Thông số kỹ thuật</h4>
+                        <dl data-live-specs></dl>
+                    </div>
+                    <div class="car-admin-detail-preview__section">
+                        <h4>Màu xe</h4>
+                        <div class="car-admin-detail-preview__colors" data-live-colors></div>
+                    </div>
+                    <div class="car-admin-detail-preview__section">
+                        <h4>Đặc điểm sản phẩm</h4>
+                        <div class="car-admin-detail-preview__features" data-live-features></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tab Content 3: Real Page Iframe -->
+            <div class="live-preview-tab-content" data-preview-content="iframe">
+                <div class="car-detail-page-preview">
+                    ${isRealDetailPage ? `
+                        <div class="car-detail-page-preview__bar">
+                            <strong>Trang chi tiết xe thật</strong>
+                            <a href="${previewUrl}" target="_blank" rel="noopener">Mở trang</a>
+                        </div>
+                        <iframe src="${previewUrl}" title="Xem trước trang chi tiết xe"></iframe>
+                    ` : `
+                        <div class="car-detail-page-preview__empty">
+                            <strong>Trang chi tiết xe thật</strong>
+                            <p>Xe mới cần được lưu trước, sau đó phần sửa xe sẽ hiển thị đúng trang chi tiết để bạn kiểm tra.</p>
+                        </div>
+                    `}
+                </div>
+            </div>
+        `;
+
+                // Add tab switcher event listener
+                preview.querySelectorAll('[data-preview-tab]').forEach((tabBtn) => {
+                    tabBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const tabTarget = tabBtn.dataset.previewTab;
+                        preview.querySelectorAll('[data-preview-tab]').forEach((btn) => btn.classList.toggle('is-active', btn === tabBtn));
+                        preview.querySelectorAll('[data-preview-content]').forEach((content) => {
+                            content.classList.toggle('is-active', content.dataset.previewContent === tabTarget);
+                        });
+                    });
+                });
+
+                // Initialize Drag and Drop
+                setupPreviewDrag(preview);
+
+                const title = form.querySelector('h2');
+                if (title) title.insertAdjacentElement('afterend', preview);
+                else form.insertAdjacentElement('afterbegin', preview);
+                return preview;
+            }
+
+            function updateCarPreview(form) {
+                const preview = form.querySelector('.car-live-preview');
+                if (!preview) return;
+
+                const name = getField(form, 'ten_xe')?.value || 'Xe mới';
+                const version = getField(form, 'phien_ban')?.value || '';
+                const fullName = version ? `${name} - ${version}` : name;
+
+                const selectedModel = getField(form, 'dong_xe_id')?.selectedOptions?.[0]?.textContent || 'Thông tin xe';
+                const modelCleaned = selectedModel.replace(/\s+/g, ' ').trim();
+                const slogan = getField(form, 'slogan')?.value || getField(form, 'mo_ta_ngan')?.value || 'Nhập slogan hoặc mô tả ngắn để xem trước.';
+                const price = getField(form, 'gia_ban')?.value;
+                const engine = getField(form, 'dong_co')?.value || 'Đang cập nhật';
+                const gear = getField(form, 'hop_so')?.value || 'Đang cập nhật';
+                const seats = getField(form, 'so_cho_ngoi')?.value ? getField(form, 'so_cho_ngoi').value + ' chỗ' : 'Đang cập nhật';
+
+                const previewImgSrc = getPreviewImage(form);
+
+                // Update Phone View Tab
+                const phoneName = preview.querySelector('[data-preview-name]');
+                const phoneType = preview.querySelector('[data-preview-type]');
+                const phoneSlogan = preview.querySelector('[data-preview-slogan]');
+                const phonePrice = preview.querySelector('[data-preview-price]');
+                const phoneEngine = preview.querySelector('[data-preview-engine]');
+                const phoneGear = preview.querySelector('[data-preview-gear]');
+                const phoneSeats = preview.querySelector('[data-preview-seats]');
+                const phoneImg = preview.querySelector('[data-preview-img]');
+
+                if (phoneName) phoneName.textContent = fullName;
+                if (phoneType) phoneType.textContent = modelCleaned;
+                if (phoneSlogan) phoneSlogan.textContent = slogan;
+                if (phonePrice) phonePrice.textContent = formatPreviewPrice(price);
+                if (phoneEngine) phoneEngine.textContent = engine;
+                if (phoneGear) phoneGear.textContent = gear;
+                if (phoneSeats) phoneSeats.textContent = seats;
+                if (phoneImg) phoneImg.src = previewImgSrc;
+
+                // Update Detail Showcase Tab
+                const detailName = preview.querySelector('[data-preview-name-detail]');
+                const detailType = preview.querySelector('[data-preview-type-detail]');
+                const detailSlogan = preview.querySelector('[data-preview-slogan-detail]');
+                const detailPrice = preview.querySelector('[data-preview-price-detail]');
+                const detailEngine = preview.querySelector('[data-preview-engine-detail]');
+                const detailGear = preview.querySelector('[data-preview-gear-detail]');
+                const detailSeats = preview.querySelector('[data-preview-seats-detail]');
+                const detailImg = preview.querySelector('[data-preview-img-detail]');
+
+                if (detailName) detailName.textContent = fullName;
+                if (detailType) detailType.textContent = modelCleaned;
+                if (detailSlogan) detailSlogan.textContent = slogan;
+                if (detailPrice) detailPrice.textContent = formatPreviewPrice(price);
+                if (detailEngine) detailEngine.textContent = engine;
+                if (detailGear) detailGear.textContent = gear;
+                if (detailSeats) detailSeats.textContent = seats;
+                if (detailImg) detailImg.src = previewImgSrc;
+
+                // Update dynamic color list
+                const colorsArea = getField(form, 'danh_sach_mau');
+                if (colorsArea) {
+                    const colors = parseLines(colorsArea.value, '|');
+                    const colorsContainer = preview.querySelector('[data-live-colors]');
+                    if (colorsContainer) {
+                        colorsContainer.innerHTML = colors.length
+                            ? colors.slice(0, 8).map(([label, color]) => `<span><i style="background:${color || '#e5e7eb'}"></i>${label || 'Màu xe'}</span>`).join('')
+                            : '<span><i style="background:#e5e7eb"></i>Chưa nhập màu</span>';
+                    }
+                }
+
+                // Update dynamic specifications list
+                const specsArea = getField(form, 'thong_so');
+                if (specsArea) {
+                    const specs = parseLines(specsArea.value, ':');
+                    const specsContainer = preview.querySelector('[data-live-specs]');
+                    if (specsContainer) {
+                        specsContainer.innerHTML = specs.length
+                            ? specs.slice(0, 6).map(([label, val]) => `<div><dt>${label || 'Thông số'}</dt><dd>${val || 'Đang cập nhật'}</dd></div>`).join('')
+                            : '<div><dt>Công suất</dt><dd>Đang cập nhật</dd></div><div><dt>Kích thước</dt><dd>Đang cập nhật</dd></div>';
+                    }
+                }
+
+                // Update dynamic features list
+                const featuresArea = getField(form, 'dac_diem');
+                if (featuresArea) {
+                    const features = parseLines(featuresArea.value, '|');
+                    const featuresContainer = preview.querySelector('[data-live-features]');
+                    if (featuresContainer) {
+                        featuresContainer.innerHTML = features.length
+                            ? features.slice(0, 4).map(([group, title, desc]) => `<article><small>${group || 'Đặc điểm'}</small><b>${title || 'Tiêu đề'}</b><p>${desc || 'Mô tả đang cập nhật'}</p></article>`).join('')
+                            : '<article><small>Đặc điểm</small><b>Chưa nhập đặc điểm</b><p>Nội dung này sẽ hiển thị khi bạn nhập vào ô đặc điểm sản phẩm.</p></article>';
+                    }
+                }
+            }
+
+            document.querySelectorAll('.car-live-editor').forEach((form) => {
+                createCarPreview(form);
+                updateCarPreview(form);
+
+                form.addEventListener('input', () => updateCarPreview(form));
+                form.addEventListener('change', (event) => {
+                    updateCarPreview(form);
+                });
+            });
+
+
+        </script>
+        <script>
+            const carItems = Array.from(document.querySelectorAll('[data-car-item]'));
+            const pageSize = 6;
+            let currentCarPage = 1;
+            let filteredCarItems = [...carItems];
+
+            const searchInput = document.getElementById('car-search-input');
+
+            function renderCarPage(page) {
+                if (!carItems.length) return;
+
+                const totalPages = Math.max(1, Math.ceil(filteredCarItems.length / pageSize));
+                currentCarPage = Math.min(Math.max(page, 1), totalPages);
+                const start = (currentCarPage - 1) * pageSize;
+                const end = start + pageSize;
+
+                // First hide all items completely using display: none (overrides flex/grid stylesheets)
+                carItems.forEach((item) => {
+                    item.style.display = 'none';
+                });
+
+                // Show only the visible ones from the filtered list
+                filteredCarItems.forEach((item, index) => {
+                    const visible = index >= start && index < end;
+                    if (visible) {
+                        item.style.display = ''; // Fallback to stylesheet's default display style (flex)
+                    } else {
+                        item.classList.remove('is-open');
+                    }
+                });
+
+                const status = document.querySelector('[data-car-page-status]');
+                const prev = document.querySelector('[data-car-page-prev]');
+                const next = document.querySelector('[data-car-page-next]');
+
+                if (status) status.textContent = `${currentCarPage} / ${totalPages}`;
+                if (prev) prev.disabled = currentCarPage === 1;
+                if (next) next.disabled = currentCarPage === totalPages;
+            }
+
+            // Handle live search input
+            searchInput?.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                if (!query) {
+                    filteredCarItems = [...carItems];
+                } else {
+                    filteredCarItems = carItems.filter((item) => {
+                        const title = item.querySelector('strong')?.textContent.toLowerCase() || '';
+                        const type = item.querySelector('span')?.textContent.toLowerCase() || '';
+                        return title.includes(query) || type.includes(query);
+                    });
+                }
+                renderCarPage(1);
+            });
+
+            document.querySelector('[data-car-page-prev]')?.addEventListener('click', () => renderCarPage(currentCarPage - 1));
+            document.querySelector('[data-car-page-next]')?.addEventListener('click', () => renderCarPage(currentCarPage + 1));
+
+            carItems.forEach((item) => {
+                item.querySelector('[data-car-toggle]')?.addEventListener('click', () => {
+                    const isOpening = !item.classList.contains('is-open');
+                    carItems.forEach((otherItem) => otherItem.classList.remove('is-open'));
+                    if (isOpening) {
+                        item.classList.add('is-open');
+                        item.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+
+            renderCarPage(1);
+
+            // --- Visual Editors For Colors & Features (Interactive Form Synchronization) ---
+
+            function createColorRowHTML(ten = '', ma = '#ffffff', anh = '', gia = '0', anh_360 = '') {
+                let options = `<option value="">-- Chọn ảnh xe theo màu --</option>`;
+                (allImageFiles || []).forEach((file) => {
+                    options += `<option value="${file}" ${file === anh ? 'selected' : ''}>${file}</option>`;
+                });
+
+                const selectedSet = (allBo360Sets || []).find((set) => String(set.id) === String(anh_360) || set.ten_bo_anh === anh_360);
+                const selectedSetName = selectedSet ? selectedSet.ten_bo_anh : '';
+                let firstImageSrc = '';
+                if (selectedSet && selectedSet.danh_sach_anh) {
+                    const firstImg = selectedSet.danh_sach_anh.split(',')[0].trim();
+                    if (firstImg) firstImageSrc = `/images/${firstImg}`;
+                }
+
+                const imgPreview = anh ? `/images/${anh}` : '/images/no-car.jpg';
+                const has360Sets = (allBo360Sets || []).length > 0;
+
+                return `
+        <div class="visual-color-row" style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-sm); position: relative; width: 100%; flex-wrap: wrap;">
+            <div style="flex: 2; min-width: 150px; display: flex; flex-direction: column; gap: 4px;">
+                <label style="margin: 0; font-size: 11px; color: var(--text-muted); font-weight: 600;">Tên màu</label>
+                <input type="text" class="color-name-input" value="${ten.replace(/"/g, '&quot;')}" placeholder="Ví dụ: Đỏ Ruby" style="min-height: 34px; padding: 0 10px; font-size: 13px; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); width: 100%;">
+            </div>
+            
+            <div style="flex: 1; min-width: 110px; display: flex; flex-direction: column; gap: 4px;">
+                <label style="margin: 0; font-size: 11px; color: var(--text-muted); font-weight: 600;">Mã màu</label>
+                <div style="display: flex; gap: 6px; align-items: center;">
+                    <input type="color" class="color-picker-input" value="${ma}" style="width: 34px; height: 34px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0; cursor: pointer; background: transparent; flex-shrink: 0;">
+                    <input type="text" class="color-hex-input" value="${ma}" placeholder="#ffffff" style="min-height: 34px; padding: 0 6px; font-size: 12px; width: 70px; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-sm);">
+                </div>
+            </div>
+
+            <div style="flex: 2; min-width: 200px; display: flex; flex-direction: column; gap: 4px;">
+                <label style="margin: 0; font-size: 11px; color: var(--text-muted); font-weight: 600;">Ảnh xe theo màu</label>
+                <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
+                    <select class="color-image-select" style="min-height: 34px; padding: 0 8px; font-size: 12px; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); flex: 1;">
+                        ${options}
+                    </select>
+                    <img class="color-image-preview" src="${imgPreview}" style="width: 50px; height: 34px; object-fit: contain; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: #ffffff; flex-shrink: 0;">
+                </div>
+            </div>
+
+            <div style="flex: 2; min-width: 220px; display: flex; flex-direction: column; gap: 4px;">
+                <label style="margin: 0; font-size: 11px; color: var(--text-muted); font-weight: 700; display: flex; align-items: center; gap: 6px;">
+                    Bộ ảnh 360° liên kết
+                    <a href="/admin/anh-360" target="_blank" style="font-size: 10px; font-weight: 600; color: var(--primary); text-decoration: none; background: #eef2ff; padding: 1px 6px; border-radius: 20px;">+ Quản lý</a>
+                </label>
+                ${has360Sets
+                        ? `
+                    <div class="color-360-picker-container" style="display: flex; align-items: center; gap: 8px; width: 100%;">
+                      <input type="hidden" class="color-360-input" value="${anh_360}">
+                      <div class="color-360-display-wrapper" style="flex: 1; display: flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 8px; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); font-size: 12px; overflow: hidden; position: relative;">
+                          <span class="color-360-name-display" style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; color: var(--primary);">
+                              ${selectedSetName || '-- Chưa liên kết --'}
+                          </span>
+                          <img class="color-360-thumb-preview" src="${firstImageSrc}" style="width: 38px; height: 26px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color); display: ${firstImageSrc ? 'block' : 'none'};">
+                          <button type="button" class="btn-clear-360" style="background: none; border: none; color: #ef4444; font-size: 14px; font-weight: 700; cursor: pointer; padding: 0 4px; display: ${anh_360 ? 'block' : 'none'};" title="Xóa liên kết">✕</button>
+                      </div>
+                      <button type="button" class="btn-choose-360 btn secondary" style="min-height: 34px; padding: 0 12px; font-size: 12px; font-weight: 700; margin: 0; cursor: pointer; flex-shrink: 0;">Chọn</button>
+                    </div>
+                    `
+                        : `<div style="min-height: 34px; padding: 0 10px; font-size: 12px; background: #f1f5f9; border: 1px dashed var(--border-color); border-radius: var(--radius-sm); display: flex; align-items: center; color: var(--text-muted); gap: 6px;">Chưa có bộ ảnh nào. <a href="/admin/anh-360" target="_blank" style="color: var(--primary); font-weight: 700;">Tạo ngay →</a></div>`
+                    }
+            </div>
+
+            <div style="flex: 1; min-width: 100px; display: flex; flex-direction: column; gap: 4px;">
+                <label style="margin: 0; font-size: 11px; color: var(--text-muted); font-weight: 600;">Giá thêm (VND)</label>
+                <input type="number" class="color-price-input" value="${gia}" placeholder="0" style="min-height: 34px; padding: 0 10px; font-size: 13px; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); width: 100%;">
+            </div>
+
+            <button type="button" class="btn-delete-color" style="background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; border-radius: var(--radius-sm); width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; align-self: flex-end; transition: var(--transition-smooth); flex-shrink: 0;" title="Xóa màu này">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+            </button>
+        </div>
+    `;
+            }
+
+            function createFeatureCardHTML(nhom = 'noi_bat', tieu_de = '', mo_ta = '', anh = '') {
+                let options = `<option value="">-- Chọn ảnh minh họa --</option>`;
+                (allImageFiles || []).forEach((file) => {
+                    options += `<option value="${file}" ${file === anh ? 'selected' : ''}>${file}</option>`;
+                });
+
+                const imgPreview = anh ? `/images/${anh}` : '/images/no-car.jpg';
+
+                return `
+        <div class="visual-feature-card" style="display: flex; flex-direction: column; gap: 12px; padding: 16px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); position: relative; box-shadow: var(--shadow-sm);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="flex: 1;">
+                    <label style="margin: 0; font-size: 11px; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; display: block;">Nhóm đặc điểm</label>
+                    <select class="feature-group-select" style="min-height: 32px; padding: 0 8px; font-size: 12px; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); width: auto; font-weight: 700; color: var(--primary);">
+                        <option value="noi_bat" ${nhom === 'noi_bat' ? 'selected' : ''}>🌟 Đặc điểm nổi bật</option>
+                        <option value="ngoai_that" ${nhom === 'ngoai_that' ? 'selected' : ''}>🚗 Ngoại thất</option>
+                        <option value="noi_that" ${nhom === 'noi_that' ? 'selected' : ''}>🛋️ Nội thất</option>
+                    </select>
+                </div>
+                
+                <button type="button" class="btn-delete-feature" style="background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; border-radius: var(--radius-sm); width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition-smooth);" title="Xóa đặc điểm này">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                </button>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <label style="margin: 0; font-size: 11px; color: var(--text-muted); font-weight: 600;">Tiêu đề đặc điểm</label>
+                <input type="text" class="feature-title-input" value="${tieu_de.replace(/"/g, '&quot;')}" placeholder="Ví dụ: Động cơ Ecoboost 2.0L mạnh mẽ" style="min-height: 34px; padding: 0 10px; font-size: 13px; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); width: 100%;">
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <label style="margin: 0; font-size: 11px; color: var(--text-muted); font-weight: 600;">Mô tả chi tiết đặc điểm</label>
+                <textarea class="feature-desc-textarea" rows="3" placeholder="Ví dụ: Động cơ sản sinh công suất 170 mã lực mang lại cảm giác lái vượt trội..." style="min-height: 70px; padding: 8px 10px; font-size: 12px; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); resize: vertical; margin-bottom: 0; line-height: 1.45; width: 100%; font-family: inherit;">${mo_ta}</textarea>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <label style="margin: 0; font-size: 11px; color: var(--text-muted); font-weight: 600;">Ảnh nền minh họa</label>
+                <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
+                    <select class="feature-image-select" style="min-height: 34px; padding: 0 8px; font-size: 12px; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); flex: 1;">
+                        ${options}
+                    </select>
+                    <img class="feature-image-preview" src="${imgPreview}" style="width: 60px; height: 34px; object-fit: contain; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: #ffffff; flex-shrink: 0;">
+                </div>
+            </div>
+        </div>
+    `;
+            }
+
+
+
+
+
+
+
+
+
+
+
+            // Sync visual inputs to textarea
+            function syncColors(container) {
+                const list = container.querySelector('.visual-colors-list');
+                const textarea = container.querySelector('textarea[name="danh_sach_mau"]');
+                if (!list || !textarea) return;
+
+                const rows = Array.from(list.querySelectorAll('.visual-color-row'));
+                const lines = rows.map((row) => {
+                    const ten = row.querySelector('.color-name-input').value.trim();
+                    const ma = row.querySelector('.color-hex-input').value.trim();
+                    const anh = row.querySelector('.color-image-select').value.trim();
+                    const gia = row.querySelector('.color-price-input').value.trim() || '0';
+                    const input360 = row.querySelector('.color-360-input') || row.querySelector('.color-360-select');
+                    const anh_360 = input360 ? input360.value.trim() : '';
+
+                    if (!ten) return '';
+                    return `${ten} | ${ma || '#ffffff'} | ${anh} | ${gia} | ${anh_360}`;
+                }).filter(Boolean);
+
+                textarea.value = lines.join('\n');
+                // Trigger live preview update
+                textarea.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+
+            function syncFeatures(container) {
+                const list = container.querySelector('.visual-features-list');
+                const textarea = container.querySelector('textarea[name="dac_diem"]');
+                if (!list || !textarea) return;
+
+                const cards = Array.from(list.querySelectorAll('.visual-feature-card'));
+                const lines = cards.map((card) => {
+                    const nhom = card.querySelector('.feature-group-select').value.trim();
+                    const tieu_de = card.querySelector('.feature-title-input').value.trim();
+                    const mo_ta = card.querySelector('.feature-desc-textarea').value.trim();
+                    const anh = card.querySelector('.feature-image-select').value.trim();
+
+                    if (!tieu_de) return '';
+                    return `${nhom} | ${tieu_de} | ${mo_ta} | ${anh}`;
+                }).filter(Boolean);
+
+                textarea.value = lines.join('\n');
+                // Trigger live preview update
+                textarea.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+
+            function parseTextareaColors(text) {
+                return text.split('\n').map((line) => {
+                    const parts = line.split('|').map(p => p.trim());
+                    if (parts.length < 1 || !parts[0]) return null;
+                    return {
+                        ten: parts[0] || '',
+                        ma: parts[1] || '#ffffff',
+                        anh: parts[2] || '',
+                        gia: parts[3] || '0',
+                        anh_360: parts[4] || ''
+                    };
+                }).filter(Boolean);
+            }
+
+            function parseTextareaFeatures(text) {
+                return text.split('\n').map((line) => {
+                    const parts = line.split('|').map(p => p.trim());
+                    if (parts.length < 2 || !parts[1]) return null;
+                    return {
+                        nhom: parts[0] || 'noi_bat',
+                        tieu_de: parts[1] || '',
+                        mo_ta: parts[2] || '',
+                        anh: parts[3] || ''
+                    };
+                }).filter(Boolean);
+            }
+
+            // Main Visual Editor Init
+            function initVisualEditors() {
+                // 1. Process Color Sections
+                document.querySelectorAll('.visual-colors-section').forEach((container) => {
+                    const list = container.querySelector('.visual-colors-list');
+                    const textarea = container.querySelector('textarea[name="danh_sach_mau"]');
+                    const btnAdd = container.querySelector('.btn-add-color');
+                    if (!list || !textarea) return;
+
+                    // Populate existing colors
+                    const existingText = textarea.value.trim();
+                    if (existingText) {
+                        const colors = parseTextareaColors(existingText);
+                        colors.forEach((color) => {
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = createColorRowHTML(color.ten, color.ma, color.anh, color.gia, color.anh_360);
+                            const row = tempDiv.firstElementChild;
+                            list.appendChild(row);
+                        });
+                    }
+
+                    // Add handler
+                    btnAdd?.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = createColorRowHTML('', '#ffffff', '', '0', '');
+                        const row = tempDiv.firstElementChild;
+                        list.appendChild(row);
+                        syncColors(container);
+                        row.querySelector('.color-name-input').focus();
+                    });
+
+                    // Event listeners delegation for sync & image previews
+                    list.addEventListener('input', (e) => {
+                        const target = e.target;
+                        if (target.classList.contains('color-name-input') || target.classList.contains('color-price-input') || target.classList.contains('color-360-input')) {
+                            syncColors(container);
+                        }
+                        if (target.classList.contains('color-hex-input')) {
+                            const picker = target.parentElement.querySelector('.color-picker-input');
+                            if (picker && target.value.startsWith('#') && target.value.length === 7) {
+                                picker.value = target.value;
+                            }
+                            syncColors(container);
+                        }
+                        if (target.classList.contains('color-picker-input')) {
+                            const hexInput = target.parentElement.querySelector('.color-hex-input');
+                            if (hexInput) hexInput.value = target.value;
+                            syncColors(container);
+                        }
+                    });
+
+                    list.addEventListener('change', (e) => {
+                        const target = e.target;
+                        if (target.classList.contains('color-image-select')) {
+                            const row = target.closest('.visual-color-row');
+                            const img = row.querySelector('.color-image-preview');
+                            if (img) {
+                                img.src = target.value ? `/images/${target.value}` : '/images/no-car.jpg';
+                            }
+                            syncColors(container);
+                        }
+                        if (target.classList.contains('color-picker-input') || target.classList.contains('color-360-select')) {
+                            syncColors(container);
+                        }
+                    });
+
+                    list.addEventListener('click', (e) => {
+                        const btnDelete = e.target.closest('.btn-delete-color');
+                        if (btnDelete) {
+                            e.preventDefault();
+                            const row = btnDelete.closest('.visual-color-row');
+                            if (row) {
+                                row.remove();
+                                syncColors(container);
+                            }
+                            return;
+                        }
+
+
+                        const btnGenTrigger = e.target.closest('.btn-generate-360-trigger');
+                        if (btnGenTrigger) {
+                            e.preventDefault();
+                            const row = btnGenTrigger.closest('.visual-color-row');
+                            const panel = row.querySelector('.gen-360-panel');
+                            if (panel) {
+                                panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
+                            }
+                            return;
+                        }
+
+                        const btnCancelGen = e.target.closest('.btn-cancel-gen-360');
+                        if (btnCancelGen) {
+                            e.preventDefault();
+                            const row = btnCancelGen.closest('.visual-color-row');
+                            const panel = row.querySelector('.gen-360-panel');
+                            if (panel) {
+                                panel.style.display = 'none';
+                            }
+                            return;
+                        }
+
+                        const btnExecuteGen = e.target.closest('.btn-execute-gen-360');
+                        if (btnExecuteGen) {
+                            e.preventDefault();
+                            const row = btnExecuteGen.closest('.visual-color-row');
+                            const panel = row.querySelector('.gen-360-panel');
+                            const input = row.querySelector('.color-360-input');
+                            if (panel && input) {
+                                const prefix = panel.querySelector('.gen-360-prefix').value.trim();
+                                const count = parseInt(panel.querySelector('.gen-360-count').value || 15);
+                                const ext = panel.querySelector('.gen-360-ext').value;
+                                const pad = panel.querySelector('.gen-360-pad').value;
+
+                                if (!prefix) {
+                                    alert('Vui lòng nhập tiền tố tên ảnh.');
+                                    return;
+                                }
+
+                                const files = [];
+                                for (let i = 1; i <= count; i++) {
+                                    let numStr = String(i);
+                                    if (pad === 'pad2' && i < 10) {
+                                        numStr = '0' + numStr;
+                                    }
+                                    files.push(prefix + numStr + ext);
+                                }
+                                input.value = files.join(', ');
+                                syncColors(container);
+                                panel.style.display = 'none';
+                            }
+                            return;
+                        }
+                    });
+                });
+
+                // 2. Process Feature Sections
+                document.querySelectorAll('.visual-features-section').forEach((container) => {
+                    const list = container.querySelector('.visual-features-list');
+                    const textarea = container.querySelector('textarea[name="dac_diem"]');
+                    const btnAdd = container.querySelector('.btn-add-feature');
+                    if (!list || !textarea) return;
+
+                    // Populate existing features
+                    const existingText = textarea.value.trim();
+                    if (existingText) {
+                        const features = parseTextareaFeatures(existingText);
+                        features.forEach((feat) => {
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = createFeatureCardHTML(feat.nhom, feat.tieu_de, feat.mo_ta, feat.anh);
+                            const card = tempDiv.firstElementChild;
+                            list.appendChild(card);
+                        });
+                    }
+
+                    // Add handler
+                    btnAdd?.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = createFeatureCardHTML('noi_bat', '', '', '');
+                        const card = tempDiv.firstElementChild;
+                        list.appendChild(card);
+                        syncFeatures(container);
+                        card.querySelector('.feature-title-input').focus();
+                    });
+
+                    // Event delegation
+                    list.addEventListener('input', (e) => {
+                        const target = e.target;
+                        if (target.classList.contains('feature-title-input') || target.classList.contains('feature-desc-textarea')) {
+                            syncFeatures(container);
+                        }
+                    });
+
+                    list.addEventListener('change', (e) => {
+                        const target = e.target;
+                        if (target.classList.contains('feature-group-select')) {
+                            syncFeatures(container);
+                        }
+                        if (target.classList.contains('feature-image-select')) {
+                            const card = target.closest('.visual-feature-card');
+                            const img = card.querySelector('.feature-image-preview');
+                            if (img) {
+                                img.src = target.value ? `/images/${target.value}` : '/images/no-car.jpg';
+                            }
+                            syncFeatures(container);
+                        }
+                    });
+
+                    list.addEventListener('click', (e) => {
+                        const btnDelete = e.target.closest('.btn-delete-feature');
+                        if (btnDelete) {
+                            e.preventDefault();
+                            const card = btnDelete.closest('.visual-feature-card');
+                            if (card) {
+                                card.remove();
+                                syncFeatures(container);
+                            }
+                        }
+                    });
+                });
+
+
+            }
+
+            // Run initializations
+            initVisualEditors();
+
+            // --- Global 360 Picker Modal Management ---
+            let activePickerRow = null;
+            let activePickerContainer = null;
+
+            const modalPicker = document.getElementById('modal-picker-360');
+            const modalPickerList = document.getElementById('modal-picker-list');
+            const modalPickerSearch = document.getElementById('modal-picker-search');
+            const modalPickerClose = document.getElementById('modal-picker-close');
+            const modalPickerCancel = document.getElementById('modal-picker-cancel');
+
+            function open360Picker(row, container) {
+                activePickerRow = row;
+                activePickerContainer = container;
+                modalPickerSearch.value = '';
+                renderPickerList('');
+                modalPicker.style.display = 'flex';
+            }
+
+            function clear360Selection(row, container) {
+                const input = row.querySelector('.color-360-input');
+                const label = row.querySelector('.color-360-name-display');
+                const thumb = row.querySelector('.color-360-thumb-preview');
+                const btnClear = row.querySelector('.btn-clear-360');
+
+                if (input) input.value = '';
+                if (label) label.textContent = '-- Chưa liên kết --';
+                if (thumb) {
+                    thumb.src = '';
+                    thumb.style.display = 'none';
+                }
+                if (btnClear) btnClear.style.display = 'none';
+
+                if (container) syncColors(container);
+            }
+
+            function select360Set(set) {
+                if (!activePickerRow) return;
+
+                const input = activePickerRow.querySelector('.color-360-input');
+                const label = activePickerRow.querySelector('.color-360-name-display');
+                const thumb = activePickerRow.querySelector('.color-360-thumb-preview');
+                const btnClear = activePickerRow.querySelector('.btn-clear-360');
+
+                if (input) input.value = set.id;
+                if (label) label.textContent = set.ten_bo_anh;
+
+                if (thumb) {
+                    if (set.danh_sach_anh) {
+                        const firstImg = set.danh_sach_anh.split(',')[0].trim();
+                        thumb.src = firstImg ? `/images/${firstImg}` : '';
+                        thumb.style.display = firstImg ? 'block' : 'none';
+                    } else {
+                        thumb.src = '';
+                        thumb.style.display = 'none';
+                    }
+                }
+                if (btnClear) btnClear.style.display = 'block';
+
+                if (activePickerContainer) syncColors(activePickerContainer);
+                close360Picker();
+            }
+
+            function close360Picker() {
+                modalPicker.style.display = 'none';
+                activePickerRow = null;
+                activePickerContainer = null;
+            }
+
+            if (modalPickerClose) modalPickerClose.addEventListener('click', close360Picker);
+            if (modalPickerCancel) modalPickerCancel.addEventListener('click', close360Picker);
+
+            if (modalPicker) {
+                modalPicker.addEventListener('click', (e) => {
+                    if (e.target === modalPicker) {
+                        close360Picker();
+                    }
+                });
+            }
+
+            function renderPickerList(query = '') {
+                if (!modalPickerList) return;
+                modalPickerList.innerHTML = '';
+
+                const filtered = (allBo360Sets || []).filter((set) => {
+                    return !query || (set.ten_bo_anh || '').toLowerCase().includes(query.toLowerCase());
+                });
+
+                if (!filtered.length) {
+                    modalPickerList.innerHTML = `
+              <div style="text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 13px; font-style: italic;">
+                  Không tìm thấy bộ ảnh nào phù hợp.
+              </div>
+          `;
+                    return;
+                }
+
+                filtered.forEach((set) => {
+                    const files = (set.danh_sach_anh || '').split(',').map(f => f.trim()).filter(Boolean);
+                    const previewImg = files[0] ? `/images/${files[0]}` : '/images/no-car.jpg';
+
+                    const item = document.createElement('div');
+                    item.style.cssText = 'background: #ffffff; border: 1.5px solid var(--border-color); border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: all 0.2s;';
+
+                    item.addEventListener('mouseenter', () => {
+                        item.style.borderColor = 'var(--primary)';
+                        item.style.boxShadow = '0 4px 12px rgba(99,102,241,0.08)';
+                        item.style.transform = 'translateY(-1px)';
+                    });
+                    item.addEventListener('mouseleave', () => {
+                        item.style.borderColor = 'var(--border-color)';
+                        item.style.boxShadow = 'none';
+                        item.style.transform = 'none';
+                    });
+
+                    item.innerHTML = `
+              <img src="${previewImg}" style="width: 50px; height: 36px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color); flex-shrink: 0;" onerror="this.src='/images/no-car.jpg';">
+              <div style="flex: 1; min-width: 0;">
+                  <strong style="display: block; font-size: 13px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${set.ten_bo_anh}</strong>
+                  <span style="font-size: 11px; color: var(--text-muted);">${files.length} ảnh 360°</span>
+              </div>
+              <button type="button" class="btn secondary" style="margin: 0; min-height: 28px; padding: 0 10px; font-size: 11px; font-weight: 700; pointer-events: none;">Chọn</button>
+          `;
+
+                    item.addEventListener('click', () => select360Set(set));
+                    modalPickerList.appendChild(item);
+                });
+            }
+
+            if (modalPickerSearch) {
+                modalPickerSearch.addEventListener('input', (e) => {
+                    renderPickerList(e.target.value.trim());
+                });
+            }
+
+            // Global click delegator for 360 Pickers
+            document.addEventListener('click', (e) => {
+                const btnChoose360 = e.target.closest('.btn-choose-360');
+                if (btnChoose360) {
+                    e.preventDefault();
+                    // Find the picker wrapper
+                    const pickerContainer = btnChoose360.closest('.color-360-picker-container');
+                    if (pickerContainer) {
+                        // The visual colors section is the container for color rows
+                        const colorsSection = pickerContainer.closest('.visual-colors-section');
+                        open360Picker(pickerContainer, colorsSection);
+                    }
+                    return;
+                }
+
+                const btnClear360 = e.target.closest('.btn-clear-360');
+                if (btnClear360) {
+                    e.preventDefault();
+                    const pickerContainer = btnClear360.closest('.color-360-picker-container');
+                    if (pickerContainer) {
+                        const colorsSection = pickerContainer.closest('.visual-colors-section');
+                        clear360Selection(pickerContainer, colorsSection);
+                    }
+                    return;
+                }
+            });
+
+            renderCarPage(1);
+        </script>
 </body>
+
 </html>

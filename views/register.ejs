@@ -3,71 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    <link rel="stylesheet" href="/stylesheets/register.css">
+    <title><%= title || 'Đăng ký' %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/stylesheets/base.css">
+    <link rel="stylesheet" href="/stylesheets/forms.css">
 </head>
 <body>
-
-<header class="topbar">
-    <div class="brand">SHOWROOM TUẤN ANH</div>
-
-    <nav>
-        <a href="/trang-chu">Tổng quan</a>
-        <a href="/xe">Ô tô</a>
-        <a href="/bang-gia">Bảng giá</a>
-        <a href="/dich-vu">Dịch vụ</a>
-        <a class="active" href="/register">Đăng ký</a>
-    </nav>
-
-    <a href="/login" class="login-link">Đăng nhập</a>
-</header>
-
-<main class="register-layout">
-    <section class="register-left">
-        <h1>Đăng ký<br>tài khoản</h1>
-
+<main class="auth-page">
+    <form class="auth-card" action="/register" method="post">
+        <a class="auth-logo" href="/trang-chu">Ford</a>
+        <h1>Đăng ký tài khoản</h1>
         <% if (error) { %>
-            <div class="error-message"><%= error %></div>
+            <p class="auth-error"><%= error %></p>
         <% } %>
-
-        <form action="/register" method="POST" id="registerForm">
-            <input type="text" name="ho_ten" id="ho_ten" placeholder="Họ và tên">
-            <input type="email" name="email" id="email" placeholder="Email">
-            <input type="text" name="so_dien_thoai" id="so_dien_thoai" placeholder="Số điện thoại">
-            <input type="text" name="dia_chi" id="dia_chi" placeholder="Địa chỉ">
-
-            <select name="vai_tro_id" id="vai_tro_id">
-                <option value="3">Khách hàng</option>
-                <option value="2">Nhân viên quản lý showroom</option>
+        <label>
+            Ho ten
+            <input name="ho_ten" required>
+        </label>
+        <label>
+            Email
+            <input name="email" type="email" required>
+        </label>
+        <label>
+            So dien thoai
+            <input name="so_dien_thoai" required>
+        </label>
+        <label>
+            Dia chi
+            <input name="dia_chi">
+        </label>
+        <label>
+            Vai tro
+            <select name="vai_tro_id">
+                <option value="3">Khach hang</option>
+                <option value="2">Nhan vien</option>
                 <option value="1">Admin</option>
             </select>
-
-            <input type="text" name="ma_quan_ly" id="ma_quan_ly" placeholder="Mã tạo tài khoản quản lý: ADMIN123">
-
-            <div class="password-box">
-                <input type="password" name="mat_khau" id="mat_khau" placeholder="Mật khẩu">
-                <span class="eye" data-target="mat_khau">👁</span>
-            </div>
-
-            <div class="password-box">
-                <input type="password" name="xac_nhan_mat_khau" id="xac_nhan_mat_khau" placeholder="Xác nhận mật khẩu">
-                <span class="eye" data-target="xac_nhan_mat_khau">👁</span>
-            </div>
-
-            <p class="note">Chọn vai trò quản lý để truy cập trang admin. Mã tạo tài khoản quản lý mặc định là ADMIN123.</p>
-
-            <button type="submit" id="registerBtn">Đăng ký tài khoản</button>
-
-            <p class="login-text">Đã có tài khoản?</p>
-            <a href="/login" class="back-login">Đăng nhập ngay</a>
-        </form>
-    </section>
-
-    <section class="register-right">
-        <img src="/images/ford-everest.jpg" alt="Xe showroom">
-    </section>
+        </label>
+        <label>
+            Ma quan ly
+            <input name="ma_quan_ly" placeholder="Nhap ADMIN123 neu tao admin/nhan vien">
+        </label>
+        <label>
+            Mat khau
+            <input name="mat_khau" type="password" required>
+        </label>
+        <label>
+            Xac nhan mat khau
+            <input name="xac_nhan_mat_khau" type="password" required>
+        </label>
+        <button type="submit">Đăng ký</button>
+        <p>Đã có tài khoản? <a href="/login">Đăng nhập</a></p>
+    </form>
 </main>
-
-<script src="/javascripts/register.js"></script>
 </body>
 </html>

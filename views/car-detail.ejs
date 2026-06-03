@@ -3,72 +3,583 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
+    <title><%= title || car.ten_xe %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/stylesheets/showroom.css">
+    <link rel="stylesheet" href="/stylesheets/car-detail.css">
 </head>
 <body>
 <%- include('partials/site-nav') %>
 
-<main>
-    <section class="detail-hero">
-        <div class="detail-copy">
-            <p class="eyebrow"><%= car.ten_hang %> · <%= car.ten_loai %></p>
-            <h1><%= car.ten_xe %></h1>
-            <p><%= car.mo_ta_ngan || 'Mẫu xe phù hợp cho nhu cầu di chuyển hiện đại.' %></p>
-            <strong>Từ <%= formatPrice(car.gia_ban) %></strong>
-            <div class="hero-actions">
-                <a href="/bao-gia?xe_id=<%= car.id %>" class="primary-btn">Nhận báo giá</a>
-                <a href="/dang-ky-lai-thu" class="secondary-btn">Đăng ký lái thử</a>
-            </div>
-        </div>
-        <img src="/images/<%= car.anh_dai_dien || 'ford-everest.jpg' %>" alt="<%= car.ten_xe %>">
-    </section>
+<main class="kia-product-page" id="main-content">
+    <% 
+      const galleryImages = images && images.length ? images : [{ duong_dan_anh: car.anh_dai_dien || 'no-car.jpg', nhom_anh: 'chung' }]; 
+      const productFeatures = features && features.length ? features : []; 
+      const heroImage = galleryImages[0].duong_dan_anh; 
+      
+      const dbExteriorImages = galleryImages.filter((img) => img.nhom_anh === 'ngoai_that').map((img) => ({ duong_dan_anh: img.duong_dan_anh, title: car.ten_xe, desc: img.chu_thich || null }));
+      const dbInteriorImages = galleryImages.filter((img) => img.nhom_anh === 'noi_that').map((img) => ({ duong_dan_anh: img.duong_dan_anh, title: car.ten_xe, desc: img.chu_thich || null }));
 
-    <section class="section-wrap detail-grid">
-        <div>
-            <h2>Thông tin xe</h2>
-            <p><%= car.mo_ta_chi_tiet || car.mo_ta_ngan || 'Thông tin chi tiết đang được cập nhật.' %></p>
-            <dl class="info-list">
-                <div><dt>Phiên bản</dt><dd><%= car.phien_ban || 'Đang cập nhật' %></dd></div>
-                <div><dt>Năm sản xuất</dt><dd><%= car.nam_san_xuat || 'Đang cập nhật' %></dd></div>
-                <div><dt>Động cơ</dt><dd><%= car.dong_co || 'Đang cập nhật' %></dd></div>
-                <div><dt>Hộp số</dt><dd><%= car.hop_so || 'Đang cập nhật' %></dd></div>
-                <div><dt>Nhiên liệu</dt><dd><%= car.nhien_lieu || 'Đang cập nhật' %></dd></div>
-                <div><dt>Bảo hành</dt><dd><%= car.bao_hanh || 'Đang cập nhật' %></dd></div>
-            </dl>
-        </div>
+      let exteriorImages = [];
+      let interiorImages = [];
 
-        <aside class="side-card">
-            <h3>Màu xe</h3>
-            <div class="color-list">
-                <% if (colors.length > 0) { %>
-                    <% colors.forEach(color => { %>
-                        <span><i style="background:<%= color.ma_mau || '#ccc' %>"></i><%= color.ten_mau %></span>
-                    <% }) %>
-                <% } else { %>
-                    <span>Đang cập nhật màu xe</span>
+      if (dbExteriorImages.length > 0 || dbInteriorImages.length > 0) {
+          exteriorImages = dbExteriorImages;
+          interiorImages = dbInteriorImages;
+      } else {
+          // Fallback to legacy split or feature-based logic
+          const exteriorFeatures = productFeatures.filter((feature) => String(feature.nhom || '').toLowerCase().includes('ngoai'));
+          const interiorFeatures = productFeatures.filter((feature) => String(feature.nhom || '').toLowerCase().includes('noi'));
+          const galleryMid = Math.max(1, Math.ceil(galleryImages.length / 2));
+          
+          exteriorImages = exteriorFeatures.length 
+              ? exteriorFeatures.map((feature) => ({ duong_dan_anh: feature.anh || heroImage, title: feature.tieu_de, desc: feature.mo_ta })) 
+              : galleryImages.slice(0, galleryMid).map((image) => ({ duong_dan_anh: image.duong_dan_anh, title: car.ten_xe, desc: 'Ảnh ngoại thất' }));
+              
+          interiorImages = interiorFeatures.length 
+              ? interiorFeatures.map((feature) => ({ duong_dan_anh: feature.anh || heroImage, title: feature.tieu_de, desc: feature.mo_ta })) 
+              : galleryImages.slice(galleryMid).map((image) => ({ duong_dan_anh: image.duong_dan_anh, title: car.ten_xe, desc: 'Ảnh nội thất' }));
+      }
+    %>
+    <% 
+      let defaultRotateFrames = (rotateImages || []).filter(img => img.nhom_360 === 'chung').map(img => img.duong_dan_anh);
+      if (car.anh_360 && typeof bo360SetsMap !== 'undefined' && bo360SetsMap) {
+          const defaultSet = bo360SetsMap[String(car.anh_360)] || bo360SetsMap[car.anh_360];
+          if (defaultSet && defaultSet.danh_sach_anh) {
+              defaultRotateFrames = defaultSet.danh_sach_anh.split(',').map(f => f.trim()).filter(Boolean);
+          }
+      }
+      const rotateFrameUrls = defaultRotateFrames.map((file) => '/images/' + file);
+      const hasAny360 = rotateFrameUrls.length > 0 || (colors && colors.some(c => c.anh_360)); 
+    %>
+
+    <section class="kia-product-hero">
+        <div class="kia-product-copy">
+            <span><%= car.ten_loai %></span>
+            <h1 id="detail-hero-title"><%= car.ten_xe %></h1>
+            <p><%= car.slogan || car.mo_ta_ngan || 'Khẳng định vị thế dẫn đầu' %></p>
+            <small>Chỉ từ</small>
+            <strong id="detail-hero-price" data-base-price="<%= car.gia_ban %>"><%= formatPrice(car.gia_ban) %></strong>
+            <div class="kia-product-actions">
+                <a href="/bao-gia?xe_id=<%= car.id %>">Dự toán</a>
+                <a href="/dang-ky-lai-thu?xe_id=<%= car.id %>">Đăng ký lái thử</a>
+                <% if (car.brochure_url) { %>
+                    <a href="<%= car.brochure_url %>" target="_blank" rel="noreferrer">Tải Brochure</a>
                 <% } %>
             </div>
-        </aside>
+        </div>
+        <img id="detail-hero-image" src="/images/<%= heroImage %>" alt="<%= car.ten_xe %>">
     </section>
 
-    <section class="section-wrap">
-        <div class="section-heading">
-            <p class="eyebrow">Thông số</p>
-            <h2>Thông số kỹ thuật</h2>
+    <section class="kia-variant-strip" aria-label="Phiên bản">
+        <% if (locals.variants && variants.length > 1) { %>
+            <% variants.forEach((variant) => { %>
+                <a href="/xe/<%= variant.duong_dan %>" class="variant-link" style="text-decoration: none; color: inherit;">
+                    <article class="variant-card <%= variant.id === car.id ? 'is-active' : '' %>" style="cursor: pointer; height: 100%;">
+                        <img src="/images/<%= variant.anh_dai_dien || 'no-car.jpg' %>" alt="<%= variant.phien_ban || variant.ten_xe %>">
+                        <h2><%= variant.phien_ban || 'Tiêu chuẩn' %></h2>
+                        <p><%= variant.slogan || variant.mo_ta_ngan || variant.ten_xe %></p>
+                    </article>
+                </a>
+            <% }) %>
+        <% } else { %>
+            <% const versionNames = (car.phien_ban || car.ten_xe).split(',').map((item) => item.trim()).filter(Boolean); %>
+            <% versionNames.forEach((version, index) => { %>
+                <% const versionImage = galleryImages[index % galleryImages.length].duong_dan_anh; %>
+                <article class="variant-card <%= index === 0 ? 'is-active' : '' %>" data-version-name="<%= version %>" data-version-image="/images/<%= versionImage %>" style="cursor: pointer;">
+                    <img src="/images/<%= versionImage %>" alt="<%= version %>">
+                    <h2><%= version %></h2>
+                    <p><%= car.slogan || car.mo_ta_ngan || car.ten_xe %></p>
+                </article>
+            <% }) %>
+        <% } %>
+    </section>
+
+    <section class="kia-product-section" id="mau-sac" style="margin-bottom: 24px;">
+        <div class="kia-section-heading" style="margin-bottom: 20px;">
+            <p>Màu sắc</p>
+            <h2>Lựa chọn màu xe</h2>
         </div>
-        <div class="spec-table">
-            <% if (specs.length > 0) { %>
-                <% specs.forEach(spec => { %>
-                    <div><span><%= spec.ten_thong_so %></span><strong><%= spec.gia_tri %></strong></div>
+        <div class="kia-color-preview" style="padding: 24px; margin-bottom: 16px;">
+            <img data-color-preview src="/images/<%= colors && colors.length && colors[0].anh_mau ? colors[0].anh_mau : heroImage %>" alt="<%= car.ten_xe %>">
+        </div>
+        <div class="kia-color-grid">
+            <% if (colors && colors.length) { %>
+                <% colors.forEach((color, index) => { %>
+                    <% 
+                      let color360Attr = '';
+                      if (color.anh_360 && bo360SetsMap) {
+                          // Try lookup by ID first, then by name
+                          const set360 = bo360SetsMap[String(color.anh_360)] || bo360SetsMap[color.anh_360] || null;
+                          if (set360 && set360.danh_sach_anh) {
+                              color360Attr = set360.danh_sach_anh; // comma-separated filenames
+                          } else {
+                              // Fallback: old system using anh_xe_360 table grouped by nhom_360
+                              const colorFrames = (rotateImages || []).filter(img => img.nhom_360 === color.anh_360).map(img => img.duong_dan_anh);
+                              color360Attr = colorFrames.join(', ');
+                          }
+                      }
+                    %>
+                    <button class="<%= index === 0 ? 'is-active' : '' %>" type="button" 
+                            data-color-image="<%= color.anh_mau ? '/images/' + color.anh_mau : '/images/' + heroImage %>"
+                            data-color-price-added="<%= color.gia_them || 0 %>"
+                            data-color-360="<%= color360Attr %>">
+                        <span style="background:<%= color.ma_mau || '#fff' %>"></span>
+                        <strong><%= color.ten_mau %></strong>
+                    </button>
                 <% }) %>
             <% } else { %>
-                <div><span>Thông số</span><strong>Đang cập nhật</strong></div>
+                <p class="empty-state">Chưa có màu xe được cấu hình.</p>
             <% } %>
         </div>
     </section>
+
+    <% 
+      let initial360Image = '/images/no-car.jpg';
+      if (rotateFrameUrls.length) {
+          initial360Image = rotateFrameUrls[0];
+      } else if (colors && colors.length && bo360SetsMap) {
+          const firstColorWith360 = colors.find(c => c.anh_360);
+          if (firstColorWith360 && firstColorWith360.anh_360) {
+              const set360 = bo360SetsMap[String(firstColorWith360.anh_360)] || bo360SetsMap[firstColorWith360.anh_360] || null;
+              if (set360 && set360.danh_sach_anh) {
+                  const firstFile = set360.danh_sach_anh.split(',').map(f => f.trim()).filter(Boolean)[0];
+                  if (firstFile) initial360Image = '/images/' + firstFile;
+              } else {
+                  const colorFrames = (rotateImages || []).filter(img => img.nhom_360 === firstColorWith360.anh_360).map(img => img.duong_dan_anh);
+                  if (colorFrames.length) initial360Image = '/images/' + colorFrames[0];
+              }
+          }
+      }
+    %>
+    <% if (hasAny360) { %>
+        <section class="kia-product-section kia-product-360" id="anh-360" style="margin-bottom: 24px; padding: 24px;">
+            <div class="viewer-360 <%= (rotateFrameUrls.length > 1 || (colors && colors.some(c => c.anh_360))) ? 'is-ready' : 'is-static-color' %>" id="car-360-viewer">
+                <img class="detail-main-image" data-car-image src="<%= initial360Image %>" alt="<%= car.ten_xe %> 360">
+                <div class="viewer-360-progress" aria-hidden="true" style="<%= rotateFrameUrls.length > 1 ? '' : 'display: none;' %>">
+                    <span data-360-progress></span>
+                </div>
+            </div>
+        </section>
+    <% } %>
+
+    <nav class="kia-product-tabs" aria-label="Điều hướng chi tiết xe">
+        <a href="#dac-diem">Đặc điểm nổi bật</a>
+        <% if (hasAny360) { %><a href="#anh-360">Ảnh 360</a><% } %>
+        <a href="#thu-vien">Thư viện hình ảnh</a>
+        <a href="#thong-so">Thông số kỹ thuật</a>
+        <a href="#mau-sac">Màu sắc</a>
+        <% if (car.ebook_url) { %><a href="#ebook">E Book</a><% } %>
+        <% if (car.brochure_url) { %><a href="<%= car.brochure_url %>" target="_blank" rel="noreferrer">E Brochure</a><% } %>
+    </nav>
+
+    <section class="kia-product-section kia-overview" id="dac-diem">
+        <div>
+            <span><%= (car.ten_xe || '').slice(0, 1) %></span>
+            <h2><%= car.ten_xe %></h2>
+            <p><%= car.mo_ta_chi_tiet || car.mo_ta_ngan || 'Nội dung giới thiệu chi tiết đang được cập nhật.' %></p>
+        </div>
+        <img src="/images/<%= heroImage %>" alt="<%= car.ten_xe %>">
+    </section>
+
+    <% if (productFeatures.length) { %>
+        <% 
+          const getNormalizedGroupName = (rawName) => {
+              const lower = String(rawName || '').toLowerCase().trim();
+              if (lower.includes('ngoai')) return 'Ngoại thất';
+              if (lower.includes('noi')) return 'Nội thất';
+              if (lower.includes('van') || lower.includes('dong_co') || lower.includes('van_hanh')) return 'Vận hành';
+              if (lower.includes('an') || lower.includes('safe') || lower.includes('an_toan')) return 'An toàn';
+              return rawName || 'Đặc điểm';
+          };
+
+          // Group features by normalized group name
+          const featuresGrouped = {};
+          productFeatures.forEach((feature) => {
+              const groupName = getNormalizedGroupName(feature.nhom);
+              if (!featuresGrouped[groupName]) {
+                  featuresGrouped[groupName] = [];
+              }
+              featuresGrouped[groupName].push(feature);
+          });
+          const groupNames = Object.keys(featuresGrouped);
+        %>
+
+        <section class="kia-product-section kia-feature-showcase" id="dac-diem">
+            <div class="kia-section-heading">
+                <p>Khám phá công nghệ</p>
+                <h2>Đặc điểm nổi bật của xe</h2>
+            </div>
+            
+            <div class="feature-group-tabs">
+                <% groupNames.forEach((groupName, gIndex) => { %>
+                    <button class="feature-group-tab <%= gIndex === 0 ? 'is-active' : '' %>" type="button" data-feature-group="<%= groupName %>">
+                        <%= groupName %>
+                    </button>
+                <% }) %>
+            </div>
+
+            <% groupNames.forEach((groupName, gIndex) => { %>
+                <div class="feature-group-panel <%= gIndex === 0 ? 'is-active' : '' %>" data-feature-group-panel="<%= groupName %>">
+                    <div class="feature-split-layout">
+                        <!-- Left Side: List of sub-features in this group -->
+                        <div class="feature-item-list">
+                            <% featuresGrouped[groupName].forEach((feature, fIndex) => { %>
+                                <div class="feature-item-row <%= fIndex === 0 ? 'is-active' : '' %>" 
+                                     data-feature-title="<%= feature.tieu_de %>"
+                                     data-feature-desc="<%= feature.mo_ta || '' %>"
+                                     data-feature-image="/images/<%= feature.anh || heroImage %>"
+                                     style="cursor: pointer;">
+                                    <span class="feature-row-num"><%= String(fIndex + 1).padStart(2, '0') %></span>
+                                    <div class="feature-row-content">
+                                        <h3><%= feature.tieu_de %></h3>
+                                    </div>
+                                </div>
+                            <% }) %>
+                        </div>
+                        
+                        <!-- Right Side: Showcased dynamic image and description -->
+                        <div class="feature-showcase-view">
+                            <% const firstFeature = featuresGrouped[groupName][0]; %>
+                            <div class="feature-image-wrapper">
+                                <img class="feature-showcase-image" src="/images/<%= firstFeature.anh || heroImage %>" alt="<%= firstFeature.tieu_de %>">
+                            </div>
+                            <div class="feature-showcase-content">
+                                <h3 class="feature-showcase-title"><%= firstFeature.tieu_de %></h3>
+                                <p class="feature-showcase-desc"><%= firstFeature.mo_ta || '' %></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        </section>
+    <% } %>
+
+    <section class="kia-product-section" id="thu-vien">
+        <div class="kia-section-heading">
+            <p>Thư viện hình ảnh</p>
+        </div>
+        <div class="kia-gallery-tabs" role="tablist" aria-label="Nhóm ảnh xe">
+            <button class="is-active" type="button" data-gallery-tab="ngoai-that">Ngoại thất</button>
+            <button type="button" data-gallery-tab="noi-that">Nội thất</button>
+        </div>
+        <div class="kia-gallery-panel is-active" data-gallery-panel="ngoai-that">
+            <% if (exteriorImages.length) { %>
+            <div class="kia-gallery-grid">
+                <% exteriorImages.forEach((image) => { %>
+                    <% 
+                      let imgTitle = image.title || car.ten_xe;
+                      let imgDesc = image.desc || null;
+                      if (imgDesc && imgDesc.includes('|')) {
+                          const parts = imgDesc.split('|').map(p => p.trim());
+                          imgTitle = parts[0] || imgTitle;
+                          imgDesc = parts[1] || null;
+                      }
+                    %>
+                    <article>
+                        <img src="/images/<%= image.duong_dan_anh %>" alt="<%= imgTitle %>">
+                        <div>
+                            <strong><%= imgTitle %></strong>
+                            <% if (imgDesc) { %><p><%= imgDesc %></p><% } %>
+                        </div>
+                    </article>
+                <% }) %>
+            </div>
+            <% } else { %>
+                <p class="empty-state">Chưa có ảnh ngoại thất cho mẫu xe này.</p>
+            <% } %>
+        </div>
+        <div class="kia-gallery-panel" data-gallery-panel="noi-that">
+            <% if (interiorImages.length) { %>
+                <div class="kia-gallery-grid">
+                    <% interiorImages.forEach((image) => { %>
+                        <% 
+                          let imgTitle = image.title || car.ten_xe;
+                          let imgDesc = image.desc || null;
+                          if (imgDesc && imgDesc.includes('|')) {
+                              const parts = imgDesc.split('|').map(p => p.trim());
+                              imgTitle = parts[0] || imgTitle;
+                              imgDesc = parts[1] || null;
+                          }
+                        %>
+                        <article>
+                            <img src="/images/<%= image.duong_dan_anh %>" alt="<%= imgTitle %>">
+                            <div>
+                                <strong><%= imgTitle %></strong>
+                                <% if (imgDesc) { %><p><%= imgDesc %></p><% } %>
+                            </div>
+                        </article>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <p class="empty-state">Chưa có ảnh nội thất cho mẫu xe này.</p>
+            <% } %>
+        </div>
+    </section>
+
+
+
+    <section class="kia-product-section" id="thong-so">
+        <div class="kia-section-heading">
+            <p>Thông số kỹ thuật</p>
+            <h2>Chi tiết vận hành và trang bị</h2>
+        </div>
+
+        <%
+          // Build basic info items from car fields
+          const fuelMap = { xang: 'Xăng', dau: 'Dầu Diesel', dien: 'Điện', hybrid: 'Hybrid' };
+          const basicSpecItems = [];
+          if (car.dong_co) basicSpecItems.push({ label: 'Động cơ', value: car.dong_co });
+          if (car.hop_so) basicSpecItems.push({ label: 'Hộp số', value: car.hop_so });
+          if (car.nhien_lieu) basicSpecItems.push({ label: 'Nhiên liệu', value: fuelMap[car.nhien_lieu] || car.nhien_lieu });
+          if (car.so_cho_ngoi) basicSpecItems.push({ label: 'Số chỗ ngồi', value: car.so_cho_ngoi + ' chỗ' });
+          if (car.xuat_xu) basicSpecItems.push({ label: 'Xuất xứ', value: car.xuat_xu });
+          if (car.bao_hanh) basicSpecItems.push({ label: 'Bảo hành', value: car.bao_hanh });
+          if (car.nam_san_xuat) basicSpecItems.push({ label: 'Năm sản xuất', value: String(car.nam_san_xuat) });
+
+          // Group specs into sections
+          const specSections = [];
+          let currentSection = null;
+          (specs || []).forEach((spec) => {
+              if (spec.gia_tri === '__SECTION__') {
+                  currentSection = { title: spec.ten_thong_so, items: [] };
+                  specSections.push(currentSection);
+              } else {
+                  if (!currentSection) {
+                      currentSection = { title: null, items: [] };
+                      specSections.push(currentSection);
+                  }
+                  currentSection.items.push(spec);
+              }
+          });
+        %>
+
+        <div class="spec-accordion">
+            <%# Always show basic info section first if there's any data %>
+            <% if (basicSpecItems.length) { %>
+            <div class="spec-accordion-item is-open" data-spec-section>
+                <button class="spec-accordion-header" type="button" aria-expanded="true">
+                    <span>Thông tin cơ bản</span>
+                    <svg class="spec-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="spec-accordion-body">
+                    <ul class="spec-item-list">
+                        <% basicSpecItems.forEach((item) => { %>
+                        <li class="spec-item spec-item--kv">
+                            <span class="spec-item-label"><%= item.label %></span>
+                            <span class="spec-item-value"><%= item.value %></span>
+                        </li>
+                        <% }) %>
+                    </ul>
+                </div>
+            </div>
+            <% } %>
+
+            <%# Render sections from admin-entered specs %>
+            <% specSections.forEach((section, sIndex) => { %>
+            <div class="spec-accordion-item is-open" data-spec-section>
+                <% if (section.title) { %>
+                <button class="spec-accordion-header" type="button" aria-expanded="true">
+                    <span><%= section.title %></span>
+                    <svg class="spec-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <% } %>
+                <div class="spec-accordion-body">
+                    <ul class="spec-item-list">
+                        <% section.items.forEach((spec) => { %>
+                        <% if (spec.gia_tri === '__BULLET__' || !spec.gia_tri) { %>
+                        <li class="spec-item spec-item--bullet">
+                            <%= spec.ten_thong_so %>
+                        </li>
+                        <% } else { %>
+                        <li class="spec-item spec-item--kv">
+                            <span class="spec-item-label"><%= spec.ten_thong_so %></span>
+                            <span class="spec-item-value"><%= spec.gia_tri %></span>
+                        </li>
+                        <% } %>
+                        <% }) %>
+                    </ul>
+                </div>
+            </div>
+            <% }) %>
+
+            <% if (!basicSpecItems.length && !specSections.length) { %>
+            <p class="empty-state">Thông số kỹ thuật đang được cập nhật.</p>
+            <% } %>
+        </div>
+    </section>
+
+    <% if (car.ebook_url) { %>
+        <section class="kia-product-section kia-ebook" id="ebook">
+            <h2>E Book</h2>
+            <a href="<%= car.ebook_url %>" target="_blank" rel="noreferrer">Mở E Book</a>
+        </section>
+    <% } %>
 </main>
 
 <%- include('partials/site-footer') %>
+<script src="/javascripts/nav-search.js"></script>
+<script>
+    window.car360Frames = <%- JSON.stringify(rotateFrameUrls) %>;
+    window.defaultCar360Frames = <%- JSON.stringify(rotateFrameUrls) %>;
+</script>
+<script src="/javascripts/car-detail.js"></script>
+<script>
+    // Tab switching for image gallery
+    document.querySelectorAll('[data-gallery-tab]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const target = button.dataset.galleryTab;
+            document.querySelectorAll('[data-gallery-tab]').forEach((item) => item.classList.toggle('is-active', item === button));
+            document.querySelectorAll('[data-gallery-panel]').forEach((panel) => {
+                panel.classList.toggle('is-active', panel.dataset.galleryPanel === target);
+            });
+        });
+    });
+
+    // Swatches selection for colors
+    document.querySelectorAll('[data-color-image]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const preview = document.querySelector('[data-color-preview]');
+            const heroImage = document.getElementById('detail-hero-image');
+            const priceTag = document.getElementById('detail-hero-price');
+            
+            const colorImg = button.dataset.colorImage;
+            const priceAdded = Number(button.dataset.colorPriceAdded || 0);
+
+            // Update color section preview image
+            if (preview && colorImg) preview.src = colorImg;
+            
+            // Update top hero page main image with a smooth opacity fade
+            if (heroImage && colorImg) {
+                heroImage.style.opacity = '0';
+                setTimeout(() => {
+                    heroImage.src = colorImg;
+                    heroImage.style.opacity = '1';
+                }, 150);
+            }
+
+            // Update top hero page price tag (Base Price + Selected Color Added Price)
+            if (priceTag) {
+                const basePrice = Number(priceTag.dataset.basePrice || 0);
+                const totalPrice = basePrice + priceAdded;
+                priceTag.textContent = totalPrice.toLocaleString('vi-VN') + ' VND';
+            }
+
+            // Update 360-degree rotation frames if this color has specific 360 frames
+            const color360Raw = button.dataset.color360 || '';
+            if (window.update360Frames) {
+                if (color360Raw.trim()) {
+                    const frames = color360Raw.split(',').map(f => '/images/' + f.trim()).filter(Boolean);
+                    window.update360Frames(frames);
+                } else {
+                    window.update360Frames(window.defaultCar360Frames || []);
+                }
+            }
+
+            document.querySelectorAll('[data-color-image]').forEach((item) => item.classList.toggle('is-active', item === button));
+        });
+    });
+
+    // On load, if active color swatch has specific 360 frames, load them
+    const activeColorBtn = document.querySelector('[data-color-image].is-active');
+    if (activeColorBtn && activeColorBtn.dataset.color360 && window.update360Frames) {
+        const frames = activeColorBtn.dataset.color360.split(',').map(f => '/images/' + f.trim()).filter(Boolean);
+        if (frames.length) {
+            window.update360Frames(frames);
+        }
+    }
+
+    // Interactive Variant Selection
+    const variantCards = document.querySelectorAll('.variant-card');
+    const heroImage = document.getElementById('detail-hero-image');
+    const heroTitle = document.getElementById('detail-hero-title');
+    const baseCarName = "<%= car.ten_xe %>";
+
+    variantCards.forEach((card) => {
+        card.addEventListener('click', () => {
+            // Remove active class from all version cards
+            variantCards.forEach((c) => c.classList.remove('is-active'));
+            // Add active class to clicked card
+            card.classList.add('is-active');
+
+            const versionName = card.dataset.versionName;
+            const versionImage = card.dataset.versionImage;
+
+            // Fade out hero image, change src, fade in
+            if (heroImage && versionImage) {
+                heroImage.style.opacity = '0';
+                setTimeout(() => {
+                    heroImage.src = versionImage;
+                    heroImage.style.opacity = '1';
+                }, 200);
+            }
+
+            // Update title
+            if (heroTitle && versionName) {
+                heroTitle.textContent = `${baseCarName} - ${versionName}`;
+            }
+
+            // Smooth scroll to top showcase
+            document.getElementById('main-content').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
+
+    // Feature Group Tabs switching
+    document.querySelectorAll('[data-feature-group]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const groupName = btn.dataset.featureGroup;
+            document.querySelectorAll('[data-feature-group]').forEach((b) => b.classList.toggle('is-active', b === btn));
+            document.querySelectorAll('[data-feature-group-panel]').forEach((panel) => {
+                panel.classList.toggle('is-active', panel.dataset.featureGroupPanel === groupName);
+            });
+        });
+    });
+
+    // Sub-feature item clicking within each panel
+    document.querySelectorAll('.feature-item-row').forEach((row) => {
+        row.addEventListener('click', () => {
+            const parentPanel = row.closest('.feature-group-panel');
+            if (!parentPanel) return;
+
+            // Toggle active state in row list
+            parentPanel.querySelectorAll('.feature-item-row').forEach((r) => r.classList.remove('is-active'));
+            row.classList.add('is-active');
+
+            // Select showcase elements in the same panel
+            const showcaseImg = parentPanel.querySelector('.feature-showcase-image');
+            const showcaseTitle = parentPanel.querySelector('.feature-showcase-title');
+            const showcaseDesc = parentPanel.querySelector('.feature-showcase-desc');
+
+            const newImg = row.dataset.featureImage;
+            const newTitle = row.dataset.featureTitle;
+            const newDesc = row.dataset.featureDesc;
+
+            // Transition fade effect
+            if (showcaseImg && newImg) {
+                showcaseImg.style.opacity = '0';
+                setTimeout(() => {
+                    showcaseImg.src = newImg;
+                    showcaseImg.style.opacity = '1';
+                }, 150);
+            }
+
+            if (showcaseTitle && newTitle) showcaseTitle.textContent = newTitle;
+            if (showcaseDesc && newDesc) showcaseDesc.textContent = newDesc;
+        });
+    });
+
+    // Spec Accordion toggle
+    document.querySelectorAll('.spec-accordion-header').forEach((header) => {
+        header.addEventListener('click', () => {
+            const item = header.closest('.spec-accordion-item');
+            if (!item) return;
+            const isOpen = item.classList.contains('is-open');
+            item.classList.toggle('is-open', !isOpen);
+            header.setAttribute('aria-expanded', String(!isOpen));
+        });
+    });
+</script>
 </body>
 </html>

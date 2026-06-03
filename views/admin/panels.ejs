@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || 'Admin' %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/stylesheets/base.css">
+    <link rel="stylesheet" href="/stylesheets/admin.css">
+</head>
+<body>
+<main class="admin-page">
+    <aside class="admin-sidebar">
+        <a class="admin-brand" href="/trang-chu">Showroom</a>
+        <a href="/admin/dai-ly">Quản lý đại lý</a>
+        <a href="/admin/tin-tuc">Quản lý tin tức</a>
+        <a href="/admin/xe">Quản lý xe</a>
+        <a class="is-active" href="/admin/panel">Quản lý panel</a>
+        <a href="/admin/yeu-cau">Báo giá / Lái thử</a>
+        <a href="/trang-chu">Xem trang chủ</a>
+    </aside>
+
+    <section class="admin-content">
+        <div class="admin-heading">
+            <div>
+                <p>Admin</p>
+                <h1>Quản lý nội dung</h1>
+            </div>
+            <a href="/trang-chu">Mở trang chủ</a>
+        </div>
+
+        <% if (success) { %>
+            <div class="admin-alert success"><%= success %></div>
+        <% } %>
+        <% if (error) { %>
+            <div class="admin-alert error"><%= error %></div>
+        <% } %>
+
+        <div class="admin-table-wrap">
+            <h2>Quản lý panel ảnh trang chủ</h2>
+            <form class="admin-form panel-admin-form" action="/admin/panel/them" method="post" enctype="multipart/form-data">
+                <div class="admin-form-grid">
+                    <label>
+                        Ảnh panel
+                        <input name="duong_dan_anh" type="file" accept="image/*">
+                        <small>Chọn ảnh từ máy, không cần nhập đường dẫn.</small>
+                    </label>
+                    <label>
+                        Đường dẫn ảnh
+                        <input name="duong_dan_anh_text" placeholder="ten-anh.jpg hoặc /images/ten-anh.jpg">
+                        <small>Admin có thể nhập đường dẫn thay cho upload file.</small>
+                    </label>
+                    <label>
+                        Thứ tự
+                        <input name="thu_tu" type="number" value="0">
+                    </label>
+                    <label>
+                        Trạng thái
+                        <select name="trang_thai">
+                            <option value="hien">Hiện</option>
+                            <option value="an">Ẩn</option>
+                        </select>
+                    </label>
+                </div>
+                <button type="submit">Thêm panel</button>
+            </form>
+
+            <% if (panels && panels.length) { %>
+                <div class="panel-admin-list">
+                    <% panels.forEach((panel) => { %>
+                        <article class="panel-admin-item">
+                            <% const adminPanelImage = panel.duong_dan_anh || 'no-car.jpg'; %>
+                            <% const adminPanelImageSrc = /^https?:\/\//i.test(adminPanelImage) || adminPanelImage.startsWith('/') ? adminPanelImage : '/images/' + adminPanelImage; %>
+                            <img src="<%= adminPanelImageSrc %>" alt="Panel">
+                            <form action="/admin/panel/<%= panel.id %>/sua" method="post" enctype="multipart/form-data">
+                                <input type="hidden" name="current_image" value="<%= panel.duong_dan_anh %>">
+                                <div class="admin-form-grid">
+                                    <label>Đổi ảnh<input name="duong_dan_anh" type="file" accept="image/*"><small>Bỏ trống nếu muốn giữ ảnh hiện tại.</small></label>
+                                    <label>Đường dẫn ảnh<input name="duong_dan_anh_text" value="<%= panel.duong_dan_anh || '' %>"><small>Nhập tên file hoặc đường dẫn ảnh mới.</small></label>
+                                    <label>Thứ tự<input name="thu_tu" type="number" value="<%= panel.thu_tu || 0 %>"></label>
+                                    <label>
+                                        Trạng thái
+                                        <select name="trang_thai">
+                                            <option value="hien" <%= panel.trang_thai === 'hien' ? 'selected' : '' %>>Hiện</option>
+                                            <option value="an" <%= panel.trang_thai === 'an' ? 'selected' : '' %>>Ẩn</option>
+                                        </select>
+                                    </label>
+                                </div>
+                                <div class="panel-admin-actions">
+                                    <button type="submit">Sửa panel</button>
+                                </div>
+                            </form>
+                            <form action="/admin/panel/<%= panel.id %>/xoa" method="post">
+                                <button class="danger-button" type="submit">Xóa panel</button>
+                            </form>
+                        </article>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <p class="empty-state">Chưa có panel nào. Hãy thêm ảnh panel ở form phía trên.</p>
+            <% } %>
+        </div>
+    </section>
+</main>
+</body>
+</html>

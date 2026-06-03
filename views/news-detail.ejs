@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || post.tieu_de %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/stylesheets/base.css">
+    <link rel="stylesheet" href="/stylesheets/news.css">
+</head>
+<body>
+<%- include('partials/site-nav') %>
+
+<main id="main-content" class="news-detail-page">
+    <article class="news-article-detail">
+        <div class="news-detail-meta">
+            <span><%= post.tac_gia || 'Showroom Double Anh' %></span>
+            <span><%= formatDateTime(post.ngay_tao) %></span>
+        </div>
+
+        <h1><%= post.tieu_de %></h1>
+
+        <% if (post.anh_dai_dien) { %>
+            <img class="post-detail-image" src="/images/<%= post.anh_dai_dien %>" alt="<%= post.tieu_de %>">
+        <% } %>
+
+        <div class="post-body">
+            <% post.noi_dung.split(/\r?\n/).filter(Boolean).forEach((paragraph) => { %>
+                <p><%= paragraph %></p>
+            <% }) %>
+        </div>
+    </article>
+</main>
+
+<%- include('partials/site-footer') %>
+<script src="/javascripts/nav-search.js"></script>
+</body>
+</html>

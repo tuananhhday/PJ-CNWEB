@@ -3,38 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    <link rel="stylesheet" href="/stylesheets/showroom.css">
+    <title><%= title || 'Tin tức' %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/stylesheets/base.css">
+    <link rel="stylesheet" href="/stylesheets/news.css">
+    <style>
+        /* Scoped styles for scrollable list and pagination on public news page */
+        .magazine-news-list {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            max-height: 700px;
+            overflow-y: auto;
+            padding-right: 12px;
+        }
+
+        .magazine-news-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        .magazine-news-list::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        .magazine-news-list::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .magazine-news-list::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .magazine-news-item {
+            flex-shrink: 0;
+        }
+
+        .pager-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #f1f5f9 !important;
+            border-color: #e2e8f0 !important;
+            color: #94a3b8 !important;
+        }
+
+        .pager-btn:hover:not(:disabled) {
+            border-color: var(--primary, #0284c7) !important;
+            color: var(--primary, #0284c7) !important;
+            background: #f8fafc !important;
+        }
+    </style>
 </head>
 <body>
 <%- include('partials/site-nav') %>
 
-<main class="page-shell">
-    <section class="page-title">
-        <p class="eyebrow">Tin tức</p>
-        <h1>Cập nhật từ showroom</h1>
-        <p>Tin sản phẩm, ưu đãi, dịch vụ và kinh nghiệm chọn xe.</p>
-    </section>
+<main id="main-content" class="news-page">
+    <% 
+    const newsPostsAll = posts && posts.length ? posts : [];
+    
+    // 1. Sidebar posts (up to 4) prioritizing hien_sidebar = 1
+    const sidebarCandidates = newsPostsAll.filter((post) => Number(post.hien_sidebar));
+    const displaySidebarPosts = [];
+    const usedIds = new Set();
+    
+    for (const post of sidebarCandidates) {
+        if (displaySidebarPosts.length < 4) {
+            displaySidebarPosts.push(post);
+            usedIds.add(post.id);
+        }
+    }
+    
+    // Fallback if not enough sidebar candidates: fill from other posts
+    for (const post of newsPostsAll) {
+        if (displaySidebarPosts.length < 4 && !usedIds.has(post.id)) {
+            displaySidebarPosts.push(post);
+            usedIds.add(post.id);
+        }
+    }
+    
+    // 2. Main list posts: all other posts not used in sidebar
+    const mainListPosts = newsPostsAll.filter(p => !usedIds.has(p.id));
+    %>
 
-    <section class="news-grid">
-        <% if (news.length > 0) { %>
-            <% news.forEach(item => { %>
-                <article class="news-card">
-                    <img src="/images/<%= item.anh_dai_dien || 'ford-everest.jpg' %>" alt="<%= item.tieu_de %>">
-                    <h3><%= item.tieu_de %></h3>
-                    <p><%= (item.noi_dung || '').slice(0, 180) %></p>
-                </article>
+    <section class="magazine-news-layout">
+        <div style="display: flex; flex-direction: column; width: 100%; min-width: 0;">
+            <div class="magazine-news-list" id="public-news-list">
+                <% if (newsPostsAll.length) { %>
+                    <% newsPostsAll.forEach((post) => { %>
+                        <article class="magazine-news-item" data-public-news-item>
+                            <a class="magazine-news-image" href="/tin-tuc/<%= post.duong_dan %>">
+                                <img src="/images/<%= post.anh_dai_dien || 'no-car.jpg' %>" alt="<%= post.tieu_de %>">
+                            </a>
+                            <div>
+                                <a href="/tin-tuc/<%= post.duong_dan %>">
+                                    <h2><%= post.tieu_de %></h2>
+                                </a>
+                                <div class="news-meta"><%= formatDateTime(post.ngay_tao) %></div>
+                                <p><%= post.noi_dung.length > 180 ? post.noi_dung.slice(0, 180) + '...' : post.noi_dung %></p>
+                            </div>
+                        </article>
+                    <% }) %>
+                <% } else { %>
+                    <p class="empty-state">Chưa có tin tức nào được đăng.</p>
+                <% } %>
+            </div>
+
+            <% if (newsPostsAll.length > 6) { %>
+                <div class="public-news-pager" style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 24px;">
+                    <button type="button" id="public-prev-btn" class="pager-btn" style="min-height: 38px; padding: 0 16px; border: 1.5px solid #cbd5e1; background: #ffffff; font-weight: 700; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Trước</button>
+                    <span id="public-page-status" style="font-size: 14px; font-weight: 700; color: #64748b;">1 / 1</span>
+                    <button type="button" id="public-next-btn" class="pager-btn" style="min-height: 38px; padding: 0 16px; border: 1.5px solid #cbd5e1; background: #ffffff; font-weight: 700; border-radius: 8px; cursor: pointer; transition: all 0.2s;">Sau</button>
+                </div>
+            <% } %>
+        </div>
+
+        <aside class="magazine-news-sidebar" aria-label="Tin nổi bật">
+            <% displaySidebarPosts.forEach((post) => { %>
+                <a class="magazine-sidebar-card" href="/tin-tuc/<%= post.duong_dan %>">
+                    <img src="/images/<%= post.anh_dai_dien || 'no-car.jpg' %>" alt="<%= post.tieu_de %>">
+                    <strong><%= post.tieu_de %></strong>
+                </a>
             <% }) %>
-        <% } else { %>
-            <article class="news-card">
-                <img src="/images/ford-everest.jpg" alt="Tin showroom">
-                <h3>Chưa có tin tức được đăng</h3>
-                <p>Vui lòng quay lại sau để xem các cập nhật mới nhất từ showroom.</p>
-            </article>
-        <% } %>
+        </aside>
     </section>
 </main>
 
 <%- include('partials/site-footer') %>
+<script src="/javascripts/nav-search.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const newsItems = Array.from(document.querySelectorAll('[data-public-news-item]'));
+        if (!newsItems.length) return;
+
+        const prevBtn = document.getElementById('public-prev-btn');
+        const nextBtn = document.getElementById('public-next-btn');
+        const statusText = document.getElementById('public-page-status');
+
+        let currentPage = 1;
+        const itemsPerPage = 6;
+
+        function renderPage(page) {
+            currentPage = page;
+            const totalItems = newsItems.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+
+            newsItems.forEach((item, index) => {
+                if (index >= startIndex && index < endIndex) {
+                    item.style.display = 'grid'; // Display style of .magazine-news-item is grid
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            if (statusText) statusText.textContent = `${currentPage} / ${totalPages}`;
+            if (prevBtn) prevBtn.disabled = currentPage <= 1;
+            if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+
+            // Scroll the news container to top on page switch
+            const container = document.getElementById('public-news-list');
+            if (container) {
+                container.scrollTop = 0;
+            }
+        }
+
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => renderPage(currentPage - 1));
+        }
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => renderPage(currentPage + 1));
+        }
+
+        renderPage(1);
+    });
+</script>
 </body>
 </html>

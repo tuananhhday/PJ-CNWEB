@@ -1,273 +1,719 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+/* Homepage Specific Layout & Animations (Double Anh Showroom) */
 
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: white;
-    color: #333;
-}
-
-.header-logo {
-    height: 58px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: white;
-}
-
-.logo-text {
-    font-size: 30px;
-    font-weight: 800;
-    color: #005baa;
-}
-
-.logo-text span {
-    color: #003c7c;
-}
-
-.navbar {
-    height: 64px;
-    background: #202931;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.navbar a {
-    height: 64px;
-    padding: 0 22px;
-    display: flex;
-    align-items: center;
-    color: white;
-    text-decoration: none;
-    font-size: 15px;
-    font-weight: bold;
-}
-
-.navbar a.active {
-    background: #f05a00;
-}
-
-.navbar a:hover {
-    background: #f05a00;
-}
-
-.hero {
+/* Hero Banner Slide Showcase */
+.front-panel {
     position: relative;
-    height: 560px;
+    width: 100%;
+    /* Aspect ratio matches standard widescreen automotive banners (~2.4:1), similar to ford.com.vn */
+    height: 41.67vw; 
+    min-height: 380px;
+    max-height: 720px;
+    background: #000000;
     overflow: hidden;
 }
 
-.hero img {
+.front-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(1.01);
+    transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+}
+
+.front-slide.is-active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
+    z-index: 2;
+}
+
+.slide-media {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    z-index: 1;
 }
 
-.hero-text {
-    position: absolute;
-    top: 160px;
-    left: 26%;
-    color: white;
-    text-align: left;
-}
-
-.hero-text h1 {
-    font-size: 52px;
-    letter-spacing: 1px;
-}
-
-.hero-text p {
-    font-size: 28px;
-    margin-top: 15px;
-}
-
-.car-section {
-    padding: 50px 12% 30px;
-}
-
-.car-section h2,
-.news-section h2 {
-    text-align: center;
-    font-size: 42px;
-    color: #384848;
-    letter-spacing: 2px;
-}
-
-.line {
-    width: 350px;
-    height: 1px;
-    background: #333;
-    margin: 20px auto 45px;
-}
-
-.car-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 45px 30px;
-}
-
-.car-card {
-    text-align: center;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 15px;
-}
-
-.car-card img {
+.slide-media img {
     width: 100%;
-    height: 160px;
-    object-fit: contain;
+    height: 100%;
+    object-fit: cover; /* Absolutely prevents image distortion (no méo ảnh) */
+    object-position: center center;
+    filter: none; /* Crystal clear high-fidelity rendering */
 }
 
-.car-card h3 {
-    font-size: 18px;
-    margin: 15px 0;
-    color: #555;
+.slide-overlay {
+    position: absolute;
+    inset: 0;
+    /* Very subtle bottom overlay to help white text CTA buttons stand out */
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0) 75%, rgba(15, 23, 42, 0.2) 100%);
+    z-index: 2;
+    pointer-events: none;
 }
 
-.car-actions {
+/* Call to Actions inside slides (hidden by default on desktop, shown on hover in the bottom center) */
+.slide-cta {
+    position: absolute;
+    left: 50%;
+    bottom: 32px;
+    transform: translateX(-50%) translateY(12px);
+    z-index: 10;
+    display: flex;
+    gap: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.35s;
+    pointer-events: auto;
+}
+
+/* Show CTA at the bottom center when hovering over the panel */
+.front-panel:hover .front-slide.is-active .slide-cta {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+.btn-quote, .btn-drive {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 0 28px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-family: var(--font-title);
+    transition: var(--transition-smooth);
+}
+
+.btn-icon {
+    transition: transform 0.3s ease;
+}
+
+.btn-quote {
+    background: var(--primary);
+    color: var(--text-light);
+    border: 1px solid var(--primary);
+    box-shadow: 0 4px 14px rgba(2, 132, 199, 0.25);
+}
+
+.btn-quote:hover {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4);
+}
+
+.btn-quote:hover .btn-icon {
+    transform: rotate(90deg);
+}
+
+.btn-drive {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-light);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(4px);
+}
+
+.btn-drive:hover {
+    background: var(--text-light);
+    color: var(--text-dark);
+    border-color: var(--text-light);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.15);
+}
+
+.btn-drive:hover .btn-icon {
+    transform: scale(1.1);
+}
+
+/* Arrows controls */
+.front-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: rgba(15, 23, 42, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: var(--transition-smooth);
+    opacity: 0;
+}
+
+.front-panel:hover .front-arrow {
+    opacity: 1;
+}
+
+.front-arrow:hover {
+    background: rgba(15, 23, 42, 0.7);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: var(--text-light);
+    transform: translateY(-50%) scale(1.05);
+}
+
+.front-arrow-left { left: 32px; }
+.front-arrow-right { right: 32px; }
+
+/* Dots navigation indicator */
+.front-dots {
+    position: absolute;
+    bottom: 32px;
+    right: 48px;
+    z-index: 10;
+    display: flex;
+    gap: 8px;
+}
+
+.front-dots button {
+    width: 16px;
+    height: 4px;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.25);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.front-dots button.is-active {
+    width: 32px;
+    background: var(--primary);
+    box-shadow: 0 0 12px rgba(2, 132, 199, 0.4);
+}
+
+/* Featured Cars Interactive Slider Showcase (Pure CSS Animatable Stages) */
+.featured-cars {
+    padding: 96px 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.featured-tabs {
     display: flex;
     justify-content: center;
-    gap: 14px;
+    gap: 12px;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
 }
 
-.price-btn,
-.fee-btn {
-    padding: 9px 14px;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
+.featured-tabs button {
+    padding: 12px 24px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-full);
+    background: var(--bg-card);
+    color: var(--text-dark);
+    font-family: var(--font-title);
+    font-weight: 600;
     font-size: 14px;
-    font-weight: bold;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-smooth);
 }
 
-.price-btn {
-    background: #3498db;
+.featured-tabs button.is-active {
+    background: var(--primary);
+    color: var(--text-light);
+    border-color: var(--primary);
+    box-shadow: var(--shadow-glow);
 }
 
-.fee-btn {
-    background: #999;
+.featured-stage {
+    position: relative;
+    min-height: 480px;
 }
 
-.news-section {
-    padding: 70px 13%;
-    background: #fafafa;
-}
-
-.news-section h2 {
-    text-align: left;
-    color: #777;
-    border-bottom: 1px solid #3498db;
-    padding-bottom: 12px;
-    margin-bottom: 40px;
-}
-
-.news-content {
+.featured-car {
     display: grid;
-    grid-template-columns: 58% 42%;
-    gap: 30px;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 64px;
+    align-items: center;
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(30px);
+    transition: var(--transition-smooth);
 }
 
-.news-large img {
-    width: 100%;
-    height: 360px;
-    object-fit: cover;
+.featured-car.is-active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+    position: relative;
 }
 
-.news-item {
-    display: grid;
-    grid-template-columns: 140px 1fr;
-    gap: 18px;
-    margin-bottom: 28px;
+.featured-copy span {
+    font-family: var(--font-title);
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--primary);
 }
 
-.news-item img {
-    width: 140px;
-    height: 90px;
-    object-fit: cover;
+.featured-copy h2 {
+    font-family: var(--font-title);
+    font-size: clamp(32px, 4vw, 56px);
+    line-height: 1.15;
+    margin: 12px 0 16px;
+    font-weight: 900;
 }
 
-.news-item h4 {
+.featured-copy p {
+    color: var(--text-muted);
     font-size: 16px;
-    margin-bottom: 10px;
-    color: #444;
+    line-height: 1.6;
+    margin-bottom: 24px;
 }
 
-.news-item p {
-    color: #777;
-    line-height: 1.5;
+.featured-copy strong {
+    display: block;
+    font-family: var(--font-title);
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 8px;
 }
 
-.floating-left {
-    position: fixed;
+.featured-copy em {
+    display: block;
+    font-style: normal;
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-bottom: 24px;
+}
+
+.featured-copy a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 28px;
+    background: var(--bg-dark);
+    color: var(--text-light);
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+}
+
+.featured-copy a:hover {
+    background: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+}
+
+.featured-media {
+    position: relative;
+}
+
+.featured-specs {
+    position: absolute;
+    top: -24px;
     left: 0;
-    bottom: 35px;
+    display: flex;
+    gap: 8px;
+    z-index: 5;
+}
+
+.featured-specs span {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid var(--border-color);
+    padding: 8px 16px;
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 700;
+    box-shadow: var(--shadow-sm);
+}
+
+.featured-media img {
+    width: 100%;
+    filter: drop-shadow(0 20px 30px rgba(0,0,0,0.15));
+    transition: var(--transition-smooth);
+}
+
+.featured-car:hover .featured-media img {
+    transform: scale(1.03) translateY(-4px);
+}
+
+.featured-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 32px;
+}
+
+.featured-controls span {
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.featured-controls button {
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-full);
+    background: var(--bg-card);
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-smooth);
+}
+
+.featured-controls button:hover {
+    background: var(--primary);
+    color: var(--text-light);
+    border-color: var(--primary);
+    transform: scale(1.05);
+}
+
+/* Beautiful All Cars Listing Layout */
+.home-cars {
+    padding: 96px 24px;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border-color);
+}
+
+.home-cars-heading {
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto 56px;
+}
+
+.home-cars-heading p {
+    font-family: var(--font-title);
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 8px;
+}
+
+.home-cars-heading h2 {
+    font-family: var(--font-title);
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 12px;
+}
+
+.home-cars-heading span {
+    color: var(--text-muted);
+    font-size: 15px;
+}
+
+.home-car-grid {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 32px;
+}
+
+.home-car-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    transition: var(--transition-smooth);
+}
+
+.home-car-card a {
+    display: block;
+    padding: 24px;
+}
+
+.home-car-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: contain;
+    margin-bottom: 20px;
+    transition: var(--transition-smooth);
+}
+
+.home-car-card span {
+    font-family: var(--font-title);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--primary);
+}
+
+.home-car-card h3 {
+    font-family: var(--font-title);
+    font-size: 20px;
+    font-weight: 700;
+    margin: 6px 0 10px;
+}
+
+.home-car-card p {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 42px;
+    margin-bottom: 14px;
+}
+
+.car-card-meta {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.car-card-meta small {
+    background: var(--bg-surface-soft);
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.home-car-card strong {
+    display: block;
+    font-family: var(--font-title);
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 12px;
+}
+
+.home-car-card em {
+    font-style: normal;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.home-car-card em::after {
+    content: " →";
+}
+
+.home-car-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-premium);
+    border-color: var(--primary);
+}
+
+.home-car-card:hover img {
+    transform: scale(1.04) translateY(-3px);
+}
+
+/* Home News Magazine Styling Section */
+.home-news-section {
+    max-width: 1400px;
+    margin: 96px auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr 1fr;
+    gap: 40px;
+}
+
+.home-news-section h2 {
+    font-family: var(--font-title);
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--text-dark);
+}
+
+.home-news-popular, .home-news-side {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    z-index: 99;
+    gap: 18px;
 }
 
-.floating-left a {
-    background: #d71920;
-    color: white;
-    text-decoration: none;
-    padding: 14px 28px;
-    border-radius: 0 25px 25px 0;
-    font-weight: bold;
-    font-size: 20px;
+.home-news-mini {
+    display: flex;
+    gap: 16px;
+    align-items: center;
 }
 
-.floating-right {
-    position: fixed;
-    right: 0;
-    bottom: 120px;
-    z-index: 99;
+.home-news-mini img {
+    width: 80px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    background: var(--bg-surface-soft);
 }
 
-.floating-right a {
-    background: #0094e8;
-    color: white;
-    text-decoration: none;
-    padding: 15px 28px;
-    border-radius: 25px 0 0 25px;
-    font-weight: bold;
-    font-size: 18px;
+.home-news-mini span {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
-@media (max-width: 1100px) {
-    .navbar {
-        overflow-x: auto;
-        justify-content: flex-start;
+.home-news-mini strong {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--text-dark);
+    transition: var(--transition-smooth);
+}
+
+.home-news-mini:hover strong {
+    color: var(--primary);
+}
+
+.home-news-mini small {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.home-news-main a {
+    display: block;
+}
+
+.home-news-main img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    margin-bottom: 16px;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-smooth);
+}
+
+.home-news-main strong {
+    font-family: var(--font-title);
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.3;
+    display: block;
+    transition: var(--transition-smooth);
+}
+
+.home-news-main:hover img {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.home-news-main:hover strong {
+    color: var(--primary);
+}
+
+.home-news-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.home-news-card img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+}
+
+.home-news-card strong {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+    transition: var(--transition-smooth);
+}
+
+.home-news-card small {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.home-news-card:hover strong {
+    color: var(--primary);
+}
+
+@media (max-width: 1024px) {
+    .featured-car {
+        grid-template-columns: 1fr;
+        gap: 32px;
     }
-
-    .car-grid {
+    
+    .home-news-section {
+        grid-template-columns: 1fr;
+        gap: 48px;
+    }
+    
+    .home-news-side {
         grid-template-columns: repeat(2, 1fr);
     }
 
-    .news-content {
-        grid-template-columns: 1fr;
+    .slide-container {
+        padding: 0 32px;
     }
+    
 }
 
-@media (max-width: 650px) {
-    .car-grid {
+@media (max-width: 768px) {
+    .front-panel {
+        height: 60vw; /* Taller viewport ratio on mobile for prominent rendering */
+        min-height: 280px;
+        max-height: 400px;
+    }
+    
+    .slide-media img {
+        object-fit: cover; /* Prevents image distortion on mobile */
+        object-position: center center;
+    }
+    
+    .slide-overlay {
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0) 50%, rgba(15, 23, 42, 0.45) 100%);
+    }
+    
+    .slide-cta {
+        position: absolute;
+        left: 50%;
+        bottom: 24px;
+        transform: translateX(-50%) translateY(0) !important;
+        display: flex;
+        flex-direction: row;
+        width: 88%;
+        max-width: 340px;
+        gap: 10px;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    
+    .btn-quote, .btn-drive {
+        flex: 1;
+        width: auto;
+        min-height: 42px;
+        font-size: 11px;
+        padding: 0 12px;
+    }
+    
+    .front-arrow {
+        display: none;
+    }
+    
+    .front-dots {
+        bottom: 12px;
+        right: 50%;
+        transform: translateX(50%);
+    }
+    
+    .home-news-side {
         grid-template-columns: 1fr;
-    }
-
-    .hero {
-        height: 320px;
-    }
-
-    .hero-text {
-        left: 30px;
-        top: 100px;
-    }
-
-    .hero-text h1 {
-        font-size: 32px;
     }
 }

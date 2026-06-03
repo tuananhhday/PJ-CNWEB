@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || 'Đại lý' %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/stylesheets/base.css">
+    <link rel="stylesheet" href="/stylesheets/forms.css">
+</head>
+<body>
+<%- include('partials/site-nav') %>
+
+<main id="main-content" class="dealer-page dealer-directory-page">
+    <%
+        const activeFilters = filters || {};
+        const activeOptions = filterOptions || {};
+        const activeDealer = dealers && dealers.length ? dealers[0] : null;
+        const activeAddress = activeDealer ? `${activeDealer.dia_chi || ''} ${activeDealer.thanh_pho || ''}`.trim() : 'Việt Nam';
+        const fallbackMap = `https://www.google.com/maps?q=${encodeURIComponent(activeAddress)}&output=embed`;
+        const savedMap = activeDealer ? (activeDealer.map_embed_url || activeDealer.google_map_url || '') : '';
+        const activeMap = savedMap && (savedMap.includes('output=embed') || savedMap.includes('/embed')) ? savedMap : fallbackMap;
+    %>
+
+    <section class="dealer-directory" aria-label="Danh sách đại lý và bản đồ">
+        <aside class="dealer-directory-list">
+            <% if (dealers && dealers.length) { %>
+                <% dealers.forEach((dealer, index) => { %>
+                    <%
+                        const dealerAddress = `${dealer.dia_chi || ''} ${dealer.thanh_pho || ''}`.trim() || 'Việt Nam';
+                        const dealerFallbackMap = `https://www.google.com/maps?q=${encodeURIComponent(dealerAddress)}&output=embed`;
+                        const dealerSavedMap = dealer.map_embed_url || dealer.google_map_url || '';
+                        const dealerMap = dealerSavedMap && (dealerSavedMap.includes('output=embed') || dealerSavedMap.includes('/embed')) ? dealerSavedMap : dealerFallbackMap;
+                        const dealerWebsite = dealer.website && /^https?:\/\//i.test(dealer.website) ? dealer.website : (dealer.website ? `https://${dealer.website}` : '');
+                    %>
+                    <article
+                        class="dealer-directory-card <%= index === 0 ? 'is-active' : '' %>"
+                        id="dealer-<%= dealer.id %>"
+                        tabindex="0"
+                        data-map-src="<%= dealerMap %>"
+                        data-map-title="Bản đồ <%= dealer.ten_dai_ly %>">
+                        <div class="dealer-directory-title">
+                            <span class="dealer-kia-mark">KIA</span>
+                            <h2><%= dealer.ten_dai_ly %></h2>
+                        </div>
+
+                        <div class="dealer-directory-info">
+                            <% if (dealerWebsite) { %>
+                                <p>website: <a href="<%= dealerWebsite %>" target="_blank" rel="noreferrer"><%= dealer.website %></a></p>
+                            <% } else { %>
+                                <p>website: Đang cập nhật</p>
+                            <% } %>
+                            <p>Liên lạc: <%= dealer.so_dien_thoai || 'Đang cập nhật' %></p>
+                        </div>
+
+                        <div class="dealer-directory-actions">
+                            <% if (dealer.so_dien_thoai) { %>
+                                <a href="tel:<%= dealer.so_dien_thoai %>">☎ Liên hệ showroom</a>
+                            <% } else { %>
+                                <span>☎ Liên hệ showroom</span>
+                            <% } %>
+                            <% if (dealerWebsite) { %>
+                                <a href="<%= dealerWebsite %>" target="_blank" rel="noreferrer">● Đi tới website</a>
+                            <% } else { %>
+                                <span>● Đi tới website</span>
+                            <% } %>
+                            <% if (dealer.email) { %>
+                                <a href="mailto:<%= dealer.email %>">✹ Chat với đại lý</a>
+                            <% } else { %>
+                                <span>✹ Chat với đại lý</span>
+                            <% } %>
+                        </div>
+                    </article>
+                <% }) %>
+            <% } else { %>
+                <div class="dealer-empty-panel">
+                    <h2>Không tìm thấy đại lý phù hợp</h2>
+                    <p>Thử bỏ bớt bộ lọc hoặc chọn khu vực khác.</p>
+                </div>
+            <% } %>
+        </aside>
+
+        <section class="dealer-directory-map">
+            <form class="dealer-directory-search" action="/lien-he" method="get">
+                <label>
+                    <span>Thành phố</span>
+                    <select name="khu_vuc">
+                        <option value="">Tất cả khu vực</option>
+                        <% (activeOptions.khuVucs || []).forEach((option) => { %>
+                            <option value="<%= option %>" <%= activeFilters.khu_vuc === option ? 'selected' : '' %>><%= option %></option>
+                        <% }) %>
+                    </select>
+                </label>
+
+                <label>
+                    <span>Đại lý</span>
+                    <select name="ten">
+                        <option value="">Chọn đại lý</option>
+                        <% (dealers || []).forEach((dealer) => { %>
+                            <option value="<%= dealer.ten_dai_ly %>" <%= activeFilters.ten === dealer.ten_dai_ly ? 'selected' : '' %>>
+                                <%= dealer.ten_dai_ly %> - <%= dealer.dia_chi || dealer.thanh_pho || '' %>
+                            </option>
+                        <% }) %>
+                    </select>
+                </label>
+
+                <button type="submit" aria-label="Tìm kiếm">⌕</button>
+            </form>
+
+            <iframe
+                src="<%= activeMap %>"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                title="Bản đồ đại lý"
+                allowfullscreen>
+            </iframe>
+        </section>
+    </section>
+</main>
+
+<%- include('partials/site-footer') %>
+<script src="/javascripts/nav-search.js"></script>
+<script>
+    document.querySelectorAll('.dealer-directory-card').forEach((card) => {
+        const selectDealer = () => {
+            const frame = document.querySelector('.dealer-directory-map iframe');
+            if (!frame || !card.dataset.mapSrc) return;
+
+            document.querySelectorAll('.dealer-directory-card').forEach((item) => item.classList.remove('is-active'));
+            card.classList.add('is-active');
+            frame.src = card.dataset.mapSrc;
+            frame.title = card.dataset.mapTitle || 'Bản đồ đại lý';
+        };
+
+        card.addEventListener('click', selectDealer);
+        card.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                selectDealer();
+            }
+        });
+    });
+</script>
+</body>
+</html>

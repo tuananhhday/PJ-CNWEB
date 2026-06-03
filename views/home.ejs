@@ -3,112 +3,546 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    <link rel="stylesheet" href="/stylesheets/showroom.css">
+    <title><%= title || 'Showroom Double Anh' %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/stylesheets/base.css">
+    <link rel="stylesheet" href="/stylesheets/home.css">
 </head>
-<body>
+<body class="home-landing">
 <%- include('partials/site-nav') %>
 
-<main>
-    <section class="hero-home">
-        <img src="/images/ford-everest.jpg" alt="Showroom ô tô">
-        <div class="hero-copy">
-            <h1>Sẵn sàng cho hành trình mới</h1>
-            <p>Khám phá xe SUV, bán tải và các gói tư vấn mua xe phù hợp cho gia đình hoặc doanh nghiệp.</p>
-            <div class="hero-actions">
-                <a href="/xe" class="primary-btn">Chọn xe</a>
-                <a href="/dang-ky-lai-thu" class="secondary-btn">Đăng ký lái thử</a>
-            </div>
-        </div>
-    </section>
+<main id="main-content">
+    <section class="front-panel" aria-label="Showroom ô tô Double Anh">
+        <% const displayPanels = panels && panels.length ? panels : []; %>
 
-    <section class="section-wrap">
-        <div class="section-heading">
-            <p class="eyebrow">Toàn bộ xe</p>
-            <h2>Khám phá các dòng xe</h2>
-            <a href="/bang-gia">Xem bảng giá</a>
-        </div>
-
-        <div class="car-grid">
-            <% cars.slice(0, 6).forEach(car => { %>
-                <article class="vehicle-card">
-                    <img src="/images/<%= car.anh_dai_dien || 'ford-everest.jpg' %>" alt="<%= car.ten_xe %>">
-                    <div class="vehicle-content">
-                        <p><%= car.ten_hang %> · <%= car.ten_loai %></p>
-                        <h3><%= car.ten_xe %></h3>
-                        <strong>Từ <%= formatPrice(car.gia_ban) %></strong>
-                        <div class="card-actions">
-                            <a href="/xe/<%= car.duong_dan %>">Xem thêm</a>
-                            <a href="/bao-gia?xe_id=<%= car.id %>">Báo giá</a>
-                        </div>
+        <% if (displayPanels.length) { %>
+            <% displayPanels.forEach((panel, index) => { %>
+                <% const panelImage = panel.duong_dan_anh || 'no-car.jpg'; %>
+                <% const panelImageSrc = /^https?:\/\//i.test(panelImage) || panelImage.startsWith('/') ? panelImage : '/images/' + panelImage; %>
+                <article class="front-slide <%= index === 0 ? 'is-active' : '' %>" data-slide>
+                    <div class="slide-media">
+                        <img src="<%= panelImageSrc %>" alt="Không gian trưng bày xe tại showroom">
+                        <div class="slide-overlay"></div>
+                    </div>
+                    
+                    <div class="slide-cta">
+                        <a href="/bao-gia" class="btn-quote">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            Nhận báo giá
+                        </a>
+                        <a href="/dang-ky-lai-thu" class="btn-drive">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path><path d="M2 12h20"></path></svg>
+                            Lịch lái thử
+                        </a>
                     </div>
                 </article>
             <% }) %>
-        </div>
+
+            <% if (displayPanels.length > 1) { %>
+                <button class="front-arrow front-arrow-left" type="button" data-prev aria-label="Ảnh trước">&#8249;</button>
+                <button class="front-arrow front-arrow-right" type="button" data-next aria-label="Ảnh tiếp theo">&#8250;</button>
+
+                <div class="front-dots" aria-label="Chọn ảnh">
+                    <% displayPanels.forEach((panel, index) => { %>
+                        <button class="<%= index === 0 ? 'is-active' : '' %>" type="button" data-goto="<%= index %>" aria-label="Panel <%= index + 1 %>"></button>
+                    <% }) %>
+                </div>
+            <% } %>
+        <% } else { %>
+            <div class="front-empty">
+                <p>Chưa có ảnh panel. Vào Admin để thêm ảnh panel trang chủ.</p>
+            </div>
+        <% } %>
     </section>
 
-    <section class="buying-band">
-        <div>
-            <p class="eyebrow">Mua xe</p>
-            <h2>Bắt đầu sở hữu chiếc xe bạn mong muốn</h2>
-        </div>
-        <div class="quick-actions">
-            <a href="/lien-he">Tìm đại lý</a>
-            <a href="/bao-gia">Nhận báo giá</a>
-            <a href="/dang-ky-lai-thu">Đăng ký lái thử</a>
-        </div>
+    <section class="featured-cars" aria-label="Thông tin xe nổi bật">
+        <% const carList = cars && cars.length ? cars : []; %>
+        <% const carTypes = []; %>
+        <% carList.forEach((car) => { %>
+            <% const typeName = car.ten_loai || 'Khác'; %>
+            <% if (!carTypes.includes(typeName)) carTypes.push(typeName); %>
+        <% }) %>
+
+        <% if (carList.length) { %>
+            <div class="featured-tabs" aria-label="Chọn nhóm xe">
+                <% carTypes.forEach((typeName, index) => { %>
+                    <% const typeCount = carList.filter((car) => (car.ten_loai || 'Khác') === typeName).length; %>
+                    <button class="<%= index === 0 ? 'is-active' : '' %>" type="button" data-feature-filter="<%= typeName %>">
+                        <%= typeName %> (<%= typeCount %>)
+                    </button>
+                <% }) %>
+            </div>
+
+            <div class="featured-stage">
+                <% carList.forEach((car, index) => { %>
+                    <% const featureType = car.ten_loai || 'Khác'; %>
+                    <% const carUrl = '/xe/' + (car.duong_dan || car.id); %>
+                    <article class="featured-car <%= index === 0 ? 'is-active' : '' %>" data-feature-car data-feature-type="<%= featureType %>">
+                        <div class="featured-copy">
+                            <span><%= car.ten_hang %> <%= car.ten_loai %></span>
+                            <h2><%= car.ten_xe %></h2>
+                            <p><%= car.mo_ta_ngan || 'Thông tin xe đang được cập nhật.' %></p>
+                            <strong><%= formatPrice(car.gia_ban) %></strong>
+                            <em>Ưu đãi và lịch lái thử đang chờ bạn</em>
+                            <a href="<%= carUrl %>">Xem tất cả</a>
+                        </div>
+
+                        <div class="featured-media">
+                            <div class="featured-specs">
+                                <span><%= car.dong_co || car.nhien_lieu || 'Động cơ đang cập nhật' %></span>
+                                <span><%= car.hop_so || 'Hộp số đang cập nhật' %></span>
+                                <span><%= car.so_cho_ngoi ? car.so_cho_ngoi + ' chỗ' : 'Số chỗ đang cập nhật' %></span>
+                            </div>
+                            <img src="/images/<%= car.anh_dai_dien || 'no-car.jpg' %>" alt="<%= car.ten_xe %>">
+                        </div>
+                    </article>
+                <% }) %>
+
+                <div class="featured-controls">
+                    <span><strong data-feature-current>1</strong> / <span data-feature-total><%= carList.length %></span></span>
+                    <button type="button" data-feature-prev aria-label="Xe trước">&#8592;</button>
+                    <button type="button" data-feature-next aria-label="Xe tiếp theo">&#8594;</button>
+                </div>
+            </div>
+        <% } else { %>
+            <p class="empty-state">Chưa có xe trong database. Hãy vào /admin/xe để thêm xe.</p>
+        <% } %>
     </section>
 
-    <section class="section-wrap service-preview">
-        <div class="media-panel">
-            <img src="/images/ford-everest.jpg" alt="Dịch vụ showroom">
-        </div>
-        <div class="text-panel">
-            <p class="eyebrow">Dịch vụ & Bảo dưỡng</p>
-            <h2>Chăm sóc xe sau bán hàng</h2>
-            <p>Đặt lịch bảo dưỡng, nhận tư vấn phụ tùng, kiểm tra xe và hỗ trợ khách hàng sau khi mua xe.</p>
-            <a href="/dich-vu" class="primary-btn">Xem dịch vụ</a>
-        </div>
-    </section>
-
-    <section class="section-wrap">
-        <div class="section-heading">
-            <p class="eyebrow">Tin tức mới nhất</p>
-            <h2>Điều gì đang diễn ra</h2>
-            <a href="/tin-tuc">Xem toàn bộ tin</a>
+    <section class="home-cars" aria-label="Danh sách xe của showroom">
+        <div class="home-cars-heading">
+            <p>Danh sách xe</p>
+            <h2>Tất cả mẫu xe đang có tại showroom.</h2>
+            <span>Xem nhanh hình ảnh, giá bán, phiên bản và thông tin cơ bản của từng mẫu xe.</span>
         </div>
 
-        <div class="news-grid">
-            <% if (news && news.length > 0) { %>
-                <% news.forEach(item => { %>
-                    <article class="news-card">
-                        <img src="/images/<%= item.anh_dai_dien || 'ford-everest.jpg' %>" alt="<%= item.tieu_de %>">
-                        <h3><%= item.tieu_de %></h3>
-                        <p><%= (item.noi_dung || '').slice(0, 120) %></p>
+        <div class="home-car-grid">
+            <% if (cars && cars.length) { %>
+                <% cars.forEach((car) => { %>
+                    <article class="home-car-card">
+                        <a href="/xe/<%= car.duong_dan || car.id %>">
+                            <img src="/images/<%= car.anh_dai_dien || 'no-car.jpg' %>" alt="<%= car.ten_xe %>">
+                            <span><%= car.ten_hang %> <%= car.ten_loai %></span>
+                            <h3><%= car.ten_xe %></h3>
+                            <p><%= car.mo_ta_ngan || 'Thông tin xe đang được cập nhật.' %></p>
+                            <div class="car-card-meta">
+                                <small><%= car.nhien_lieu || 'Nhiên liệu đang cập nhật' %></small>
+                                <small><%= car.so_cho_ngoi ? car.so_cho_ngoi + ' chỗ' : 'Số chỗ đang cập nhật' %></small>
+                            </div>
+                            <strong>Giá từ <%= formatPrice(car.gia_ban) %></strong>
+                            <em>Xem chi tiết</em>
+                        </a>
                     </article>
                 <% }) %>
             <% } else { %>
-                <article class="news-card">
-                    <img src="/images/ford-everest.jpg" alt="Ưu đãi showroom">
-                    <h3>Ưu đãi lái thử và báo giá trong tháng</h3>
-                    <p>Liên hệ showroom để nhận tư vấn phiên bản, giá lăn bánh và chương trình hỗ trợ tài chính.</p>
-                </article>
-                <article class="news-card">
-                    <img src="/images/ford-everest.jpg" alt="Dịch vụ bảo dưỡng">
-                    <h3>Dịch vụ bảo dưỡng định kỳ</h3>
-                    <p>Đội ngũ kỹ thuật hỗ trợ kiểm tra xe, bảo dưỡng nhanh và tư vấn phụ tùng chính hãng.</p>
-                </article>
-                <article class="news-card">
-                    <img src="/images/ford-everest.jpg" alt="Tư vấn xe">
-                    <h3>Tư vấn chọn xe phù hợp</h3>
-                    <p>So sánh các dòng xe theo nhu cầu gia đình, công việc, tài chính và trải nghiệm lái.</p>
-                </article>
+                <p class="empty-state">Chưa có xe trong database. Hãy vào /admin/xe để thêm xe.</p>
+            <% } %>
+        </div>
+    </section>
+
+    <style>
+        /* Scoped styling to fix distorted images in the homepage news section */
+        .home-news-section {
+            max-width: 1400px;
+            margin: 80px auto;
+            padding: 0 24px;
+            display: grid;
+            grid-template-columns: 1fr 1.2fr 1fr;
+            gap: 40px;
+        }
+
+        @media (max-width: 1024px) {
+            .home-news-section {
+                grid-template-columns: 1fr;
+                gap: 48px;
+            }
+        }
+
+        .home-news-section h2 {
+            font-family: var(--font-title, 'Outfit', sans-serif);
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--text-dark, #0f172a);
+            color: var(--text-dark, #0f172a);
+        }
+
+        /* Left Column: Xem nhiều */
+        .home-news-popular {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .home-news-mini {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .home-news-mini .mini-img-wrapper {
+            width: 90px;
+            height: 68px;
+            flex-shrink: 0;
+            border-radius: 6px;
+            overflow: hidden;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+        }
+
+        .home-news-mini .mini-img-wrapper img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+        }
+
+        .home-news-mini span {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        .home-news-mini strong {
+            font-size: 13.5px;
+            font-weight: 700;
+            line-height: 1.4;
+            color: var(--text-dark, #0f172a);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            transition: var(--transition-smooth);
+        }
+
+        .home-news-mini:hover strong {
+            color: var(--primary, #0284c7);
+        }
+
+        .home-news-mini small {
+            font-size: 11px;
+            color: var(--text-muted, #64748b);
+        }
+
+        /* Center Column: Tin mới */
+        .home-news-main {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .home-news-main-scroll {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        /* Stylized scrollbar for Center Column */
+        .home-news-main-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .home-news-main-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+        .home-news-main-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .home-news-main-scroll::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .home-news-main-scroll .home-news-main-card {
+            height: auto;
+            flex-shrink: 0;
+        }
+
+
+        .home-news-main-card {
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.05));
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .home-news-main-card .main-img-wrapper {
+            width: 100%;
+            height: 240px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f8fafc;
+            border: 1px solid #f1f5f9;
+            margin-bottom: 16px;
+        }
+
+        .home-news-main-card .main-img-wrapper img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            transition: transform 0.5s ease;
+        }
+
+        .home-news-main-card strong {
+            font-family: var(--font-title, 'Outfit', sans-serif);
+            font-size: 18px;
+            font-weight: 800;
+            line-height: 1.35;
+            color: var(--text-dark, #0f172a);
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            transition: var(--transition-smooth);
+        }
+
+        .home-news-main-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md, 0 4px 6px rgba(0,0,0,0.05));
+            border-color: var(--primary, #0284c7);
+        }
+
+        .home-news-main-card:hover .main-img-wrapper img {
+            transform: scale(1.03);
+        }
+
+        .home-news-main-card:hover strong {
+            color: var(--primary, #0284c7);
+        }
+
+        .home-news-main-card .main-meta {
+            font-size: 11px;
+            color: var(--text-muted, #64748b);
+            margin-top: auto;
+        }
+
+        /* Right Column: Các tin khác */
+        .home-news-side {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .home-news-side-scroll {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        /* Stylized scrollbar for Right Column */
+        .home-news-side-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .home-news-side-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+        .home-news-side-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .home-news-side-scroll::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .home-news-side-scroll .home-news-card {
+            height: auto;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .home-news-side {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .home-news-side {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .home-news-card {
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px;
+            box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.05));
+            transition: all 0.3s ease;
+        }
+
+        .home-news-card .side-img-wrapper {
+            width: 100%;
+            height: 120px;
+            border-radius: 6px;
+            overflow: hidden;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 10px;
+        }
+
+        .home-news-card .side-img-wrapper img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+        }
+
+        .home-news-card strong {
+            font-size: 13.5px;
+            font-weight: 700;
+            line-height: 1.4;
+            color: var(--text-dark, #0f172a);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 38px;
+            transition: var(--transition-smooth);
+        }
+
+        .home-news-card small {
+            font-size: 11px;
+            color: var(--text-muted, #64748b);
+        }
+
+        .home-news-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md, 0 4px 6px rgba(0,0,0,0.05));
+            border-color: var(--primary, #0284c7);
+        }
+
+        .home-news-card:hover strong {
+            color: var(--primary, #0284c7);
+        }
+    </style>
+
+    <section class="home-news-section" aria-label="Tin tức showroom">
+        <% 
+        const homePosts = posts && posts.length ? posts : [];
+        
+        // 1. Center post: newest post overall (index 0)
+        const mainPost = homePosts.length ? homePosts[0] : null;
+        const otherPosts = homePosts.slice(1);
+        
+        // 2. Initial selection based on user flags (excluding mainPost since it's from otherPosts)
+        let popularPosts = otherPosts.filter(p => Number(p.xem_nhieu)).slice(0, 4);
+        let sidePosts = otherPosts.filter(p => Number(p.hien_sidebar)).slice(0, 3);
+        
+        // 3. Fallback filling to show old posts and prevent them from disappearing:
+        // Fill popularPosts (up to 4) preferring posts not already in sidePosts
+        for (const post of otherPosts) {
+            if (popularPosts.length >= 4) break;
+            if (popularPosts.some(x => x.id === post.id)) continue;
+            if (!sidePosts.some(x => x.id === post.id)) {
+                popularPosts.push(post);
+            }
+        }
+        // Fill remaining popularPosts slots with any other remaining posts
+        for (const post of otherPosts) {
+            if (popularPosts.length >= 4) break;
+            if (!popularPosts.some(x => x.id === post.id)) {
+                popularPosts.push(post);
+            }
+        }
+        
+        // Fill sidePosts (up to 3) preferring posts not already in popularPosts
+        for (const post of otherPosts) {
+            if (sidePosts.length >= 3) break;
+            if (sidePosts.some(x => x.id === post.id)) continue;
+            if (!popularPosts.some(x => x.id === post.id)) {
+                sidePosts.push(post);
+            }
+        }
+        // Fill remaining sidePosts slots with any other remaining posts
+        for (const post of otherPosts) {
+            if (sidePosts.length >= 3) break;
+            if (!sidePosts.some(x => x.id === post.id)) {
+                sidePosts.push(post);
+            }
+        }
+        %>
+
+
+        <div class="home-news-column home-news-popular">
+            <h2>Xem nhiều</h2>
+            <% popularPosts.forEach((post) => { %>
+                <a class="home-news-mini" href="/tin-tuc/<%= post.duong_dan %>">
+                    <div class="mini-img-wrapper">
+                        <img src="/images/<%= post.anh_dai_dien || 'no-car.jpg' %>" alt="<%= post.tieu_de %>" onerror="this.src='/images/no-car.jpg';">
+                    </div>
+                    <span>
+                        <strong><%= post.tieu_de %></strong>
+                        <small><%= formatDateTime(post.ngay_tao) %></small>
+                    </span>
+                </a>
+            <% }) %>
+        </div>
+
+        <div class="home-news-main">
+            <h2>Tin mới</h2>
+            <% if (homePosts.length) { %>
+                <div class="home-news-main-scroll">
+                    <% homePosts.forEach((post) => { %>
+                        <a class="home-news-main-card" href="/tin-tuc/<%= post.duong_dan %>">
+                            <div class="main-img-wrapper">
+                                <img src="/images/<%= post.anh_dai_dien || 'no-car.jpg' %>" alt="<%= post.tieu_de %>" onerror="this.src='/images/no-car.jpg';">
+                            </div>
+                            <strong><%= post.tieu_de %></strong>
+                            <span class="main-meta"><%= formatDateTime(post.ngay_tao) %></span>
+                        </a>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <p class="empty-state">Chưa có tin tức nào được đăng.</p>
+            <% } %>
+        </div>
+
+        <div class="home-news-column home-news-side">
+            <h2>Tin tức khác</h2>
+            <% if (sidePosts.length) { %>
+                <div class="home-news-side-scroll">
+                    <% sidePosts.forEach((post) => { %>
+                        <a class="home-news-card" href="/tin-tuc/<%= post.duong_dan %>">
+                            <div class="side-img-wrapper">
+                                <img src="/images/<%= post.anh_dai_dien || 'no-car.jpg' %>" alt="<%= post.tieu_de %>" onerror="this.src='/images/no-car.jpg';">
+                            </div>
+                            <strong><%= post.tieu_de %></strong>
+                            <small><%= formatDateTime(post.ngay_tao) %></small>
+                        </a>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <p class="empty-state">Chưa có tin tức nào khác.</p>
             <% } %>
         </div>
     </section>
 </main>
 
 <%- include('partials/site-footer') %>
+
 <script src="/javascripts/home.js"></script>
+<script src="/javascripts/nav-search.js"></script>
 </body>
 </html>

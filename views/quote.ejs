@@ -1,49 +1,127 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
-    <link rel="stylesheet" href="/stylesheets/showroom.css">
+    <title>
+        <%= title %>
+    </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/stylesheets/base.css">
+    <link rel="stylesheet" href="/stylesheets/forms.css">
 </head>
-<body>
-<%- include('partials/site-nav') %>
 
-<main class="form-page">
-    <section class="form-copy">
-        <p class="eyebrow">Mua xe</p>
-        <h1>Yêu cầu báo giá</h1>
-        <p>Để lại thông tin, showroom sẽ tư vấn phiên bản, ưu đãi, trả góp và chi phí lăn bánh.</p>
-    </section>
+<body class="page-form">
+    <%- include('partials/site-nav') %>
 
-    <form class="sales-form" action="/bao-gia" method="POST">
-        <% if (error) { %><div class="message error-message"><%= error %></div><% } %>
-        <% if (success) { %><div class="message success-message"><%= success %></div><% } %>
+        <main id="main-content">
+            <section class="form-section">
+                <div class="form-container">
+                    <div class="form-header">
+                        <span>Báo giá xe</span>
+                        <h1>Nhận báo giá chi tiết</h1>
+                        <p>Điền thông tin để showroom tư vấn phiên bản, màu xe, ưu đãi hiện có và chi phí lăn bánh phù
+                            hợp với khu vực của bạn.</p>
+                    </div>
 
-        <label>Họ và tên*
-            <input type="text" name="ho_ten" value="<%= formData.ho_ten || (currentUser ? currentUser.ho_ten : '') %>">
-        </label>
-        <label>Số điện thoại*
-            <input type="tel" name="so_dien_thoai" value="<%= formData.so_dien_thoai || (currentUser ? currentUser.so_dien_thoai : '') %>">
-        </label>
-        <label>Email
-            <input type="email" name="email" value="<%= formData.email || (currentUser ? currentUser.email : '') %>">
-        </label>
-        <label>Mẫu xe quan tâm
-            <select name="xe_id">
-                <option value="">Chọn mẫu xe</option>
-                <% cars.forEach(car => { %>
-                    <option value="<%= car.id %>" <%= String(formData.xe_id || '') === String(car.id) ? 'selected' : '' %>><%= car.ten_xe %></option>
-                <% }) %>
-            </select>
-        </label>
-        <label>Nội dung
-            <textarea name="noi_dung" rows="4"><%= formData.noi_dung || '' %></textarea>
-        </label>
-        <button type="submit" class="primary-btn">Gửi yêu cầu</button>
-    </form>
-</main>
+                    <% const quoteFormData=locals.formData || {}; %>
+                        <% const quoteUser=locals.currentUser || null; %>
+                            <% const quoteError=locals.error || '' ; %>
+                                <% const quoteSuccess=locals.success || '' ; %>
+                                    <form action="/bao-gia" method="post" class="customer-form">
+                                        <% if (quoteError) { %>
+                                            <div class="message error-message">
+                                                <%= quoteError %>
+                                            </div>
+                                            <% } %>
+                                                <% if (quoteSuccess) { %>
+                                                    <div class="message success-message">
+                                                        <%= quoteSuccess %>
+                                                    </div>
+                                                    <% } %>
 
-<%- include('partials/site-footer') %>
+                                                        <div class="form-group">
+                                                            <label for="ho_ten">Họ và tên*</label>
+                                                            <input type="text" id="ho_ten" name="ho_ten" required
+                                                                placeholder="Nhập họ và tên"
+                                                                value="<%= quoteFormData.ho_ten || (quoteUser ? quoteUser.ho_ten : '') || '' %>">
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label for="email">Email*</label>
+                                                            <input type="email" id="email" name="email" required
+                                                                placeholder="Nhập địa chỉ email"
+                                                                value="<%= quoteFormData.email || (quoteUser ? quoteUser.email : '') || '' %>">
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label for="dien_thoai">Số điện thoại*</label>
+                                                            <input type="tel" id="dien_thoai" name="so_dien_thoai"
+                                                                required placeholder="Nhập số điện thoại"
+                                                                value="<%= quoteFormData.so_dien_thoai || (quoteUser ? quoteUser.so_dien_thoai : '') || '' %>">
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label for="mau_xe">Mẫu xe quan tâm*</label>
+                                                            <select id="mau_xe" name="xe_id" required>
+                                                                <option value="">Chọn mẫu xe muốn nhận báo giá</option>
+                                                                <% cars.forEach(car=> { %>
+                                                                    <option value="<%= car.id %>"
+                                                                        <%=String(quoteFormData.xe_id || selectedCarId
+                                                                        || '' )===String(car.id) ? 'selected' : '' %>>
+                                                                        <%= car.ten_xe %>
+                                                                    </option>
+                                                                    <% }) %>
+                                                            </select>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label for="thanh_pho">Tỉnh/Thành phố*</label>
+                                                            <input type="text" id="thanh_pho" name="thanh_pho" required
+                                                                placeholder="Nhập tỉnh hoặc thành phố"
+                                                                value="<%= quoteFormData.thanh_pho || '' %>">
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label for="noi_dung">Nội dung tư vấn</label>
+                                                            <input type="text" id="noi_dung" name="noi_dung"
+                                                                placeholder="Ví dụ: Tôi muốn báo giá lăn bánh và trả góp"
+                                                                value="<%= quoteFormData.noi_dung || '' %>">
+                                                        </div>
+
+                                                        <div class="form-policy">
+                                                            <label class="checkbox-label">
+                                                                <input type="checkbox" name="dong_y_bao_mat" required>
+                                                                <span>Tôi đồng ý để Showroom Double Anh sử dụng thông
+                                                                    tin cá nhân nhằm liên hệ, tư vấn và xử lý yêu cầu
+                                                                    báo giá theo chính sách bảo mật.</span>
+                                                            </label>
+                                                            <p class="marketing-consent">Tôi đồng ý nhận thông tin ưu
+                                                                đãi, chương trình bán hàng và dịch vụ chăm sóc khách
+                                                                hàng từ Showroom Double Anh.</p>
+                                                            <div class="radio-group">
+                                                                <label class="radio-label"><input type="radio"
+                                                                        name="dong_y_tiep_thi" value="co" required>
+                                                                    Có</label>
+                                                                <label class="radio-label"><input type="radio"
+                                                                        name="dong_y_tiep_thi" value="khong">
+                                                                    Không</label>
+                                                            </div>
+                                                        </div>
+                                                        <button type="submit" class="btn primary btn-submit">Gửi yêu cầu
+                                                            báo giá</button>
+                                    </form>
+                </div>
+            </section>
+        </main>
+
+        <%- include('partials/site-footer') %>
+
+            <script src="/javascripts/nav-search.js"></script>
 </body>
+
 </html>

@@ -4,139 +4,99 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= title %></title>
-    <link rel="stylesheet" href="/stylesheets/test-drive.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/stylesheets/base.css">
+    <link rel="stylesheet" href="/stylesheets/forms.css">
 </head>
-<body>
+<body class="page-form">
+<%- include('partials/site-nav') %>
 
-<header class="test-header">
-    <nav class="main-nav" aria-label="Điều hướng chính">
-        <a href="/xe">Sản Phẩm</a>
-        <a href="/bang-gia">Mua Xe</a>
-        <a href="/dich-vu">Dịch Vụ & Hỗ Trợ</a>
-    </nav>
-
-    <a href="/trang-chu" class="ford-badge" aria-label="Về trang chủ">Ford</a>
-
-    <div class="header-actions" aria-label="Liên kết nhanh">
-        <a href="/lien-he" title="Tìm đại lý">⌖</a>
-        <a href="/login" title="Tài khoản">♙</a>
-        <a href="/xe" title="Tìm kiếm">⌕</a>
-    </div>
-</header>
-
-<main class="test-drive-page">
-    <section class="form-panel">
-        <h1>Đăng ký lái thử</h1>
-        <p class="intro">Khám phá ngay sự mạnh mẽ và tiện nghi vượt trội.</p>
-
-        <% if (error) { %>
-            <div class="message error-message"><%= error %></div>
-        <% } %>
-
-        <% if (success) { %>
-            <div class="message success-message"><%= success %></div>
-        <% } %>
-
-        <form action="/dang-ky-lai-thu" method="POST" id="testDriveForm" novalidate>
-            <div class="field full">
-                <label for="ho_ten">Họ và tên*</label>
-                <input type="text" id="ho_ten" name="ho_ten" placeholder="Vui lòng nhập Họ và Tên" value="<%= formData.ho_ten || '' %>">
-                <span class="field-error"></span>
+<main id="main-content">
+    <section class="form-section">
+        <div class="form-container">
+            <div class="form-header">
+                <span>Lái thử xe</span>
+                <h1>Đặt lịch lái thử</h1>
+                <p>Chọn mẫu xe và đại lý phù hợp để showroom chuẩn bị xe, tư vấn tính năng và xác nhận lịch hẹn với bạn.</p>
             </div>
 
-            <div class="form-row">
-                <div class="field">
-                    <label for="email">Địa chỉ email*</label>
-                    <input type="email" id="email" name="email" placeholder="Vui lòng nhập địa chỉ email của bạn" value="<%= formData.email || '' %>">
-                    <span class="field-error"></span>
+            <% const driveFormData = locals.formData || {}; %>
+            <% const driveError = locals.error || ''; %>
+            <% const driveSuccess = locals.success || ''; %>
+            <form action="/dang-ky-lai-thu" method="post" class="customer-form">
+                <% if (driveError) { %><div class="message error-message"><%= driveError %></div><% } %>
+                <% if (driveSuccess) { %><div class="message success-message"><%= driveSuccess %></div><% } %>
+
+                <div class="form-group">
+                    <label for="ho_ten">Họ và tên*</label>
+                    <input type="text" id="ho_ten" name="ho_ten" required placeholder="Nhập họ và tên" value="<%= driveFormData.ho_ten || '' %>">
                 </div>
 
-                <div class="field">
-                    <label for="so_dien_thoai">Điện thoại di động*</label>
-                    <input type="tel" id="so_dien_thoai" name="so_dien_thoai" placeholder="Vui lòng nhập số điện thoại của bạn" value="<%= formData.so_dien_thoai || '' %>">
-                    <span class="field-error"></span>
+                <div class="form-group">
+                    <label for="email">Email*</label>
+                    <input type="email" id="email" name="email" required placeholder="Nhập địa chỉ email" value="<%= driveFormData.email || '' %>">
                 </div>
-            </div>
 
-            <div class="field full">
-                <label for="mau_xe">Mẫu xe*</label>
-                <select id="mau_xe" name="mau_xe">
-                    <option value="">Vui lòng chọn mẫu xe bạn muốn lái thử</option>
-                    <% if (cars && cars.length > 0) { %>
+                <div class="form-group">
+                    <label for="dien_thoai">Số điện thoại*</label>
+                    <input type="tel" id="dien_thoai" name="so_dien_thoai" required placeholder="Nhập số điện thoại" value="<%= driveFormData.so_dien_thoai || '' %>">
+                </div>
+
+                <div class="form-group">
+                    <label for="mau_xe">Mẫu xe lái thử*</label>
+                    <select id="mau_xe" name="mau_xe" required>
+                        <option value="">Chọn mẫu xe muốn lái thử</option>
                         <% cars.forEach(car => { %>
-                            <option value="<%= car.id %>" <%= String(formData.mau_xe || '') === String(car.id) ? 'selected' : '' %>><%= car.ten_xe %></option>
+                            <option value="<%= car.id %>" <%= String(driveFormData.mau_xe || selectedCarId || '') === String(car.id) ? 'selected' : '' %>><%= car.ten_xe %></option>
                         <% }) %>
-                    <% } else { %>
-                        <% ['Ford Everest', 'Ford Ranger', 'Ford Territory', 'Ford Transit', 'Ford Explorer'].forEach(carName => { %>
-                            <option value="1" <%= formData.mau_xe === '1' ? 'selected' : '' %>><%= carName %></option>
-                        <% }) %>
-                    <% } %>
-                </select>
-                <span class="field-error"></span>
-            </div>
-
-            <div class="field full search-field">
-                <label for="thanh_pho">Thành phố*</label>
-                <span class="search-icon">⌕</span>
-                <input type="text" id="thanh_pho" name="thanh_pho" placeholder="Vui lòng nhập Tỉnh hoặc Thành phố" value="<%= formData.thanh_pho || '' %>">
-                <span class="field-error"></span>
-            </div>
-
-            <div class="field full">
-                <label for="dai_ly">Đại lý*</label>
-                <select id="dai_ly" name="dai_ly">
-                    <option value="">Vui lòng chọn đại lý</option>
-                    <% ['Showroom Tuấn Anh - Hà Nội', 'Showroom Tuấn Anh - TP. Hồ Chí Minh', 'Showroom Tuấn Anh - Đà Nẵng', 'Showroom Tuấn Anh - Cần Thơ'].forEach(dealer => { %>
-                        <option value="<%= dealer %>" <%= formData.dai_ly === dealer ? 'selected' : '' %>><%= dealer %></option>
-                    <% }) %>
-                </select>
-                <span class="field-error"></span>
-            </div>
-
-            <div class="form-row">
-                <div class="field">
-                    <label for="ngay_muon_lai">Ngày muốn lái thử*</label>
-                    <input type="date" id="ngay_muon_lai" name="ngay_muon_lai" value="<%= formData.ngay_muon_lai || '' %>">
-                    <span class="field-error"></span>
+                    </select>
                 </div>
 
-                <div class="field">
-                    <label for="gio_muon_lai">Giờ muốn lái thử*</label>
-                    <input type="time" id="gio_muon_lai" name="gio_muon_lai" value="<%= formData.gio_muon_lai || '' %>">
-                    <span class="field-error"></span>
+                <div class="form-group">
+                    <label for="thanh_pho">Tỉnh/Thành phố*</label>
+                    <input type="text" id="thanh_pho" name="thanh_pho" required placeholder="Nhập tỉnh hoặc thành phố" value="<%= driveFormData.thanh_pho || '' %>">
                 </div>
-            </div>
 
-            <label class="checkbox-line">
-                <input type="checkbox" name="dong_y_chinh_sach" value="yes" <%= formData.dong_y_chinh_sach ? 'checked' : '' %>>
-                <span>Bằng việc cung cấp thông tin cho Ford Việt Nam, tôi đồng ý với <a href="#">Chính sách Bảo mật</a> và cho phép xử lý dữ liệu cá nhân của tôi cho mục đích phục vụ yêu cầu lái thử.</span>
-            </label>
+                <div class="form-group">
+                    <label for="dai_ly">Đại lý lái thử*</label>
+                    <select id="dai_ly" name="dai_ly" required>
+                        <option value="">Chọn đại lý</option>
+                        <option value="Double Anh - Hà Nội" <%= driveFormData.dai_ly === 'Double Anh - Hà Nội' ? 'selected' : '' %>>Showroom Double Anh - Hà Nội</option>
+                        <option value="Double Anh - TP.HCM" <%= driveFormData.dai_ly === 'Double Anh - TP.HCM' ? 'selected' : '' %>>Showroom Double Anh - TP.HCM</option>
+                    </select>
+                </div>
 
-            <div class="marketing-copy">
-                Tôi đồng ý để Ford Việt Nam và các bên xử lý dữ liệu liên quan sử dụng thông tin cá nhân của tôi cho mục đích tiếp thị, nhận thông tin ưu đãi hay các mục đích khác được quy định trong <a href="#">Chính sách Bảo mật</a>.
-            </div>
+                <div class="form-group">
+                    <label for="ngay_muon_lai">Ngày muốn lái thử</label>
+                    <input type="date" id="ngay_muon_lai" name="ngay_muon_lai" value="<%= driveFormData.ngay_muon_lai || '' %>">
+                </div>
 
-            <div class="radio-group" aria-label="Đồng ý nhận thông tin tiếp thị">
-                <label>
-                    <input type="radio" name="dong_y_marketing" value="co" <%= formData.dong_y_marketing === 'co' ? 'checked' : '' %>>
-                    <span>Có</span>
-                </label>
-                <label>
-                    <input type="radio" name="dong_y_marketing" value="khong" <%= formData.dong_y_marketing === 'khong' ? 'checked' : '' %>>
-                    <span>Không</span>
-                </label>
-            </div>
+                <div class="form-group">
+                    <label for="gio_muon_lai">Giờ muốn lái thử</label>
+                    <input type="time" id="gio_muon_lai" name="gio_muon_lai" value="<%= driveFormData.gio_muon_lai || '' %>">
+                </div>
 
-            <button type="submit" id="submitBtn">Gửi đi</button>
-        </form>
+                <div class="form-policy">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="dong_y_bao_mat" required>
+                        <span>Tôi đồng ý để Showroom Double Anh sử dụng thông tin cá nhân nhằm liên hệ, tư vấn và xử lý yêu cầu lái thử theo chính sách bảo mật.</span>
+                    </label>
+                    <p class="marketing-consent">Tôi đồng ý nhận thông tin ưu đãi, chương trình bán hàng và dịch vụ chăm sóc khách hàng từ Showroom Double Anh.</p>
+                    <div class="radio-group">
+                        <label class="radio-label"><input type="radio" name="dong_y_tiep_thi" value="co" required> Có</label>
+                        <label class="radio-label"><input type="radio" name="dong_y_tiep_thi" value="khong"> Không</label>
+                    </div>
+                </div>
+                <button type="submit" class="btn primary btn-submit">Gửi lịch lái thử</button>
+            </form>
+        </div>
     </section>
 </main>
 
-<div class="assist-buttons" aria-hidden="true">
-    <span>⌘</span>
-    <span>◉</span>
-</div>
+<%- include('partials/site-footer') %>
 
-<script src="/javascripts/test-drive.js"></script>
+<script src="/javascripts/nav-search.js"></script>
 </body>
 </html>

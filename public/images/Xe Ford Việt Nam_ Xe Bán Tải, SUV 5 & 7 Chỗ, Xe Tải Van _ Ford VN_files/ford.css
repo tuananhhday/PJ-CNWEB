@@ -1,0 +1,134 @@
+@font-face {
+    font-family: FordMotion;
+    font-style: normal;
+    font-weight: 100 300;
+    src: url(//www.ford.com/shared/fonts/f1/light.woff2) format("woff2"), url(//www.ford.com/shared/fonts/f1/light.woff) format("woff")
+}
+
+@font-face {
+    font-family: FordMotion;
+    font-style: normal;
+    font-weight: 400;
+    src: url(//www.ford.com/shared/fonts/f1/regular.woff2) format("woff2"), url(//www.ford.com/shared/fonts/f1/regular.woff) format("woff")
+}
+
+@font-face {
+    font-family: FordMotion;
+    font-style: normal;
+    font-weight: 500;
+    src: url(//www.ford.com/shared/fonts/f1/medium.woff2) format("woff2"), url(//www.ford.com/shared/fonts/f1/medium.woff) format("woff")
+}
+
+@font-face {
+    font-family: FordMotion;
+    font-style: normal;
+    font-weight: 600;
+    src: url(//www.ford.com/shared/fonts/f1/semibold.woff2) format("woff2"), url(//www.ford.com/shared/fonts/f1/semibold.woff) format("woff")
+}
+
+@font-face {
+    font-family: FordMotion;
+    font-style: normal;
+    font-weight: 700 900;
+    src: url(//www.ford.com/shared/fonts/f1/bold.woff2) format("woff2"), url(//www.ford.com/shared/fonts/f1/bold.woff) format("woff")
+}
+
+@font-face {
+    font-family: FordGUXFont;
+    font-style: normal;
+    src: url(//www.ford.com/shared/fonts/gux-icons.woff2) format("woff2"), url(//www.ford.com/shared/fonts/gux-icons.woff) format("woff")
+}
+
+@font-face {
+    font-family: FordFont;
+    font-style: normal;
+    font-weight: 100 300;
+    src: url(//www.ford.com/shared/fonts/f1/light.woff2) format("woff2"), url(//www.ford.com/shared/fonts/f1/light.woff) format("woff")
+}
+
+@font-face {
+    font-family: FordFont;
+    font-style: normal;
+    font-weight: 400;
+    src: url(//www.ford.com/shared/fonts/f1/regular.woff2) format("woff2"), url(//www.ford.com/shared/fonts/f1/regular.woff) format("woff")
+}
+
+@font-face {
+    font-family: FordFont;
+    font-style: normal;
+    font-weight: 500;
+    src: url(//www.ford.com/shared/fonts/f1/medium.woff2) format("woff2"), url(//www.ford.com/shared/fonts/f1/medium.woff) format("woff")
+}
+
+@font-face {
+    font-family: FordFont;
+    font-style: normal;
+    font-weight: 600;
+    src: url(//www.ford.com/shared/fonts/f1/semibold.woff2) format("woff2"), url(//www.ford.com/shared/fonts/f1/semibold.woff) format("woff")
+}
+
+@font-face {
+    font-family: FordFont;
+    font-style: normal;
+    font-weight: 700 900;
+    src: url(//www.ford.com/shared/fonts/f1/bold.woff2) format("woff2"), url(//www.ford.com/shared/fonts/f1/bold.woff) format("woff")
+}
+
+@font-face {
+    font-family: "FordRegularThai";
+    font-style: 400;
+    src: url("//www.ford.com/shared/fonts/f1/FordF1Thai-Regular.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "FordMediumThai";
+    font-style: 500;
+    src: url("//www.ford.com/shared/fonts/f1/FordF1Thai-Medium.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "FordBoldThai";
+    font-style: 700;
+    src: url("//www.ford.com/shared/fonts/f1/FordF1Thai-Bold.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "FordRegularArabic";
+    font-style: 400;
+    src: url("//www.ford.com/shared/fonts/f1/FordF1Arabic-Regular.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "FordMediumArabic";
+    font-style: 500;
+    src: url("//www.ford.com/shared/fonts/f1/FordF1Arabic-Medium.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "FordBoldArabic";
+    font-style: 700;
+    src: url("//www.ford.com/shared/fonts/f1/FordF1Arabic-Bold.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: 'FordFontVietnamese';
+    font-style: normal;
+    font-weight: 100 400;
+    font-display: swap;
+    src: url('//www.ford.com/shared/fonts/f1/FordF1Vietnamese-Regular.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'FordFontVietnamese';
+    font-style: normal;
+    font-weight: 500 600;
+    font-display: swap;
+    src: url('//www.ford.com/shared/fonts/f1/FordF1Vietnamese-Medium.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'FordFontVietnamese';
+    font-style: normal;
+    font-weight: 700 900;
+    font-display: swap;
+    src: url('//www.ford.com/shared/fonts/f1/FordF1Vietnamese-Bold.woff2') format('woff2');

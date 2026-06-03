@@ -1,0 +1,401 @@
+/* Sleek Web Forms & Showroom Directories Styles (EJS Compatible) */
+
+/* Form page background wrapper */
+.page-form {
+    background: radial-gradient(circle at top left, var(--primary-glow), transparent 36%), var(--bg-main);
+    min-height: 100vh;
+}
+
+.form-section {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 76px 24px 96px;
+}
+
+.form-container {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: clamp(24px, 5vw, 56px);
+    box-shadow: var(--shadow-lg);
+}
+
+.form-header {
+    margin-bottom: 40px;
+}
+
+.form-header span {
+    font-family: var(--font-title);
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.form-header h1 {
+    font-family: var(--font-title);
+    font-size: clamp(30px, 4.5vw, 52px);
+    font-weight: 800;
+    color: var(--text-dark);
+    line-height: 1.1;
+    margin-bottom: 12px;
+}
+
+.form-header p {
+    color: var(--text-muted);
+    font-size: 16px;
+    line-height: 1.55;
+}
+
+/* Alert feedback messages */
+.message {
+    grid-column: 1 / -1;
+    padding: 16px 20px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 24px;
+}
+
+.error-message {
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+.success-message {
+    border: 1px solid #bbf7d0;
+    background: #f0fdf4;
+    color: #166534;
+}
+
+/* Form structure grid */
+.customer-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Labels and input fields styling */
+.form-group label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="tel"],
+.form-group input[type="date"],
+.form-group input[type="time"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    min-height: 48px;
+    padding: 0 16px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--bg-surface);
+    font-size: 14px;
+    color: var(--text-dark);
+    outline: none;
+    transition: var(--transition-smooth);
+}
+
+.form-group select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 16px;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: var(--primary);
+    background: var(--bg-card);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+}
+
+/* Consent Policy Box Area */
+.form-policy {
+    grid-column: 1 / -1;
+    padding: 24px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    margin-top: 4px;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary);
+}
+
+.checkbox-label span {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 500;
+    line-height: 1.45;
+}
+
+.marketing-consent {
+    font-size: 13px;
+    color: var(--text-dark);
+    font-weight: 700;
+}
+
+.radio-group {
+    display: flex;
+    gap: 20px;
+}
+
+.radio-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.radio-label input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary);
+}
+
+/* Submit Actions */
+.btn-submit {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-height: 52px;
+    background: var(--primary);
+    color: var(--text-light);
+    border: 0;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-title);
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    transition: var(--transition-smooth);
+    margin-top: 12px;
+}
+
+.btn-submit:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+}
+
+/* Premium Showroom & Dealer Directory Layout Styles */
+.dealer-page {
+    max-width: 1400px;
+    margin: 48px auto;
+    padding: 0 24px;
+}
+
+.dealer-directory {
+    display: grid;
+    grid-template-columns: 380px minmax(0, 1fr);
+    gap: 32px;
+    align-items: start;
+    min-height: 600px;
+}
+
+.dealer-directory-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    max-height: 720px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.dealer-directory-card {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    outline: none;
+    transition: var(--transition-smooth);
+}
+
+.dealer-directory-card:focus,
+.dealer-directory-card.is-active {
+    border-color: var(--primary);
+    box-shadow: var(--shadow-md), 0 0 0 3px var(--primary-glow);
+}
+
+.dealer-directory-title {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.dealer-kia-mark {
+    background: var(--primary);
+    color: var(--text-light);
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: var(--radius-sm);
+    text-transform: uppercase;
+}
+
+.dealer-directory-title h2 {
+    font-family: var(--font-title);
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.3;
+}
+
+.dealer-directory-info {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+}
+
+.dealer-directory-info p {
+    margin-bottom: 6px;
+}
+
+.dealer-directory-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.dealer-directory-actions a,
+.dealer-directory-actions span {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    background: var(--bg-surface);
+    color: var(--text-dark);
+}
+
+.dealer-directory-actions a:hover {
+    background: var(--primary-glow);
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-1px);
+}
+
+.dealer-directory-map {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: 720px;
+}
+
+.dealer-directory-search {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
+    gap: 16px;
+    align-items: flex-end;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+}
+
+.dealer-directory-search label {
+    display: grid;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.dealer-directory-search select {
+    min-height: 40px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--bg-surface);
+    padding: 0 12px;
+    font-size: 13px;
+}
+
+.dealer-directory-search button {
+    min-height: 40px;
+    padding: 0 20px;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: var(--primary);
+    color: var(--text-light);
+    font-size: 18px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.dealer-directory-search button:hover {
+    background: var(--primary-dark);
+    box-shadow: var(--shadow-glow);
+}
+
+.dealer-directory-map iframe {
+    width: 100%;
+    flex: 1;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    background: #e2e8f0;
+}
+
+@media (max-width: 960px) {
+    .dealer-directory {
+        grid-template-columns: 1fr;
+    }
+    
+    .dealer-directory-map {
+        height: 480px;
+    }
+    
+    .dealer-directory-search {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .form-container {
+        padding: 32px 24px;
+    }
+    
+    .customer-form {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+}
