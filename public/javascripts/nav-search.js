@@ -1,4 +1,49 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Mobile Navigation Menu Toggle
+    const navToggle = document.querySelector('.nav-toggle');
+    const navMenu = document.querySelector('.nav-menu');
+    const navActions = document.querySelector('.nav-actions');
+    const siteHeader = document.querySelector('.site-header');
+
+    function openMobileMenu() {
+        navToggle?.setAttribute('aria-expanded', 'true');
+        navMenu?.classList.add('is-open');
+        navActions?.classList.add('is-open');
+        // Khoá cuộn trang khi menu mở
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeMobileMenu() {
+        navToggle?.setAttribute('aria-expanded', 'false');
+        navMenu?.classList.remove('is-open');
+        navActions?.classList.remove('is-open');
+        // Cho phép cuộn lại
+        document.body.style.overflow = '';
+    }
+
+    navToggle?.addEventListener('click', () => {
+        const isOpen = navToggle.getAttribute('aria-expanded') === 'true';
+        if (isOpen) {
+            closeMobileMenu();
+        } else {
+            openMobileMenu();
+        }
+    });
+
+    // Đóng menu khi nhấn phím Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && navMenu?.classList.contains('is-open')) {
+            closeMobileMenu();
+        }
+    });
+
+    // Đóng menu khi click bên ngoài header (vùng overlay)
+    document.addEventListener('click', (e) => {
+        if (navMenu?.classList.contains('is-open') && siteHeader && !siteHeader.contains(e.target)) {
+            closeMobileMenu();
+        }
+    });
+
     const searchWrapper = document.getElementById('nav-search-wrapper');
     if (!searchWrapper) return;
 

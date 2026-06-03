@@ -934,45 +934,71 @@ img {
         display: flex;
     }
     
+    /* Ẩn menu hoàn toàn bằng display:none — tránh conflict với opacity/visibility */
     .nav-menu {
+        display: none;
         position: fixed;
-        top: 76px;
+        top: 0;
         left: 0;
         right: 0;
         bottom: 0;
+        /* Thêm padding-top bằng chiều cao header để menu không bị header che */
+        padding-top: 76px;
         background: var(--bg-card);
         flex-direction: column;
         align-items: stretch;
-        padding: 24px;
+        padding-left: 24px;
+        padding-right: 24px;
+        padding-bottom: 24px;
         gap: 0;
         overflow-y: auto;
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(20px);
-        transition: var(--transition-smooth);
-        z-index: 90;
+        z-index: 200;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+        animation: none;
     }
     
+    /* Hiện menu khi JS add .is-open */
     .nav-menu.is-open {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
+        display: flex;
+        animation: mobileNavSlideIn 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
     
+    @keyframes mobileNavSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-12px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Link trong nav mobile */
     .nav-menu > a, .nav-item > a {
         height: auto;
         padding: 16px 0;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid var(--border-color);
         font-size: 16px;
+        font-weight: 600;
+        color: var(--text-dark);
+        display: flex;
+        align-items: center;
     }
     
+    .nav-menu > a:hover, .nav-item > a:hover {
+        color: var(--primary);
+    }
+
+    /* Tắt hover dropdown trên mobile */
     .nav-item:hover .mega-menu,
     .nav-item:hover .dropdown-menu {
-        display: none !important; /* Disable hover dropdowns on mobile */
+        display: none !important;
     }
     
+    /* Ẩn mega menu lớn */
     .nav-item .mega-menu {
-        display: none !important; /* Hide heavy mega menu on mobile */
+        display: none !important;
     }
     
     .nav-item.has-menu {
@@ -981,6 +1007,7 @@ img {
         align-items: stretch;
     }
     
+    /* Dropdown nhỏ (Mua xe) — hiện thẳng không cần hover */
     .nav-item.has-menu .dropdown-menu {
         position: static !important;
         display: flex !important;
@@ -993,7 +1020,7 @@ img {
         border: none !important;
         padding: 4px 0 12px 16px !important;
         background: transparent !important;
-        border-left: 2px solid #e2e8f0 !important;
+        border-left: 2px solid var(--border-color) !important;
         margin-left: 8px !important;
         margin-top: 4px !important;
         margin-bottom: 8px !important;
@@ -1005,7 +1032,7 @@ img {
         padding: 8px 0 !important;
         border-bottom: none !important;
         font-size: 14px !important;
-        color: #475569 !important;
+        color: var(--text-muted) !important;
         height: auto !important;
         font-weight: 500 !important;
     }
@@ -1239,4 +1266,259 @@ img {
         display: block;
     }
 }
+
+/* =============================================================================
+   DARK MODE STYLES & OVERRIDES
+   ============================================================================= */
+/* Theme Toggle Button Styling */
+.theme-toggle-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #475569;
+    transition: var(--transition-smooth);
+    border-radius: var(--radius-full);
+    margin: 0 8px;
+}
+
+.theme-toggle-btn:hover {
+    color: var(--primary);
+    background: var(--bg-surface-soft);
+}
+
+.theme-toggle-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Toggle icon display depending on the current theme */
+[data-theme="dark"] .theme-icon-sun {
+    display: block;
+}
+[data-theme="dark"] .theme-icon-moon {
+    display: none;
+}
+.theme-icon-sun {
+    display: none;
+    color: #f59e0b; /* Golden sun */
+}
+.theme-icon-moon {
+    display: block;
+    color: #475569;
+}
+
+/* Dark Theme Variables Override */
+[data-theme="dark"] {
+    --bg-main: #0b0f19; /* Deep dark blue-slate */
+    --bg-card: #111827; /* Slate 900 */
+    --bg-header: rgba(11, 15, 25, 0.85);
+    --bg-surface-soft: #1f2937;
+    
+    --text-dark: #f8fafc; /* Invert text */
+    --text-muted: #94a3b8; /* Slate 400 */
+    
+    --border-color: #1f2937; /* Dark borders */
+    
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 12px 30px -4px rgba(0, 0, 0, 0.5);
+    --shadow-premium: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
+}
+
+/* Dark theme overrides for components using hardcoded backgrounds/colors */
+[data-theme="dark"] body,
+[data-theme="dark"] main,
+[data-theme="dark"] .cl-sidebar,
+[data-theme="dark"] .cl-card,
+[data-theme="dark"] .cl-type-btn:hover,
+[data-theme="dark"] .cl-type-btn.active,
+[data-theme="dark"] .cl-card-specs span,
+[data-theme="dark"] .cl-search-form,
+[data-theme="dark"] .feature-card,
+[data-theme="dark"] .testimonial-card,
+[data-theme="dark"] .home-news-main-card,
+[data-theme="dark"] .home-news-card,
+[data-theme="dark"] .kia-product-tabs,
+[data-theme="dark"] .kia-variant-strip article,
+[data-theme="dark"] .kia-overview,
+[data-theme="dark"] .kia-color-preview,
+[data-theme="dark"] .kia-gallery-grid article,
+[data-theme="dark"] .kia-feature-showcase,
+[data-theme="dark"] .feature-item-row,
+[data-theme="dark"] .feature-showcase-view,
+[data-theme="dark"] .form-container,
+[data-theme="dark"] .form-policy,
+[data-theme="dark"] .dealer-directory-card,
+[data-theme="dark"] .dealer-directory-search,
+[data-theme="dark"] .news-article-detail,
+[data-theme="dark"] .magazine-news-sidebar,
+[data-theme="dark"] .magazine-news-item,
+[data-theme="dark"] .nav-search-overlay {
+    background-color: var(--bg-card) !important;
+    background-image: none !important;
+    color: var(--text-dark) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .news-page,
+[data-theme="dark"] .dealer-directory-page,
+[data-theme="dark"] .dealer-directory-list,
+[data-theme="dark"] .page-form,
+[data-theme="dark"] .cl-hero,
+[data-theme="dark"] .cl-type-list,
+[data-theme="dark"] .cl-main,
+[data-theme="dark"] .featured-stage,
+[data-theme="dark"] .home-cars,
+[data-theme="dark"] .home-landing {
+    background-color: var(--bg-main) !important;
+    background-image: none !important;
+    color: var(--text-dark) !important;
+}
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6,
+[data-theme="dark"] strong,
+[data-theme="dark"] .cl-card-name,
+[data-theme="dark"] .cl-price,
+[data-theme="dark"] .featured-copy h2,
+[data-theme="dark"] .features-heading h2,
+[data-theme="dark"] .testimonials-heading h2,
+[data-theme="dark"] .home-cars-heading h2,
+[data-theme="dark"] .magazine-news-item h2,
+[data-theme="dark"] .news-article-detail h1,
+[data-theme="dark"] .dealer-directory-title h2 {
+    color: var(--text-dark) !important;
+}
+
+[data-theme="dark"] p,
+[data-theme="dark"] span,
+[data-theme="dark"] small,
+[data-theme="dark"] em,
+[data-theme="dark"] time,
+[data-theme="dark"] .cl-card-desc,
+[data-theme="dark"] .cl-price-hint,
+[data-theme="dark"] .dealer-directory-info {
+    color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .form-group input,
+[data-theme="dark"] .form-group select,
+[data-theme="dark"] .form-group textarea,
+[data-theme="dark"] .cl-search-form input,
+[data-theme="dark"] .dealer-directory-search select {
+    background-color: var(--bg-main) !important;
+    color: var(--text-dark) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .feature-item-row.is-active,
+[data-theme="dark"] .cl-type-btn.active,
+[data-theme="dark"] .kia-variant-strip article.is-active {
+    background-color: var(--bg-surface-soft) !important;
+    border-color: var(--primary) !important;
+}
+
+.theme-toggle-text {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .theme-toggle-btn {
+        height: auto;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--border-color);
+        justify-content: flex-start;
+        width: 100%;
+        border-radius: 0;
+        margin: 0;
+    }
+    
+    [data-theme="dark"] .theme-toggle-btn {
+        border-bottom-color: var(--border-color) !important;
+    }
+
+    /* Dark mode: nền menu tối */
+    [data-theme="dark"] .nav-menu.is-open {
+        background: var(--bg-card);
+    }
+    
+    .theme-toggle-text {
+        display: inline !important;
+    }
+}
+
+/* =============================================================================
+   DARK THEME HEADER & MOBILE NAVIGATION OVERRIDES
+   ============================================================================= */
+[data-theme="dark"] .site-header {
+    background-color: var(--bg-header) !important;
+    border-bottom-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .nav-menu > a,
+[data-theme="dark"] .nav-item > a,
+[data-theme="dark"] .nav-menu button,
+[data-theme="dark"] .mega-all-cars-btn,
+[data-theme="dark"] .mega-type-item-btn {
+    color: var(--text-dark) !important;
+}
+
+[data-theme="dark"] .nav-menu > a,
+[data-theme="dark"] .nav-item > a {
+    border-bottom-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .nav-menu > a:hover,
+[data-theme="dark"] .nav-item > a:hover,
+[data-theme="dark"] .mega-all-cars-btn:hover,
+[data-theme="dark"] .mega-type-item-btn:hover {
+    color: var(--primary) !important;
+}
+
+[data-theme="dark"] .mega-menu,
+[data-theme="dark"] .dropdown-menu {
+    background-color: var(--bg-card) !important;
+    border-color: var(--border-color) !important;
+    box-shadow: var(--shadow-premium) !important;
+}
+
+[data-theme="dark"] .mega-menu-sidebar {
+    border-right-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .mega-car-card-item {
+    background-color: var(--bg-main) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .mega-car-card-item strong {
+    color: var(--text-dark) !important;
+}
+
+[data-theme="dark"] .mega-car-card-item span {
+    color: var(--primary) !important;
+}
+
+[data-theme="dark"] .mega-car-card-item:hover {
+    background-color: var(--bg-surface-soft) !important;
+    border-color: var(--primary) !important;
+}
+
+[data-theme="dark"] .nav-toggle {
+    background-color: var(--bg-surface-soft) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .nav-toggle span {
+    background-color: var(--text-dark) !important;
+}
+
 

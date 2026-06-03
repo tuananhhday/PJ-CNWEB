@@ -1065,6 +1065,11 @@ img {
     font-size: 14px;
 }
 
+@keyframes mobileNavSlideIn {
+    from { opacity: 0; transform: translateY(-12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
 @media (max-width: 980px) {
     .site-nav {
         height: auto;
@@ -1074,25 +1079,50 @@ img {
     }
 
     .nav-toggle {
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         margin-left: auto;
     }
 
-    .nav-menu,
-    .nav-actions {
+    /* Đồng bộ với base.css: menu là overlay full-screen */
+    .nav-menu {
         display: none;
-        width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding-top: 68px;
+        background: var(--bg-card, #ffffff);
+        flex-direction: column;
+        align-items: stretch;
+        padding-left: 24px;
+        padding-right: 24px;
+        padding-bottom: 24px;
+        gap: 0;
+        overflow-y: auto;
+        z-index: 200;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+        width: auto;
+    }
+
+    .nav-menu.is-open {
+        display: flex;
+        animation: mobileNavSlideIn 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
 
     .nav-menu > a,
     .nav-item > a {
         min-height: auto;
-    }
-
-    .nav-menu.is-open,
-    .nav-actions.is-open {
-        display: grid;
-        gap: 14px;
+        height: auto;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--line, #d9e1ea);
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--ink, #101820);
+        display: flex;
+        align-items: center;
     }
 
     .mega-menu,
