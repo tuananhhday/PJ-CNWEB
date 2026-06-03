@@ -60,7 +60,7 @@
         <div class="kia-product-copy">
             <span><%= car.ten_loai %></span>
             <h1 id="detail-hero-title"><%= car.ten_xe %></h1>
-            <p><%= car.slogan || car.mo_ta_ngan || 'Khẳng định vị thế dẫn đầu' %></p>
+            <p><%= car.mo_ta_ngan || 'Khẳng định vị thế dẫn đầu' %></p>
             <small>Chỉ từ</small>
             <strong id="detail-hero-price" data-base-price="<%= car.gia_ban %>"><%= formatPrice(car.gia_ban) %></strong>
             <div class="kia-product-actions">
@@ -81,7 +81,7 @@
                     <article class="variant-card <%= variant.id === car.id ? 'is-active' : '' %>" style="cursor: pointer; height: 100%;">
                         <img src="/images/<%= variant.anh_dai_dien || 'no-car.jpg' %>" alt="<%= variant.phien_ban || variant.ten_xe %>">
                         <h2><%= variant.phien_ban || 'Tiêu chuẩn' %></h2>
-                        <p><%= variant.slogan || variant.mo_ta_ngan || variant.ten_xe %></p>
+                        <p><%= variant.mo_ta_ngan || variant.ten_xe %></p>
                     </article>
                 </a>
             <% }) %>
@@ -92,7 +92,7 @@
                 <article class="variant-card <%= index === 0 ? 'is-active' : '' %>" data-version-name="<%= version %>" data-version-image="/images/<%= versionImage %>" style="cursor: pointer;">
                     <img src="/images/<%= versionImage %>" alt="<%= version %>">
                     <h2><%= version %></h2>
-                    <p><%= car.slogan || car.mo_ta_ngan || car.ten_xe %></p>
+                    <p><%= car.mo_ta_ngan || car.ten_xe %></p>
                 </article>
             <% }) %>
         <% } %>
@@ -178,9 +178,8 @@
 
     <section class="kia-product-section kia-overview" id="dac-diem">
         <div>
-            <span><%= (car.ten_xe || '').slice(0, 1) %></span>
             <h2><%= car.ten_xe %></h2>
-            <p><%= car.mo_ta_chi_tiet || car.mo_ta_ngan || 'Nội dung giới thiệu chi tiết đang được cập nhật.' %></p>
+            <p><%= car.mo_ta_chi_tiet || 'Nội dung giới thiệu chi tiết đang được cập nhật.' %></p>
         </div>
         <img src="/images/<%= heroImage %>" alt="<%= car.ten_xe %>">
     </section>

@@ -165,10 +165,6 @@
                                                     Số chỗ ngồi
                                                     <input name="so_cho_ngoi" type="number" placeholder="7">
                                                 </label>
-                                                <label style="grid-column: span 2;">
-                                                    Slogan sản phẩm
-                                                    <input name="slogan" placeholder="Khẳng định vị thế dẫn đầu">
-                                                </label>
                                                 <label>
                                                     Link E Book
                                                     <input name="ebook_url" placeholder="https://...">
@@ -532,11 +528,6 @@
                                                                         Số chỗ ngồi
                                                                         <input name="so_cho_ngoi" type="number"
                                                                             value="<%= car.so_cho_ngoi || '' %>">
-                                                                    </label>
-                                                                    <label style="grid-column: span 2;">
-                                                                        Slogan sản phẩm
-                                                                        <input name="slogan"
-                                                                            value="<%= car.slogan || '' %>">
                                                                     </label>
                                                                     <label>
                                                                         Link E Book
@@ -1258,7 +1249,7 @@
                     <div>
                         <span data-preview-type>Thông tin xe</span>
                         <h3 data-preview-name>Xe mới</h3>
-                        <p data-preview-slogan>Nhập slogan hoặc mô tả ngắn để xem trước.</p>
+                        <p data-preview-slogan>Nhập mô tả ngắn để xem trước.</p>
                         <strong data-preview-price>Giá đang cập nhật</strong>
                         <dl>
                             <div><dt>Động cơ</dt><dd data-preview-engine>Đang cập nhật</dd></div>
@@ -1280,7 +1271,7 @@
                         <div>
                             <span data-preview-type-detail>Thông tin xe</span>
                             <h3 data-preview-name-detail>Xe mới</h3>
-                            <p data-preview-slogan-detail>Nhập slogan hoặc mô tả ngắn để xem trước.</p>
+                            <p data-preview-slogan-detail>Nhập mô tả ngắn để xem trước.</p>
                             <strong data-preview-price-detail>Giá đang cập nhật</strong>
                             <div class="car-admin-detail-preview__actions">
                                 <button type="button">Nhận báo giá</button>
@@ -1366,7 +1357,7 @@
 
                 const selectedModel = getField(form, 'dong_xe_id')?.selectedOptions?.[0]?.textContent || 'Thông tin xe';
                 const modelCleaned = selectedModel.replace(/\s+/g, ' ').trim();
-                const slogan = getField(form, 'slogan')?.value || getField(form, 'mo_ta_ngan')?.value || 'Nhập slogan hoặc mô tả ngắn để xem trước.';
+                const slogan = getField(form, 'mo_ta_ngan')?.value || 'Nhập mô tả ngắn để xem trước.';
                 const price = getField(form, 'gia_ban')?.value;
                 const engine = getField(form, 'dong_co')?.value || 'Đang cập nhật';
                 const gear = getField(form, 'hop_so')?.value || 'Đang cập nhật';
