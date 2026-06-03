@@ -341,16 +341,16 @@ exports.getCarDetail = async (req, res) => {
             await dbInit.ensureBo360SetsTable();
             const [bo360Sets] = await dbp.query('SELECT id, ten_bo_anh, danh_sach_anh FROM bo_anh_360');
             bo360Sets.forEach(s => { bo360SetsMap[String(s.id)] = s; bo360SetsMap[s.ten_bo_anh] = s; });
-        } catch(e) { /* table may not exist yet */ }
+        } catch (e) { /* table may not exist yet */ }
 
-        res.render('car-detail', { 
-            title: car.phien_ban ? `${car.ten_xe} - ${car.phien_ban}` : car.ten_xe, 
-            formatPrice: parser.formatPrice, 
-            car, 
-            specs, 
-            colors, 
-            images, 
-            rotateImages, 
+        res.render('car-detail', {
+            title: car.phien_ban ? `${car.ten_xe} - ${car.phien_ban}` : car.ten_xe,
+            formatPrice: parser.formatPrice,
+            car,
+            specs,
+            colors,
+            images,
+            rotateImages,
             features,
             variants,
             bo360SetsMap
@@ -521,10 +521,10 @@ exports.getPanelsData = getPanels;
 
 exports.getCarsPage = async (req, res) => {
     const tim_kiem = String(req.query.tim_kiem || '').trim();
-    const loai     = String(req.query.loai     || '').trim();
+    const loai = String(req.query.loai || '').trim();
     try {
         // Build WHERE clause
-        const where  = ["xe.trang_thai = 'con_hang'"];
+        const where = ["xe.trang_thai = 'con_hang'"];
         const params = [];
         if (tim_kiem) {
             where.push('(xe.ten_xe LIKE ? OR xe.phien_ban LIKE ?)');
@@ -584,3 +584,4 @@ exports.getCarsPage = async (req, res) => {
         });
     }
 };
+
