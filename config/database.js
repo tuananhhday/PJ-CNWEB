@@ -7,8 +7,10 @@ const db = mysql.createPool({
     database: process.env.DB_NAME || 'showroom_oto',
     charset: 'utf8mb4',
     waitForConnections: true,
-    connectionLimit: 10,
+    connectionLimit: 15,
     queueLimit: 0,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 10000,
     // Railway MySQL thường dùng port khác, đọc từ biến môi trường DB_PORT
     port: parseInt(process.env.DB_PORT) || 3306
 });

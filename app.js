@@ -57,7 +57,7 @@ const dbp = db.promise();
 let cachedNavCarTypes = null;
 let cachedNavCars = null;
 let lastCacheFetch = 0;
-const CACHE_TTL = 60000; // Cache 60 giây
+const CACHE_TTL = 24 * 60 * 60 * 1000; // Cache 24 giờ (tự động làm mới khi admin thay đổi dữ liệu)
 
 app.use(async (req, res, next) => {
     const now = Date.now();
@@ -103,6 +103,14 @@ app.use(async (req, res, next) => {
         console.log('Loi lay du lieu menu dong xe:', err);
         res.locals.navCarTypes = cachedNavCarTypes || {};
         res.locals.navCars = cachedNavCars || [];
+    }
+    next();
+});
+
+// Middleware reset cache menu khi admin cập nhật dữ liệu (bất kỳ request POST nào vào /admin)
+app.use('/admin', (req, res, next) => {
+    if (req.method === 'POST') {
+        lastCacheFetch = 0; // Buộc nạp lại dữ liệu fresh ở request tiếp theo
     }
     next();
 });
