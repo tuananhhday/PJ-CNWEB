@@ -88,9 +88,59 @@ exports.updateRequest = async (req, res) => {
 
     try {
         await dbInit.ensureCustomerRequestTables();
+        
+        // Fetch current status and history
+        const [currentRows] = await dbp.query(
+            `SELECT trang_thai, ghi_chu_admin, lich_su_xu_ly, ngay_tao, ho_ten FROM ${tableName} WHERE id = ?`,
+            [req.params.id]
+        );
+        
+        if (currentRows.length === 0) {
+            return parser.redirectWithMessage(res, '/admin/yeu-cau', 'error', 'Không tìm thấy yêu cầu.');
+        }
+        
+        const current = currentRows[0];
+        let historyList = [];
+        if (current.lich_su_xu_ly) {
+            try {
+                historyList = JSON.parse(current.lich_su_xu_ly);
+            } catch (e) {
+                historyList = [];
+            }
+        }
+        
+        // If history is empty, populate the initial "created" state
+        if (historyList.length === 0) {
+            historyList.push({
+                ngay: current.ngay_tao,
+                trang_thai_cu: null,
+                trang_thai_moi: 'moi',
+                ghi_chu: tableName === 'lich_lai_thu' ? 'Khách đặt lịch lái thử trên website' : 'Khách gửi yêu cầu báo giá trên website',
+                nguoi_thuc_hien: 'Khách hàng'
+            });
+        }
+        
+        // Append history only if status or note changed
+        const statusChanged = current.trang_thai !== trang_thai;
+        const noteChanged = (current.ghi_chu_admin || '') !== (ghi_chu_admin || '');
+        
+        if (statusChanged || noteChanged) {
+            const now = new Date();
+            const pad = (n) => String(n).padStart(2, '0');
+            const nowStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+            
+            historyList.push({
+                ngay: nowStr,
+                trang_thai_cu: current.trang_thai,
+                trang_thai_moi: trang_thai,
+                ghi_chu: ghi_chu_admin || (statusChanged ? 'Cập nhật trạng thái' : 'Cập nhật ghi chú'),
+                nguoi_thuc_hien: 'Admin'
+            });
+        }
+
         await dbp.query(
-            `UPDATE ${tableName} SET trang_thai = ?, ghi_chu_admin = ? WHERE id = ?`,
-            [trang_thai, ghi_chu_admin || null, req.params.id]
+            `UPDATE ${tableName} SET trang_thai = ?, ghi_chu_admin = ?, lich_su_xu_ly = ? WHERE id = ?`,
+            [trang_thai, ghi_chu_admin || null, JSON.stringify(historyList), req.params.id]
         );
         parser.redirectWithMessage(res, '/admin/yeu-cau', 'success', 'Đã cập nhật yêu cầu khách hàng.');
     } catch (err) {

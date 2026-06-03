@@ -202,6 +202,7 @@ async function ensureCustomerRequestTables() {
     await ensureColumn('yeu_cau_bao_gia', 'dong_y_tiep_thi', 'TINYINT(1) DEFAULT 0');
     await ensureColumn('yeu_cau_bao_gia', 'trang_thai', "ENUM('moi', 'dang_xu_ly', 'da_lien_he', 'hoan_tat', 'huy') DEFAULT 'moi'");
     await ensureColumn('yeu_cau_bao_gia', 'ghi_chu_admin', 'TEXT');
+    await ensureColumn('yeu_cau_bao_gia', 'lich_su_xu_ly', 'TEXT DEFAULT NULL');
     await ensureColumn('yeu_cau_bao_gia', 'ngay_tao', 'DATETIME DEFAULT CURRENT_TIMESTAMP');
     await ensureColumn('yeu_cau_bao_gia', 'ngay_cap_nhat', 'DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP');
 
@@ -237,6 +238,7 @@ async function ensureCustomerRequestTables() {
     await ensureColumn('lich_lai_thu', 'dong_y_tiep_thi', 'TINYINT(1) DEFAULT 0');
     await ensureColumn('lich_lai_thu', 'trang_thai', "ENUM('moi', 'dang_xu_ly', 'da_xac_nhan', 'hoan_tat', 'huy') DEFAULT 'moi'");
     await ensureColumn('lich_lai_thu', 'ghi_chu_admin', 'TEXT');
+    await ensureColumn('lich_lai_thu', 'lich_su_xu_ly', 'TEXT DEFAULT NULL');
     await ensureColumn('lich_lai_thu', 'ngay_tao', 'DATETIME DEFAULT CURRENT_TIMESTAMP');
     await ensureColumn('lich_lai_thu', 'ngay_cap_nhat', 'DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP');
 }

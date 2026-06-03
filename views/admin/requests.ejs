@@ -207,7 +207,6 @@
                                                             <dt>Nhận marketing</dt>
                                                             <dd><%= item.dong_y_tiep_thi ? 'Có đồng ý' : 'Không đồng ý' %></dd>
                                                         </div>
-                                                        
                                                         <% if (item.loai_yeu_cau === 'bao_gia') { %>
                                                             <div class="request-info-field" style="grid-column: 1 / -1;">
                                                                 <dt>Nội dung tư vấn yêu cầu</dt>
@@ -223,13 +222,64 @@
                                                                 <dd>📅 <%= item.ngay_muon_lai || 'Chưa chọn ngày' %> <%= item.gio_muon_lai ? '⏱️ ' + item.gio_muon_lai : '' %></dd>
                                                             </div>
                                                         <% } %>
+                                                        <div class="request-info-field" style="grid-column: 1 / -1;">
+                                                            <dt>Ghi chú xử lý gần nhất</dt>
+                                                            <dd style="white-space: pre-line; font-weight: 500;"><%= item.ghi_chu_admin || 'Chưa có ghi chú xử lý.' %></dd>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Processing History Timeline -->
+                                                <div class="request-history-section">
+                                                    <h4>Lịch sử xử lý</h4>
+                                                    <div class="request-timeline">
+                                                        <% 
+                                                        let history = [];
+                                                        if (item.lich_su_xu_ly) {
+                                                            try {
+                                                                history = JSON.parse(item.lich_su_xu_ly);
+                                                            } catch (e) {
+                                                                history = [];
+                                                            }
+                                                        }
+                                                        if (history.length === 0) {
+                                                            history.push({
+                                                                ngay: item.ngay_tao,
+                                                                trang_thai_cu: null,
+                                                                trang_thai_moi: 'moi',
+                                                                ghi_chu: item.loai_yeu_cau === 'lai_thu' ? 'Khách đặt lịch lái thử trên website' : 'Khách gửi yêu cầu báo giá trên website',
+                                                                nguoi_thuc_hien: 'Khách hàng'
+                                                            });
+                                                        }
+                                                        history.forEach((h) => {
+                                                        %>
+                                                            <div class="timeline-item">
+                                                                <div class="timeline-marker <%= h.trang_thai_moi %>"></div>
+                                                                <div class="timeline-content">
+                                                                    <div class="timeline-header">
+                                                                        <span class="timeline-status-badge <%= h.trang_thai_moi %>">
+                                                                            <%= statusLabel[h.trang_thai_moi] || h.trang_thai_moi %>
+                                                                        </span>
+                                                                        <span class="timeline-actor">
+                                                                            <%= h.nguoi_thuc_hien === 'Admin' ? '👤 Nhân viên' : '👥 Khách hàng' %>
+                                                                        </span>
+                                                                        <span class="timeline-time">
+                                                                            🕒 <%= formatDateTime(h.ngay) %>
+                                                                        </span>
+                                                                    </div>
+                                                                    <% if (h.ghi_chu) { %>
+                                                                        <p class="timeline-note"><%= h.ghi_chu %></p>
+                                                                    <% } %>
+                                                                </div>
+                                                            </div>
+                                                        <% }); %>
                                                     </div>
                                                 </div>
 
                                                 <!-- Status update & note box -->
                                                 <form class="request-process-box" action="/admin/yeu-cau/<%= item.loai_yeu_cau === 'lai_thu' ? 'lai-thu' : 'bao-gia' %>/<%= item.id %>/cap-nhat" method="post">
                                                     <label>
-                                                        Trạng thái xử lý
+                                                        Trạng thái xử lý mới
                                                         <select name="trang_thai">
                                                             <option value="moi" <%= item.trang_thai === 'moi' ? 'selected' : '' %>>Mới</option>
                                                             <option value="dang_xu_ly" <%= item.trang_thai === 'dang_xu_ly' ? 'selected' : '' %>>Đang xử lý</option>
@@ -243,8 +293,8 @@
                                                         </select>
                                                     </label>
                                                     <label>
-                                                        Ghi chú tiến độ (Nội bộ)
-                                                        <textarea name="ghi_chu_admin" placeholder="Nhập ghi chú (Ví dụ: khách thích trả góp, đã liên lạc nhưng thuê bao...)"><%= item.ghi_chu_admin || '' %></textarea>
+                                                        Ghi chú tiến độ mới (Nội bộ)
+                                                        <textarea name="ghi_chu_admin" placeholder="Nhập ghi chú cho bước xử lý này (ví dụ: đã liên hệ lần 1, khách hẹn gọi lại sau...)"></textarea>
                                                     </label>
                                                     <button type="submit">Cập nhật</button>
                                                 </form>
