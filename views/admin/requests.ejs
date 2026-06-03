@@ -106,18 +106,18 @@
                 </div>
             </div>
 
+            <!-- Segmented Control for Request Type -->
+            <div class="request-type-tabs">
+                <a href="/admin/yeu-cau?loai=tat_ca&trang_thai=<%= filter.trang_thai %>" class="type-tab-btn <%= filter.loai === 'tat_ca' ? 'is-active' : '' %>">Tất cả yêu cầu</a>
+                <a href="/admin/yeu-cau?loai=bao_gia&trang_thai=<%= filter.trang_thai %>" class="type-tab-btn <%= filter.loai === 'bao_gia' ? 'is-active' : '' %>">Yêu cầu báo giá</a>
+                <a href="/admin/yeu-cau?loai=lai_thu&trang_thai=<%= filter.trang_thai %>" class="type-tab-btn <%= filter.loai === 'lai_thu' ? 'is-active' : '' %>">Lịch lái thử</a>
+            </div>
+
             <!-- Unified Filters Bar -->
             <form class="admin-request-filter" action="/admin/yeu-cau" method="get">
+                <input type="hidden" name="loai" value="<%= filter.loai %>">
                 <label>
-                    Loại yêu cầu
-                    <select name="loai" onchange="this.form.submit()">
-                        <option value="tat_ca" <%= filter.loai === 'tat_ca' ? 'selected' : '' %>>Tất cả loại</option>
-                        <option value="bao_gia" <%= filter.loai === 'bao_gia' ? 'selected' : '' %>>Yêu cầu báo giá</option>
-                        <option value="lai_thu" <%= filter.loai === 'lai_thu' ? 'selected' : '' %>>Đặt lịch lái thử</option>
-                    </select>
-                </label>
-                <label>
-                    Trạng thái
+                    Lọc theo trạng thái
                     <select name="trang_thai" onchange="this.form.submit()">
                         <option value="tat_ca" <%= filter.trang_thai === 'tat_ca' ? 'selected' : '' %>>Tất cả trạng thái</option>
                         <option value="moi" <%= filter.trang_thai === 'moi' ? 'selected' : '' %>>Mới</option>
