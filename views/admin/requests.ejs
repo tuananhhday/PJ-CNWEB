@@ -110,7 +110,7 @@
             <form class="admin-request-filter" action="/admin/yeu-cau" method="get">
                 <label>
                     Loại yêu cầu
-                    <select name="loai">
+                    <select name="loai" onchange="this.form.submit()">
                         <option value="tat_ca" <%= filter.loai === 'tat_ca' ? 'selected' : '' %>>Tất cả loại</option>
                         <option value="bao_gia" <%= filter.loai === 'bao_gia' ? 'selected' : '' %>>Yêu cầu báo giá</option>
                         <option value="lai_thu" <%= filter.loai === 'lai_thu' ? 'selected' : '' %>>Đặt lịch lái thử</option>
@@ -118,7 +118,7 @@
                 </label>
                 <label>
                     Trạng thái
-                    <select name="trang_thai">
+                    <select name="trang_thai" onchange="this.form.submit()">
                         <option value="tat_ca" <%= filter.trang_thai === 'tat_ca' ? 'selected' : '' %>>Tất cả trạng thái</option>
                         <option value="moi" <%= filter.trang_thai === 'moi' ? 'selected' : '' %>>Mới</option>
                         <option value="dang_xu_ly" <%= filter.trang_thai === 'dang_xu_ly' ? 'selected' : '' %>>Đang xử lý</option>
@@ -127,7 +127,6 @@
                         <option value="huy" <%= filter.trang_thai === 'huy' ? 'selected' : '' %>>Đã hủy</option>
                     </select>
                 </label>
-                <button type="submit">Lọc kết quả</button>
             </form>
 
             <!-- Lead lists section -->
@@ -277,7 +276,7 @@
                                                 </div>
 
                                                 <!-- Status update & note box -->
-                                                <form class="request-process-box" action="/admin/yeu-cau/<%= item.loai_yeu_cau === 'lai_thu' ? 'lai-thu' : 'bao-gia' %>/<%= item.id %>/cap-nhat" method="post">
+                                                <form class="request-process-box" action="/admin/yeu-cau/<%= item.loai_yeu_cau === 'lai_thu' ? 'lai-thu' : 'bao-gia' %>/<%= item.id %>/cap-nhat?loai=<%= filter.loai %>&trang_thai=<%= filter.trang_thai %>" method="post">
                                                     <label>
                                                         Trạng thái xử lý mới
                                                         <select name="trang_thai">
@@ -301,7 +300,7 @@
 
                                                 <!-- Delete button -->
                                                 <div class="request-bottom-actions">
-                                                    <form action="/admin/yeu-cau/<%= item.loai_yeu_cau === 'lai_thu' ? 'lai-thu' : 'bao-gia' %>/<%= item.id %>/xoa" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa yêu cầu của <%= item.ho_ten %>? Thao tác này sẽ xóa vĩnh viễn dữ liệu!');">
+                                                    <form action="/admin/yeu-cau/<%= item.loai_yeu_cau === 'lai_thu' ? 'lai-thu' : 'bao-gia' %>/<%= item.id %>/xoa?loai=<%= filter.loai %>&trang_thai=<%= filter.trang_thai %>" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa yêu cầu của <%= item.ho_ten %>? Thao tác này sẽ xóa vĩnh viễn dữ liệu!');">
                                                         <button type="submit" class="danger-button">Xóa yêu cầu</button>
                                                     </form>
                                                 </div>
@@ -353,6 +352,21 @@
                     }
                 });
             });
+            
+            // Auto-open drawer from URL hash if present (e.g. after updating)
+            if (window.location.hash) {
+                try {
+                    const targetCard = document.querySelector(window.location.hash);
+                    if (targetCard) {
+                        targetCard.classList.add('is-open');
+                        setTimeout(() => {
+                            targetCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 200);
+                    }
+                } catch (e) {
+                    console.log('Invalid hash element:', e);
+                }
+            }
         });
     </script>
 </body>

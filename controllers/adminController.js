@@ -142,10 +142,33 @@ exports.updateRequest = async (req, res) => {
             `UPDATE ${tableName} SET trang_thai = ?, ghi_chu_admin = ?, lich_su_xu_ly = ? WHERE id = ?`,
             [trang_thai, ghi_chu_admin || null, JSON.stringify(historyList), req.params.id]
         );
-        parser.redirectWithMessage(res, '/admin/yeu-cau', 'success', 'Đã cập nhật yêu cầu khách hàng.');
+
+        const loaiFilter = req.query.loai || '';
+        const trangThaiFilter = req.query.trang_thai || '';
+        let redirectUrl = '/admin/yeu-cau';
+        const queryParams = [];
+        if (loaiFilter) queryParams.push(`loai=${loaiFilter}`);
+        if (trangThaiFilter) queryParams.push(`trang_thai=${trangThaiFilter}`);
+        if (queryParams.length > 0) {
+            redirectUrl += `?${queryParams.join('&')}`;
+        }
+        
+        const reqType = tableName === 'lich_lai_thu' ? 'lai_thu' : 'bao_gia';
+        redirectUrl += `#request-card-${req.params.id}-${reqType}`;
+
+        parser.redirectWithMessage(res, redirectUrl, 'success', 'Đã cập nhật yêu cầu khách hàng.');
     } catch (err) {
         console.log('Loi cap nhat yeu cau:', err);
-        parser.redirectWithMessage(res, '/admin/yeu-cau', 'error', 'Không thể cập nhật yêu cầu.');
+        const loaiFilter = req.query.loai || '';
+        const trangThaiFilter = req.query.trang_thai || '';
+        let redirectUrl = '/admin/yeu-cau';
+        const queryParams = [];
+        if (loaiFilter) queryParams.push(`loai=${loaiFilter}`);
+        if (trangThaiFilter) queryParams.push(`trang_thai=${trangThaiFilter}`);
+        if (queryParams.length > 0) {
+            redirectUrl += `?${queryParams.join('&')}`;
+        }
+        parser.redirectWithMessage(res, redirectUrl, 'error', 'Không thể cập nhật yêu cầu.');
     }
 };
 
@@ -155,10 +178,30 @@ exports.deleteRequest = async (req, res) => {
     try {
         await dbInit.ensureCustomerRequestTables();
         await dbp.query(`DELETE FROM ${tableName} WHERE id = ?`, [req.params.id]);
-        parser.redirectWithMessage(res, '/admin/yeu-cau', 'success', 'Đã xóa yêu cầu khách hàng.');
+        
+        const loaiFilter = req.query.loai || '';
+        const trangThaiFilter = req.query.trang_thai || '';
+        let redirectUrl = '/admin/yeu-cau';
+        const queryParams = [];
+        if (loaiFilter) queryParams.push(`loai=${loaiFilter}`);
+        if (trangThaiFilter) queryParams.push(`trang_thai=${trangThaiFilter}`);
+        if (queryParams.length > 0) {
+            redirectUrl += `?${queryParams.join('&')}`;
+        }
+
+        parser.redirectWithMessage(res, redirectUrl, 'success', 'Đã xóa yêu cầu khách hàng.');
     } catch (err) {
         console.log('Loi xoa yeu cau:', err);
-        parser.redirectWithMessage(res, '/admin/yeu-cau', 'error', 'Không thể xóa yêu cầu.');
+        const loaiFilter = req.query.loai || '';
+        const trangThaiFilter = req.query.trang_thai || '';
+        let redirectUrl = '/admin/yeu-cau';
+        const queryParams = [];
+        if (loaiFilter) queryParams.push(`loai=${loaiFilter}`);
+        if (trangThaiFilter) queryParams.push(`trang_thai=${trangThaiFilter}`);
+        if (queryParams.length > 0) {
+            redirectUrl += `?${queryParams.join('&')}`;
+        }
+        parser.redirectWithMessage(res, redirectUrl, 'error', 'Không thể xóa yêu cầu.');
     }
 };
 
