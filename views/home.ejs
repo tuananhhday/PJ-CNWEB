@@ -91,9 +91,28 @@
 
                         <div class="featured-media">
                             <div class="featured-specs">
-                                <span><%= car.dong_co || car.nhien_lieu || 'Động cơ đang cập nhật' %></span>
-                                <span><%= car.hop_so || 'Hộp số đang cập nhật' %></span>
-                                <span><%= car.so_cho_ngoi ? car.so_cho_ngoi + ' chỗ' : 'Số chỗ đang cập nhật' %></span>
+                                <span>
+                                    <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M16 8h-1V5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v3H8a1 1 0 0 0-1 1v3H5a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h2v2a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-2h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-2V9a1 1 0 0 0-1-1z" />
+                                        <circle cx="12" cy="13" r="2" />
+                                    </svg>
+                                    <%= car.dong_co || car.nhien_lieu || 'Động cơ đang cập nhật' %>
+                                </span>
+                                <span>
+                                    <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="3" />
+                                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                                    </svg>
+                                    <%= car.hop_so || 'Hộp số đang cập nhật' %>
+                                </span>
+                                <span>
+                                    <svg class="spec-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M7 4h6a3 3 0 0 1 3 3v8h2" />
+                                        <path d="M5 15h11a3 3 0 0 1 3 3v2H5v-5z" />
+                                        <path d="M9 4V2M13 4V2" />
+                                    </svg>
+                                    <%= car.so_cho_ngoi ? car.so_cho_ngoi + ' chỗ' : 'Số chỗ đang cập nhật' %>
+                                </span>
                             </div>
                             <img src="/images/<%= car.anh_dai_dien || 'no-car.jpg' %>" alt="<%= car.ten_xe %>">
                         </div>

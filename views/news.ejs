@@ -58,6 +58,29 @@
 <%- include('partials/site-nav') %>
 
 <main id="main-content" class="news-page">
+    <div class="news-header-section">
+        <h1>Tin tức & Sự kiện</h1>
+        <p class="news-subtitle">Cập nhật tin tức mới nhất về các dòng xe Hyundai và hoạt động của showroom</p>
+        
+        <form action="/tin-tuc" method="GET" class="news-search-form">
+            <div class="news-search-box">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" name="q" value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>" placeholder="Tìm kiếm tiêu đề hoặc nội dung bài viết...">
+                <button type="submit" class="news-search-btn">Tìm kiếm</button>
+            </div>
+        </form>
+
+        <% if (typeof searchQuery !== 'undefined' && searchQuery) { %>
+            <div class="news-search-results-badge">
+                <span>Tìm kiếm: <strong>"<%= searchQuery %>"</strong> (<%= posts.length %> kết quả)</span>
+                <a href="/tin-tuc" class="clear-search-btn">✕ Hủy</a>
+            </div>
+        <% } %>
+    </div>
+
     <% 
     const newsPostsAll = posts && posts.length ? posts : [];
     
@@ -84,7 +107,7 @@
     // 2. Main list posts: all other posts not used in sidebar
     const mainListPosts = newsPostsAll.filter(p => !usedIds.has(p.id));
     %>
-
+ 
     <section class="magazine-news-layout">
         <div style="display: flex; flex-direction: column; width: 100%; min-width: 0;">
             <div class="magazine-news-list" id="public-news-list">
@@ -92,19 +115,23 @@
                     <% newsPostsAll.forEach((post) => { %>
                         <article class="magazine-news-item" data-public-news-item>
                             <a class="magazine-news-image" href="/tin-tuc/<%= post.duong_dan %>">
-                                <img src="/images/<%= post.anh_dai_dien || 'no-car.jpg' %>" alt="<%= post.tieu_de %>">
+                                <img src="/images/<%= post.anh_dai_dien || 'no-car.jpg' %>" alt="<%= post.tieu_de %>" onerror="this.src='/images/no-car.jpg';">
                             </a>
                             <div>
                                 <a href="/tin-tuc/<%= post.duong_dan %>">
                                     <h2><%= post.tieu_de %></h2>
                                 </a>
-                                <div class="news-meta"><%= formatDateTime(post.ngay_tao) %></div>
-                                <p><%= post.noi_dung.length > 180 ? post.noi_dung.slice(0, 180) + '...' : post.noi_dung %></p>
+                                <div class="news-meta">🕒 <%= formatDateTime(post.ngay_tao) %></div>
+                                <% 
+                                    const plainText = (post.noi_dung || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+                                    const truncated = plainText.length > 180 ? plainText.slice(0, 180) + '...' : plainText;
+                                %>
+                                <p><%= truncated %></p>
                             </div>
                         </article>
                     <% }) %>
                 <% } else { %>
-                    <p class="empty-state">Chưa có tin tức nào được đăng.</p>
+                    <p class="empty-state">Chưa có tin tức nào khớp với tìm kiếm.</p>
                 <% } %>
             </div>
 
@@ -118,9 +145,10 @@
         </div>
 
         <aside class="magazine-news-sidebar" aria-label="Tin nổi bật">
+            <h3>🔥 Tin nổi bật</h3>
             <% displaySidebarPosts.forEach((post) => { %>
                 <a class="magazine-sidebar-card" href="/tin-tuc/<%= post.duong_dan %>">
-                    <img src="/images/<%= post.anh_dai_dien || 'no-car.jpg' %>" alt="<%= post.tieu_de %>">
+                    <img src="/images/<%= post.anh_dai_dien || 'no-car.jpg' %>" alt="<%= post.tieu_de %>" onerror="this.src='/images/no-car.jpg';">
                     <strong><%= post.tieu_de %></strong>
                 </a>
             <% }) %>

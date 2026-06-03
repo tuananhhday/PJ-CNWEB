@@ -249,7 +249,7 @@ async function ensureNewsTables() {
             id INT AUTO_INCREMENT PRIMARY KEY,
             tieu_de VARCHAR(255) NOT NULL,
             duong_dan VARCHAR(255) NOT NULL UNIQUE,
-            noi_dung TEXT NOT NULL,
+            noi_dung LONGTEXT NOT NULL,
             anh_dai_dien VARCHAR(255),
             tac_gia VARCHAR(120) DEFAULT 'Showroom Double Anh',
             ghim TINYINT(1) DEFAULT 0,
@@ -262,7 +262,7 @@ async function ensureNewsTables() {
     `);
 
     await ensureColumn('tin_tuc', 'duong_dan', 'VARCHAR(255)');
-    await ensureColumn('tin_tuc', 'noi_dung', 'TEXT');
+    await ensureColumn('tin_tuc', 'noi_dung', 'LONGTEXT');
     await ensureColumn('tin_tuc', 'anh_dai_dien', 'VARCHAR(255)');
     await ensureColumn('tin_tuc', 'tac_gia', "VARCHAR(120) DEFAULT 'Showroom Double Anh'");
     await ensureColumn('tin_tuc', 'mau_nen', 'VARCHAR(40)');
@@ -287,8 +287,13 @@ async function ensureNewsTables() {
             ALTER TABLE tin_tuc
             MODIFY COLUMN trang_thai ENUM('nhap', 'hien', 'an') DEFAULT 'hien'
         `);
+        // Modify column type for existing tables
+        await dbp.query(`
+            ALTER TABLE tin_tuc
+            MODIFY COLUMN noi_dung LONGTEXT NOT NULL
+        `);
     } catch (err) {
-        console.log('Tin tuc enum update non-critical bypass:', err.message);
+        console.log('Tin tuc schema update non-critical bypass:', err.message);
     }
 
     await dbp.query(`

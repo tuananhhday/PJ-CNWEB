@@ -46,17 +46,23 @@ function getUniqueDealerValues(dealers, key) {
         .sort((a, b) => String(a).localeCompare(String(b), 'vi'));
 }
 
-async function getNewsPosts(onlyVisible = true) {
+async function getNewsPosts(onlyVisible = true, searchQuery = '') {
     await dbInit.ensureNewsTables();
+    let whereClause = onlyVisible ? "WHERE tin_tuc.trang_thai = 'hien'" : "WHERE 1=1";
+    const params = [];
+    if (searchQuery) {
+        whereClause += " AND (tin_tuc.tieu_de LIKE ? OR tin_tuc.noi_dung LIKE ?)";
+        params.push(`%${searchQuery}%`, `%${searchQuery}%`);
+    }
     const [posts] = await dbp.query(`
         SELECT
             tin_tuc.*,
             (SELECT COUNT(*) FROM like_tin WHERE like_tin.tin_tuc_id = tin_tuc.id) AS so_luot_thich,
             (SELECT COUNT(*) FROM binh_luan_tin WHERE binh_luan_tin.tin_tuc_id = tin_tuc.id AND binh_luan_tin.trang_thai = 'hien') AS so_binh_luan
         FROM tin_tuc
-        ${onlyVisible ? "WHERE tin_tuc.trang_thai = 'hien'" : ''}
+        ${whereClause}
         ORDER BY tin_tuc.ghim DESC, tin_tuc.ngay_tao DESC
-    `);
+    `, params);
     return posts;
 }
 
@@ -210,10 +216,12 @@ exports.getDealers = async (req, res) => {
 
 exports.getNews = async (req, res) => {
     try {
-        const posts = await getNewsPosts(true);
+        const searchQuery = String(req.query.q || '').trim();
+        const posts = await getNewsPosts(true, searchQuery);
         res.render('news', {
-            title: 'Tin tức | Showroom Double Anh',
+            title: searchQuery ? `Tìm kiếm tin tức: ${searchQuery}` : 'Tin tức | Showroom Double Anh',
             posts,
+            searchQuery,
             formatDateTime: parser.formatDateTime
         });
     } catch (err) {
