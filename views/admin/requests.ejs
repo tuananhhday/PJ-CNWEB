@@ -13,277 +13,298 @@
     <link rel="stylesheet" href="/stylesheets/base.css">
     <link rel="stylesheet" href="/stylesheets/admin.css">
 </head>
+    <% 
+    const statusLabel = { 
+        moi: 'Mới', 
+        dang_xu_ly: 'Đang xử lý', 
+        da_lien_he: 'Đã liên hệ', 
+        da_xac_nhan: 'Đã xác nhận',
+        hoan_tat: 'Hoàn tất', 
+        huy: 'Hủy' 
+    }; 
+    const typeLabel = { 
+        bao_gia: 'Báo giá', 
+        lai_thu: 'Lái thử' 
+    }; 
+    const activeStatuses = ['moi', 'dang_xu_ly']; 
+    const requestSections = [
+        { 
+            key: 'bao_gia', 
+            title: 'Yêu cầu báo giá',
+            desc: 'Khách cần tư vấn giá bán, chi phí lăn bánh, trả góp hoặc ưu đãi.', 
+            items: quoteRequests || [] 
+        }, 
+        {
+            key: 'lai_thu', 
+            title: 'Lịch lái thử',
+            desc: 'Khách đã chọn xe, đại lý và thời gian mong muốn để trải nghiệm xe.', 
+            items: testDriveRequests || [] 
+        }
+    ].filter((section) => filter.loai === 'tat_ca' || filter.loai === section.key);
 
-<body>
-    <% const statusLabel={ moi: 'Mới' , dang_xu_ly: 'Đang xử lý' , da_lien_he: 'Đã liên hệ' , da_xac_nhan: 'Đã xác nhận'
-        , hoan_tat: 'Hoàn tất' , huy: 'Hủy' }; const typeLabel={ bao_gia: 'Báo giá' , lai_thu: 'Lái thử' }; const
-        activeStatuses=['moi', 'dang_xu_ly' ]; const requestSections=[ { key: 'bao_gia' , title: 'Yêu cầu báo giá' ,
-        desc: 'Khách cần tư vấn giá bán, chi phí lăn bánh, trả góp hoặc ưu đãi.' , items: quoteRequests || [] }, {
-        key: 'lai_thu' , title: 'Lịch lái thử' ,
-        desc: 'Khách đã chọn xe, đại lý và thời gian mong muốn để trải nghiệm xe.' , items: testDriveRequests || [] }
-        ].filter((section)=> filter.loai === 'tat_ca' || filter.loai === section.key);
-        %>
-        <main class="admin-page">
-            <aside class="admin-sidebar">
-                <a class="admin-brand" href="/trang-chu">Showroom</a>
-                <a href="/admin/xe">Quản lý xe</a>
-                <a href="/admin/yeu-cau" class="is-active">Báo giá / Lái thử</a>
-                <a href="/admin/panel">Quản lý panel</a>
-                <a href="/admin/dai-ly">Quản lý đại lý</a>
-                <a href="/admin/tin-tuc">Quản lý tin tức</a>
-                <a href="/trang-chu">Xem trang chủ</a>
-            </aside>
+    const allItems = [...(quoteRequests || []), ...(testDriveRequests || [])];
+    const statCounts = {
+        total: allItems.length,
+        moi: allItems.filter(item => item.trang_thai === 'moi').length,
+        dang_xu_ly: allItems.filter(item => item.trang_thai === 'dang_xu_ly').length,
+        hoan_tat: allItems.filter(item => item.trang_thai === 'hoan_tat').length,
+        huy: allItems.filter(item => item.trang_thai === 'huy').length,
+    };
+    %>
+    <main class="admin-page">
+        <aside class="admin-sidebar">
+            <a class="admin-brand" href="/trang-chu">Showroom</a>
+            <a href="/admin/xe">Quản lý xe</a>
+            <a href="/admin/yeu-cau" class="is-active">Báo giá / Lái thử</a>
+            <a href="/admin/panel">Quản lý panel</a>
+            <a href="/admin/dai-ly">Quản lý đại lý</a>
+            <a href="/admin/tin-tuc">Quản lý tin tức</a>
+            <a href="/trang-chu">Xem trang chủ</a>
+        </aside>
 
-            <section class="admin-content">
-                <div class="admin-heading">
-                    <div>
-                        <p>Admin</p>
-                        <h1>Báo giá / Lái thử</h1>
-                    </div>
-                    <a href="/bao-gia">Mở form báo giá</a>
+        <section class="admin-content">
+            <div class="admin-heading">
+                <div>
+                    <p>Admin</p>
+                    <h1>Quản lý yêu cầu</h1>
                 </div>
+                <a href="/bao-gia" target="_blank">Nhận báo giá (Web)</a>
+            </div>
 
-                <% if (success) { %>
-                    <div class="admin-alert success">
-                        <%= success %>
+            <% if (success) { %>
+                <div class="admin-alert success">
+                    <%= success %>
+                </div>
+            <% } %>
+            <% if (error) { %>
+                <div class="admin-alert error">
+                    <%= error %>
+                </div>
+            <% } %>
+
+            <!-- Dashboard Summary Statistics -->
+            <div class="stats-dashboard">
+                <div class="stat-card">
+                    <span class="stat-title">Tổng yêu cầu</span>
+                    <strong class="stat-value"><%= statCounts.total %></strong>
+                </div>
+                <div class="stat-card stat-moi">
+                    <span class="stat-title">Mới (Chưa xử lý)</span>
+                    <strong class="stat-value"><%= statCounts.moi %></strong>
+                </div>
+                <div class="stat-card stat-processing">
+                    <span class="stat-title">Đang xử lý</span>
+                    <strong class="stat-value"><%= statCounts.dang_xu_ly %></strong>
+                </div>
+                <div class="stat-card stat-completed">
+                    <span class="stat-title">Hoàn tất</span>
+                    <strong class="stat-value"><%= statCounts.hoan_tat %></strong>
+                </div>
+                <div class="stat-card stat-canceled">
+                    <span class="stat-title">Đã hủy</span>
+                    <strong class="stat-value"><%= statCounts.huy %></strong>
+                </div>
+            </div>
+
+            <!-- Unified Filters Bar -->
+            <form class="admin-request-filter" action="/admin/yeu-cau" method="get">
+                <label>
+                    Loại yêu cầu
+                    <select name="loai">
+                        <option value="tat_ca" <%= filter.loai === 'tat_ca' ? 'selected' : '' %>>Tất cả loại</option>
+                        <option value="bao_gia" <%= filter.loai === 'bao_gia' ? 'selected' : '' %>>Yêu cầu báo giá</option>
+                        <option value="lai_thu" <%= filter.loai === 'lai_thu' ? 'selected' : '' %>>Đặt lịch lái thử</option>
+                    </select>
+                </label>
+                <label>
+                    Trạng thái
+                    <select name="trang_thai">
+                        <option value="tat_ca" <%= filter.trang_thai === 'tat_ca' ? 'selected' : '' %>>Tất cả trạng thái</option>
+                        <option value="moi" <%= filter.trang_thai === 'moi' ? 'selected' : '' %>>Mới</option>
+                        <option value="dang_xu_ly" <%= filter.trang_thai === 'dang_xu_ly' ? 'selected' : '' %>>Đang xử lý</option>
+                        <option value="da_lien_he" <%= filter.trang_thai === 'da_lien_he' ? 'selected' : '' %>>Đã liên hệ / xác nhận</option>
+                        <option value="hoan_tat" <%= filter.trang_thai === 'hoan_tat' ? 'selected' : '' %>>Hoàn tất</option>
+                        <option value="huy" <%= filter.trang_thai === 'huy' ? 'selected' : '' %>>Đã hủy</option>
+                    </select>
+                </label>
+                <button type="submit">Lọc kết quả</button>
+            </form>
+
+            <!-- Lead lists section -->
+            <% requestSections.forEach((section) => { %>
+                <% 
+                const pendingItems = section.items.filter((item) => activeStatuses.includes(item.trang_thai)); 
+                const processedItems = section.items.filter((item) => !activeStatuses.includes(item.trang_thai)); 
+                %>
+                <section class="admin-request-section">
+                    <div class="admin-request-section-head">
+                        <div>
+                            <h2><%= section.title %></h2>
+                            <p><%= section.desc %></p>
+                        </div>
+                        <span><%= section.items.length %> yêu cầu</span>
                     </div>
-                    <% } %>
-                        <% if (error) { %>
-                            <div class="admin-alert error">
-                                <%= error %>
-                            </div>
-                            <% } %>
 
-                                <form class="admin-request-filter" action="/admin/yeu-cau" method="get">
-                                    <label>
-                                        Loại yêu cầu
-                                        <select name="loai">
-                                            <option value="tat_ca" <%=filter.loai==='tat_ca' ? 'selected' : '' %>>Tất cả
-                                            </option>
-                                            <option value="bao_gia" <%=filter.loai==='bao_gia' ? 'selected' : '' %>>Báo
-                                                giá</option>
-                                            <option value="lai_thu" <%=filter.loai==='lai_thu' ? 'selected' : '' %>>Lái
-                                                thử</option>
-                                        </select>
-                                    </label>
-                                    <label>
-                                        Trạng thái
-                                        <select name="trang_thai">
-                                            <option value="tat_ca" <%=filter.trang_thai==='tat_ca' ? 'selected' : '' %>
-                                                >Tất cả</option>
-                                            <option value="moi" <%=filter.trang_thai==='moi' ? 'selected' : '' %>>Mới
-                                            </option>
-                                            <option value="dang_xu_ly" <%=filter.trang_thai==='dang_xu_ly' ? 'selected'
-                                                : '' %>>Đang xử lý</option>
-                                            <option value="da_lien_he" <%=filter.trang_thai==='da_lien_he' ? 'selected'
-                                                : '' %>>Đã liên hệ</option>
-                                            <option value="da_xac_nhan" <%=filter.trang_thai==='da_xac_nhan'
-                                                ? 'selected' : '' %>>Đã xác nhận</option>
-                                            <option value="hoan_tat" <%=filter.trang_thai==='hoan_tat' ? 'selected' : ''
-                                                %>>Hoàn tất</option>
-                                            <option value="huy" <%=filter.trang_thai==='huy' ? 'selected' : '' %>>Hủy
-                                            </option>
-                                        </select>
-                                    </label>
-                                    <button type="submit">Lọc yêu cầu</button>
-                                </form>
+                    <% 
+                    [ 
+                        { title: 'Yêu cầu cần xử lý', items: pendingItems, empty: 'Không có yêu cầu mới nào cần xử lý.' }, 
+                        { title: 'Lịch sử yêu cầu đã xử lý', items: processedItems, empty: 'Chưa có yêu cầu nào được xử lý.' }
+                    ].forEach((group) => { 
+                    %>
+                        <div class="admin-request-group">
+                            <h3><%= group.title %></h3>
+                            <% if (group.items.length) { %>
+                                <div class="admin-request-list">
+                                    <% group.items.forEach((item) => { %>
+                                        <article class="admin-request-card" id="request-card-<%= item.id %>-<%= item.loai_yeu_cau %>">
+                                            
+                                            <!-- Collapsed Header Row -->
+                                            <div class="admin-request-header-row" data-id="<%= item.id %>" data-type="<%= item.loai_yeu_cau %>">
+                                                <span class="request-badge-type <%= item.loai_yeu_cau %>">
+                                                    <%= typeLabel[item.loai_yeu_cau] %>
+                                                </span>
+                                                <div class="request-cust-name-cell">
+                                                    <span class="request-cust-name"><%= item.ho_ten %></span>
+                                                    <span class="request-cust-phone">📞 <%= item.so_dien_thoai %></span>
+                                                </div>
+                                                <span class="request-car-cell">🚗 <%= item.ten_xe || 'Xe đã bị xóa' %></span>
+                                                <span class="request-date-cell">🕒 <%= formatDateTime(item.ngay_tao) %></span>
+                                                <div>
+                                                    <span class="status-badge-request <%= item.trang_thai %>">
+                                                        <%= statusLabel[item.trang_thai] || item.trang_thai %>
+                                                    </span>
+                                                </div>
+                                                <div class="request-action-trigger">
+                                                    <button type="button">Chi tiết</button>
+                                                </div>
+                                            </div>
 
-                                <% requestSections.forEach((section)=> { %>
-                                    <% const pendingItems=section.items.filter((item)=>
-                                        activeStatuses.includes(item.trang_thai)); %>
-                                        <% const processedItems=section.items.filter((item)=>
-                                            !activeStatuses.includes(item.trang_thai)); %>
-                                            <section class="admin-request-section">
-                                                <div class="admin-request-section-head">
-                                                    <div>
-                                                        <span>
-                                                            <%= section.items.length %> yêu cầu
-                                                        </span>
-                                                        <h2>
-                                                            <%= section.title %>
-                                                        </h2>
-                                                        <p>
-                                                            <%= section.desc %>
-                                                        </p>
+                                            <!-- Expanded Drawer Details -->
+                                            <div class="admin-request-drawer">
+                                                <div class="request-details-grid">
+                                                    <div class="request-car-preview">
+                                                        <img src="/images/<%= item.anh_dai_dien || 'no-car.jpg' %>" alt="<%= item.ten_xe %>">
+                                                        <strong><%= item.ten_xe || 'Xe đã bị xóa' %></strong>
+                                                    </div>
+                                                    <div class="request-info-table">
+                                                        <div class="request-info-field">
+                                                            <dt>Khách hàng</dt>
+                                                            <dd><%= item.ho_ten %></dd>
+                                                        </div>
+                                                        <div class="request-info-field">
+                                                            <dt>Số điện thoại</dt>
+                                                            <dd><a href="tel:<%= item.so_dien_thoai %>"><%= item.so_dien_thoai %></a></dd>
+                                                        </div>
+                                                        <div class="request-info-field">
+                                                            <dt>Email</dt>
+                                                            <dd><a href="mailto:<%= item.email %>"><%= item.email %></a></dd>
+                                                        </div>
+                                                        <div class="request-info-field">
+                                                            <dt>Tỉnh / Thành phố</dt>
+                                                            <dd><%= item.thanh_pho %></dd>
+                                                        </div>
+                                                        <div class="request-info-field">
+                                                            <dt>Nhận marketing</dt>
+                                                            <dd><%= item.dong_y_tiep_thi ? 'Có đồng ý' : 'Không đồng ý' %></dd>
+                                                        </div>
+                                                        
+                                                        <% if (item.loai_yeu_cau === 'bao_gia') { %>
+                                                            <div class="request-info-field" style="grid-column: 1 / -1;">
+                                                                <dt>Nội dung tư vấn yêu cầu</dt>
+                                                                <dd style="white-space: pre-line;"><%= item.noi_dung || 'Không có ghi chú thêm.' %></dd>
+                                                            </div>
+                                                        <% } else { %>
+                                                            <div class="request-info-field">
+                                                                <dt>Đại lý đăng ký lái thử</dt>
+                                                                <dd><%= item.dai_ly %></dd>
+                                                            </div>
+                                                            <div class="request-info-field">
+                                                                <dt>Thời gian lái thử mong muốn</dt>
+                                                                <dd>📅 <%= item.ngay_muon_lai || 'Chưa chọn ngày' %> <%= item.gio_muon_lai ? '⏱️ ' + item.gio_muon_lai : '' %></dd>
+                                                            </div>
+                                                        <% } %>
                                                     </div>
                                                 </div>
 
-                                                <% [ { title: 'Cần xử lý' , items: pendingItems,
-                                                    empty: 'Không có yêu cầu mới cần xử lý.' }, { title: 'Đã xử lý' ,
-                                                    items: processedItems, empty: 'Chưa có yêu cầu đã xử lý.' }
-                                                    ].forEach((group)=> { %>
-                                                    <div
-                                                        class="admin-request-group <%= group.title === 'Đã xử lý' ? 'is-processed' : '' %>">
-                                                        <h3>
-                                                            <%= group.title %>
-                                                        </h3>
-                                                        <% if (group.items.length) { %>
-                                                            <div class="admin-request-list">
-                                                                <% group.items.forEach((item)=> { %>
-                                                                    <article class="admin-request-card">
-                                                                        <div class="admin-request-media">
-                                                                            <img src="/images/<%= item.anh_dai_dien || 'no-car.jpg' %>"
-                                                                                alt="<%= item.ten_xe || 'Xe' %>">
-                                                                            <span
-                                                                                class="request-type <%= item.loai_yeu_cau %>">
-                                                                                <%= typeLabel[item.loai_yeu_cau] %>
-                                                                            </span>
-                                                                        </div>
-                                                                        <div class="admin-request-main">
-                                                                            <div class="admin-request-title">
-                                                                                <div>
-                                                                                    <h2>
-                                                                                        <%= item.ho_ten %>
-                                                                                    </h2>
-                                                                                    <p>
-                                                                                        <%= item.ten_xe
-                                                                                            || 'Xe đã bị xóa' %>
-                                                                                    </p>
-                                                                                </div>
-                                                                                <span class="request-status">
-                                                                                    <%= statusLabel[item.trang_thai] ||
-                                                                                        item.trang_thai %>
-                                                                                </span>
-                                                                            </div>
-
-                                                                            <dl class="admin-request-info">
-                                                                                <div>
-                                                                                    <dt>Điện thoại</dt>
-                                                                                    <dd><a
-                                                                                            href="tel:<%= item.so_dien_thoai %>">
-                                                                                            <%= item.so_dien_thoai %>
-                                                                                        </a></dd>
-                                                                                </div>
-                                                                                <div>
-                                                                                    <dt>Email</dt>
-                                                                                    <dd><a
-                                                                                            href="mailto:<%= item.email %>">
-                                                                                            <%= item.email %>
-                                                                                        </a></dd>
-                                                                                </div>
-                                                                                <div>
-                                                                                    <dt>Tỉnh/Thành</dt>
-                                                                                    <dd>
-                                                                                        <%= item.thanh_pho %>
-                                                                                    </dd>
-                                                                                </div>
-                                                                                <div>
-                                                                                    <dt>Thời gian gửi</dt>
-                                                                                    <dd>
-                                                                                        <%= formatDateTime(item.ngay_tao)
-                                                                                            %>
-                                                                                    </dd>
-                                                                                </div>
-                                                                                <% if (item.loai_yeu_cau==='bao_gia' ) {
-                                                                                    %>
-                                                                                    <div>
-                                                                                        <dt>Nội dung</dt>
-                                                                                        <dd>
-                                                                                            <%= item.noi_dung
-                                                                                                || 'Khách chưa ghi thêm nội dung.'
-                                                                                                %>
-                                                                                        </dd>
-                                                                                    </div>
-                                                                                    <% } else { %>
-                                                                                        <div>
-                                                                                            <dt>Đại lý</dt>
-                                                                                            <dd>
-                                                                                                <%= item.dai_ly %>
-                                                                                            </dd>
-                                                                                        </div>
-                                                                                        <div>
-                                                                                            <dt>Lịch mong muốn</dt>
-                                                                                            <dd>
-                                                                                                <%= item.ngay_muon_lai
-                                                                                                    || 'Chưa chọn ngày'
-                                                                                                    %>
-                                                                                                    <%= item.gio_muon_lai
-                                                                                                        || '' %>
-                                                                                            </dd>
-                                                                                        </div>
-                                                                                        <% } %>
-                                                                                            <div>
-                                                                                                <dt>Nhận tiếp thị</dt>
-                                                                                                <dd>
-                                                                                                    <%= item.dong_y_tiep_thi
-                                                                                                        ? 'Có' : 'Không'
-                                                                                                        %>
-                                                                                                </dd>
-                                                                                            </div>
-                                                                            </dl>
-
-                                                                            <form class="admin-request-actions"
-                                                                                action="/admin/yeu-cau/<%= item.loai_yeu_cau === 'lai_thu' ? 'lai-thu' : 'bao-gia' %>/<%= item.id %>/cap-nhat"
-                                                                                method="post">
-                                                                                <label>
-                                                                                    Trạng thái xử lý
-                                                                                    <select name="trang_thai">
-                                                                                        <option value="moi"
-                                                                                            <%=item.trang_thai==='moi'
-                                                                                            ? 'selected' : '' %>>Mới
-                                                                                        </option>
-                                                                                        <option value="dang_xu_ly"
-                                                                                            <%=item.trang_thai==='dang_xu_ly'
-                                                                                            ? 'selected' : '' %>>Đang xử
-                                                                                            lý</option>
-                                                                                        <% if
-                                                                                            (item.loai_yeu_cau==='bao_gia'
-                                                                                            ) { %>
-                                                                                            <option value="da_lien_he"
-                                                                                                <%=item.trang_thai==='da_lien_he'
-                                                                                                ? 'selected' : '' %>>Đã
-                                                                                                liên hệ</option>
-                                                                                            <% } else { %>
-                                                                                                <option
-                                                                                                    value="da_xac_nhan"
-                                                                                                    <%=item.trang_thai==='da_xac_nhan'
-                                                                                                    ? 'selected' : '' %>
-                                                                                                    >Đã xác nhận
-                                                                                                </option>
-                                                                                                <% } %>
-                                                                                                    <option
-                                                                                                        value="hoan_tat"
-                                                                                                        <%=item.trang_thai==='hoan_tat'
-                                                                                                        ? 'selected'
-                                                                                                        : '' %>>Hoàn tất
-                                                                                                    </option>
-                                                                                                    <option value="huy"
-                                                                                                        <%=item.trang_thai==='huy'
-                                                                                                        ? 'selected'
-                                                                                                        : '' %>>Hủy
-                                                                                                    </option>
-                                                                                    </select>
-                                                                                </label>
-                                                                                <label>
-                                                                                    Ghi chú nội bộ
-                                                                                    <textarea name="ghi_chu_admin"
-                                                                                        rows="3"
-                                                                                        placeholder="Ví dụ: đã gọi lần 1, khách hẹn gọi lại chiều mai"><%= item.ghi_chu_admin || '' %></textarea>
-                                                                                </label>
-                                                                                <button type="submit">Lưu xử lý</button>
-                                                                            </form>
-                                                                            <form class="admin-request-delete"
-                                                                                action="/admin/yeu-cau/<%= item.loai_yeu_cau === 'lai_thu' ? 'lai-thu' : 'bao-gia' %>/<%= item.id %>/xoa"
-                                                                                method="post"
-                                                                                onsubmit="return confirm('Xóa yêu cầu này khỏi danh sách admin?');">
-                                                                                <button type="submit">Xóa yêu
-                                                                                    cầu</button>
-                                                                            </form>
-                                                                        </div>
-                                                                    </article>
-                                                                    <% }) %>
-                                                            </div>
+                                                <!-- Status update & note box -->
+                                                <form class="request-process-box" action="/admin/yeu-cau/<%= item.loai_yeu_cau === 'lai_thu' ? 'lai-thu' : 'bao-gia' %>/<%= item.id %>/cap-nhat" method="post">
+                                                    <label>
+                                                        Trạng thái xử lý
+                                                        <select name="trang_thai">
+                                                            <option value="moi" <%= item.trang_thai === 'moi' ? 'selected' : '' %>>Mới</option>
+                                                            <option value="dang_xu_ly" <%= item.trang_thai === 'dang_xu_ly' ? 'selected' : '' %>>Đang xử lý</option>
+                                                            <% if (item.loai_yeu_cau === 'bao_gia') { %>
+                                                                <option value="da_lien_he" <%= item.trang_thai === 'da_lien_he' ? 'selected' : '' %>>Đã liên hệ</option>
                                                             <% } else { %>
-                                                                <p class="empty-state">
-                                                                    <%= group.empty %>
-                                                                </p>
-                                                                <% } %>
-                                                    </div>
-                                                    <% }) %>
-                                            </section>
-                                            <% }) %>
-            </section>
-        </main>
+                                                                <option value="da_xac_nhan" <%= item.trang_thai === 'da_xac_nhan' ? 'selected' : '' %>>Đã xác nhận</option>
+                                                            <% } %>
+                                                            <option value="hoan_tat" <%= item.trang_thai === 'hoan_tat' ? 'selected' : '' %>>Hoàn tất</option>
+                                                            <option value="huy" <%= item.trang_thai === 'huy' ? 'selected' : '' %>>Hủy yêu cầu</option>
+                                                        </select>
+                                                    </label>
+                                                    <label>
+                                                        Ghi chú tiến độ (Nội bộ)
+                                                        <textarea name="ghi_chu_admin" placeholder="Nhập ghi chú (Ví dụ: khách thích trả góp, đã liên lạc nhưng thuê bao...)"><%= item.ghi_chu_admin || '' %></textarea>
+                                                    </label>
+                                                    <button type="submit">Cập nhật</button>
+                                                </form>
+
+                                                <!-- Delete button -->
+                                                <div class="request-bottom-actions">
+                                                    <form action="/admin/yeu-cau/<%= item.loai_yeu_cau === 'lai_thu' ? 'lai-thu' : 'bao-gia' %>/<%= item.id %>/xoa" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa yêu cầu của <%= item.ho_ten %>? Thao tác này sẽ xóa vĩnh viễn dữ liệu!');">
+                                                        <button type="submit" class="danger-button">Xóa yêu cầu</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </article>
+                                    <% }) %>
+                                </div>
+                            <% } else { %>
+                                <p class="empty-state">
+                                    <%= group.empty %>
+                                </p>
+                            <% } %>
+                        </div>
+                    <% }) %>
+                </section>
+            <% }) %>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const headerRows = document.querySelectorAll('.admin-request-header-row');
+
+            headerRows.forEach(row => {
+                row.addEventListener('click', () => {
+                    const reqId = row.getAttribute('data-id');
+                    const reqType = row.getAttribute('data-type');
+                    const reqCard = document.getElementById(`request-card-${reqId}-${reqType}`);
+                    
+                    if (reqCard) {
+                        const isOpening = !reqCard.classList.contains('is-open');
+
+                        // Collapse other open request cards in this section
+                        document.querySelectorAll('.admin-request-card.is-open').forEach(card => {
+                            if (card !== reqCard) {
+                                card.classList.remove('is-open');
+                            }
+                        });
+
+                        if (isOpening) {
+                            reqCard.classList.add('is-open');
+                            // Smooth scroll into view
+                            setTimeout(() => {
+                                reqCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }, 100);
+                        } else {
+                            reqCard.classList.remove('is-open');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 
 </html>
