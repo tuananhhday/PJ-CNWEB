@@ -275,20 +275,25 @@
             <div class="kia-gallery-grid">
                 <% exteriorImages.forEach((image) => { %>
                     <% 
-                      let imgTitle = image.title || car.ten_xe;
+                      let imgTitle = null;
                       let imgDesc = image.desc || null;
                       if (imgDesc && imgDesc.includes('|')) {
                           const parts = imgDesc.split('|').map(p => p.trim());
-                          imgTitle = parts[0] || imgTitle;
+                          imgTitle = parts[0] || null;
                           imgDesc = parts[1] || null;
+                      } else {
+                          imgTitle = imgDesc;
+                          imgDesc = null;
                       }
                     %>
                     <article>
-                        <img src="/images/<%= image.duong_dan_anh %>" alt="<%= imgTitle %>">
+                        <img src="/images/<%= image.duong_dan_anh %>" alt="<%= car.ten_xe %>">
+                        <% if (imgTitle || imgDesc) { %>
                         <div>
-                            <strong><%= imgTitle %></strong>
+                            <% if (imgTitle) { %><strong><%= imgTitle %></strong><% } %>
                             <% if (imgDesc) { %><p><%= imgDesc %></p><% } %>
                         </div>
+                        <% } %>
                     </article>
                 <% }) %>
             </div>
@@ -301,20 +306,25 @@
                 <div class="kia-gallery-grid">
                     <% interiorImages.forEach((image) => { %>
                         <% 
-                          let imgTitle = image.title || car.ten_xe;
+                          let imgTitle = null;
                           let imgDesc = image.desc || null;
                           if (imgDesc && imgDesc.includes('|')) {
                               const parts = imgDesc.split('|').map(p => p.trim());
-                              imgTitle = parts[0] || imgTitle;
+                              imgTitle = parts[0] || null;
                               imgDesc = parts[1] || null;
+                          } else {
+                              imgTitle = imgDesc;
+                              imgDesc = null;
                           }
                         %>
                         <article>
-                            <img src="/images/<%= image.duong_dan_anh %>" alt="<%= imgTitle %>">
+                            <img src="/images/<%= image.duong_dan_anh %>" alt="<%= car.ten_xe %>">
+                            <% if (imgTitle || imgDesc) { %>
                             <div>
-                                <strong><%= imgTitle %></strong>
+                                <% if (imgTitle) { %><strong><%= imgTitle %></strong><% } %>
                                 <% if (imgDesc) { %><p><%= imgDesc %></p><% } %>
                             </div>
+                            <% } %>
                         </article>
                     <% }) %>
                 </div>

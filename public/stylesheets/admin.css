@@ -26,13 +26,13 @@
     font-family: var(--font-title);
     color: var(--text-light);
     font-size: 20px;
-    font-weight: 800;
+    font-weight: 700;
     margin-bottom: 40px;
     display: flex;
     align-items: center;
     gap: 10px;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.03em;
     border-bottom: 0 !important;
 }
 
@@ -100,8 +100,9 @@
 .admin-heading h1 {
     font-family: var(--font-title);
     font-size: 28px;
-    font-weight: 800;
+    font-weight: 700;
     margin: 0;
+    letter-spacing: -0.015em;
 }
 
 .admin-heading a {
@@ -156,10 +157,11 @@
 .admin-form h2 {
     font-family: var(--font-title);
     font-size: 20px;
-    font-weight: 800;
+    font-weight: 700;
     margin-bottom: 24px;
     padding-bottom: 12px;
     border-bottom: 1px solid var(--border-color);
+    letter-spacing: -0.012em;
 }
 
 .admin-form label,
@@ -167,7 +169,7 @@
     display: grid;
     gap: 8px;
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--text-dark);
     margin-bottom: 16px;
 }
@@ -254,10 +256,11 @@
 .admin-table-wrap h2 {
     font-family: var(--font-title);
     font-size: 20px;
-    font-weight: 800;
+    font-weight: 700;
     margin-bottom: 24px;
     padding-bottom: 12px;
     border-bottom: 1px solid var(--border-color);
+    letter-spacing: -0.012em;
 }
 
 /* Interactive Car Live Editor split columns */

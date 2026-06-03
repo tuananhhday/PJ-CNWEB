@@ -263,24 +263,26 @@
 .featured-copy span {
     font-family: var(--font-title);
     font-size: 13px;
-    font-weight: 800;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     color: var(--primary);
 }
 
 .featured-copy h2 {
     font-family: var(--font-title);
     font-size: clamp(32px, 4vw, 56px);
-    line-height: 1.15;
+    line-height: 1.1;
     margin: 12px 0 16px;
-    font-weight: 900;
+    font-weight: 700;
+    letter-spacing: -0.022em;
 }
 
 .featured-copy p {
     color: var(--text-muted);
+    font-family: var(--font-body);
     font-size: 16px;
-    line-height: 1.6;
+    line-height: 1.55;
     margin-bottom: 24px;
 }
 
@@ -288,9 +290,10 @@
     display: block;
     font-family: var(--font-title);
     font-size: 28px;
-    font-weight: 800;
+    font-weight: 700;
     color: var(--accent);
     margin-bottom: 8px;
+    letter-spacing: -0.015em;
 }
 
 .featured-copy em {
@@ -402,17 +405,19 @@
     font-family: var(--font-title);
     color: var(--primary);
     font-size: 12px;
-    font-weight: 800;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     margin-bottom: 8px;
 }
 
 .home-cars-heading h2 {
     font-family: var(--font-title);
     font-size: 36px;
-    font-weight: 800;
+    font-weight: 700;
     margin-bottom: 12px;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
 }
 
 .home-cars-heading span {
@@ -453,7 +458,7 @@
 .home-car-card span {
     font-family: var(--font-title);
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 600;
     text-transform: uppercase;
     color: var(--primary);
 }
@@ -461,8 +466,10 @@
 .home-car-card h3 {
     font-family: var(--font-title);
     font-size: 20px;
-    font-weight: 700;
+    font-weight: 600;
     margin: 6px 0 10px;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
 }
 
 .home-car-card p {
@@ -534,10 +541,11 @@
 .home-news-section h2 {
     font-family: var(--font-title);
     font-size: 20px;
-    font-weight: 800;
+    font-weight: 700;
     margin-bottom: 24px;
     padding-bottom: 12px;
     border-bottom: 2px solid var(--text-dark);
+    letter-spacing: -0.015em;
 }
 
 .home-news-popular, .home-news-side {
@@ -600,10 +608,11 @@
 .home-news-main strong {
     font-family: var(--font-title);
     font-size: 22px;
-    font-weight: 800;
-    line-height: 1.3;
+    font-weight: 700;
+    line-height: 1.25;
     display: block;
     transition: var(--transition-smooth);
+    letter-spacing: -0.015em;
 }
 
 .home-news-main:hover img {

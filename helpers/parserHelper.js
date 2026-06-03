@@ -114,7 +114,14 @@ function parseMultipartForm(req) {
                     return;
                 }
 
-                body[fieldName] = value.toString('utf8');
+                const valStr = value.toString('utf8');
+                if (body[fieldName]) {
+                    body[fieldName] = Array.isArray(body[fieldName])
+                        ? [...body[fieldName], valStr]
+                        : [body[fieldName], valStr];
+                } else {
+                    body[fieldName] = valStr;
+                }
             });
 
             resolve(body);

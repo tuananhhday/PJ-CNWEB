@@ -201,20 +201,12 @@
                                                 </label>
                                             </div>
 
-                                            <div id="add-car-images-exterior"
+                                            <div id="add-car-images-exterior" class="admin-dynamic-upload-block"
                                                 style="display: grid; gap: 16px; margin-bottom: 12px; padding: 16px; background: #f8fafc; border: 1px dashed var(--border-color); border-radius: var(--radius-sm);">
                                                 <label style="margin-bottom: 0;">
                                                     Danh sách ảnh Ngoại thất
-                                                    <input name="anh_ngoai_that" type="file" accept="image/*" multiple>
-                                                    <small>Mẹo: Giữ phím Ctrl (hoặc Cmd) để chọn nhiều ảnh cùng lúc. Để
-                                                        thêm mô tả minh họa chi tiết từng ảnh (giống Ford Raptor), hãy
-                                                        dùng nút bấm "+ Thêm ô ảnh Ngoại thất" bên dưới để nhập ảnh và
-                                                        chữ minh họa độc lập.</small>
-                                                </label>
-                                                <label style="font-weight: normal; margin-top: -4px; margin-bottom: 0;">
-                                                    Chữ minh họa / chú thích (Ngoại thất)
-                                                    <input name="chu_thich_ngoai_that" type="text"
-                                                        placeholder="Nhập mô tả minh họa cho ảnh ngoại thất...">
+                                                    <input name="anh_ngoai_that" type="file" accept="image/*" multiple onchange="handleFileSelectPreview(this)">
+                                                    <small>Mẹo: Chọn ảnh để xem trước và nhập chú thích của từng ảnh ngay lập tức.</small>
                                                 </label>
                                             </div>
                                             <button type="button" class="btn secondary"
@@ -222,20 +214,12 @@
                                                 onclick="addFileInput('add-car-images-exterior', 'anh_ngoai_that', 'Ảnh ngoại thất')">+
                                                 Thêm ô ảnh Ngoại thất</button>
 
-                                            <div id="add-car-images-interior"
+                                            <div id="add-car-images-interior" class="admin-dynamic-upload-block"
                                                 style="display: grid; gap: 16px; margin-bottom: 12px; padding: 16px; background: #f8fafc; border: 1px dashed var(--border-color); border-radius: var(--radius-sm);">
                                                 <label style="margin-bottom: 0;">
                                                     Danh sách ảnh Nội thất
-                                                    <input name="anh_noi_that" type="file" accept="image/*" multiple>
-                                                    <small>Mẹo: Giữ phím Ctrl (hoặc Cmd) để chọn nhiều ảnh cùng lúc. Để
-                                                        thêm mô tả minh họa chi tiết từng ảnh (giống Ford Raptor), hãy
-                                                        dùng nút bấm "+ Thêm ô ảnh Nội thất" bên dưới để nhập ảnh và chữ
-                                                        minh họa độc lập.</small>
-                                                </label>
-                                                <label style="font-weight: normal; margin-top: -4px; margin-bottom: 0;">
-                                                    Chữ minh họa / chú thích (Nội thất)
-                                                    <input name="chu_thich_noi_that" type="text"
-                                                        placeholder="Nhập mô tả minh họa cho ảnh nội thất...">
+                                                    <input name="anh_noi_that" type="file" accept="image/*" multiple onchange="handleFileSelectPreview(this)">
+                                                    <small>Mẹo: Chọn ảnh để xem trước và nhập chú thích của từng ảnh ngay lập tức.</small>
                                                 </label>
                                             </div>
                                             <button type="button" class="btn secondary"
@@ -681,66 +665,29 @@
                                                                         </div>
                                                                         <% } %>
 
-                                                                            <label class="admin-checkbox"
-                                                                                style="margin-bottom: 20px;">
-                                                                                <input name="replace_images"
-                                                                                    type="checkbox">
-                                                                                <span
-                                                                                    style="color: var(--danger-color); font-weight: 700;">Xóa
-                                                                                    hết ảnh gallery hiện tại và tải lại
-                                                                                    từ đầu
-                                                                                    (Nội thất & Ngoại thất)</span>
-                                                                            </label>
-
-                                                                            <div id="edit-car-images-exterior-<%= car.id %>"
+                                                                                                                                                <div id="edit-car-images-exterior-<%= car.id %>" class="admin-dynamic-upload-block"
                                                                                 style="display: grid; gap: 16px; margin-bottom: 12px; padding: 16px; background: #f8fafc; border: 1px dashed var(--border-color); border-radius: var(--radius-sm);">
                                                                                 <label style="margin-bottom: 0;">
                                                                                     Bổ sung ảnh Ngoại thất
                                                                                     <input name="anh_ngoai_that"
                                                                                         type="file" accept="image/*"
-                                                                                        multiple>
-                                                                                    <small>Mẹo: Để bổ sung ảnh Ngoại
-                                                                                        thất có chữ
-                                                                                        minh họa chi tiết, hãy dùng nút
-                                                                                        "+ Thêm
-                                                                                        ô ảnh Ngoại thất" bên
-                                                                                        dưới.</small>
-                                                                                </label>
-                                                                                <label
-                                                                                    style="font-weight: normal; margin-top: -4px; margin-bottom: 0;">
-                                                                                    Chữ minh họa / chú thích (Ngoại thất
-                                                                                    mới)
-                                                                                    <input name="chu_thich_ngoai_that"
-                                                                                        type="text"
-                                                                                        placeholder="Nhập mô tả minh họa cho ảnh ngoại thất...">
+                                                                                        multiple onchange="handleFileSelectPreview(this)">
+                                                                                    <small>Mẹo: Chọn ảnh để xem trước và nhập chú thích của từng ảnh ngay lập tức.</small>
                                                                                 </label>
                                                                             </div>
                                                                             <button type="button" class="btn secondary"
                                                                                 style="width: fit-content; margin-bottom: 24px;"
                                                                                 onclick="addFileInput('edit-car-images-exterior-<%= car.id %>', 'anh_ngoai_that', 'Ảnh ngoại thất')">+
                                                                                 Thêm ô ảnh Ngoại thất</button>
-
-                                                                            <div id="edit-car-images-interior-<%= car.id %>"
+ 
+                                                                            <div id="edit-car-images-interior-<%= car.id %>" class="admin-dynamic-upload-block"
                                                                                 style="display: grid; gap: 16px; margin-bottom: 12px; padding: 16px; background: #f8fafc; border: 1px dashed var(--border-color); border-radius: var(--radius-sm);">
                                                                                 <label style="margin-bottom: 0;">
                                                                                     Bổ sung ảnh Nội thất
                                                                                     <input name="anh_noi_that"
                                                                                         type="file" accept="image/*"
-                                                                                        multiple>
-                                                                                    <small>Mẹo: Để bổ sung ảnh Nội thất
-                                                                                        có chữ
-                                                                                        minh họa chi tiết, hãy dùng nút
-                                                                                        "+ Thêm
-                                                                                        ô ảnh Nội thất" bên
-                                                                                        dưới.</small>
-                                                                                </label>
-                                                                                <label
-                                                                                    style="font-weight: normal; margin-top: -4px; margin-bottom: 0;">
-                                                                                    Chữ minh họa / chú thích (Nội thất
-                                                                                    mới)
-                                                                                    <input name="chu_thich_noi_that"
-                                                                                        type="text"
-                                                                                        placeholder="Nhập mô tả minh họa cho ảnh nội thất...">
+                                                                                        multiple onchange="handleFileSelectPreview(this)">
+                                                                                    <small>Mẹo: Chọn ảnh để xem trước và nhập chú thích của từng ảnh ngay lập tức.</small>
                                                                                 </label>
                                                                             </div>
                                                                             <button type="button" class="btn secondary"
@@ -1023,34 +970,57 @@
         </div>
 
         <script>
+            function handleFileSelectPreview(input) {
+                const name = input.name;
+                if (name !== 'anh_ngoai_that' && name !== 'anh_noi_that') return;
+
+                const parent = input.closest('.admin-dynamic-upload-block') || input.parentElement;
+                if (!parent) return;
+
+                // Find or create preview wrapper
+                let previewWrapper = parent.querySelector('.dynamic-image-preview-wrapper');
+                if (!previewWrapper) {
+                    previewWrapper = document.createElement('div');
+                    previewWrapper.className = 'dynamic-image-preview-wrapper';
+                    previewWrapper.style.cssText = 'display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; width: 100%;';
+                    parent.appendChild(previewWrapper);
+                }
+                previewWrapper.innerHTML = ''; // Clear previous previews
+
+                const files = input.files;
+                if (!files || !files.length) return;
+
+                const captionName = name === 'anh_ngoai_that' ? 'chu_thich_ngoai_that' : 'chu_thich_noi_that';
+
+                Array.from(files).forEach((file) => {
+                    const objectUrl = URL.createObjectURL(file);
+
+                    const thumbCard = document.createElement('div');
+                    thumbCard.className = 'thumb-card-item';
+                    thumbCard.style.cssText = 'display: flex; flex-direction: column; gap: 6px; width: 140px; margin-top: 8px;';
+
+                    thumbCard.innerHTML = `
+                        <div class="thumb-container" style="width: 140px; height: 90px; margin: 0; position: relative; border-radius: var(--radius-sm); border: 1px solid var(--border-color); overflow: hidden; background: #ffffff;">
+                            <img src="${objectUrl}" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <input name="${captionName}" type="text" placeholder="Thêm chú thích..." style="font-size: 11px; height: 28px; padding: 0 8px; width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-surface-soft);" title="Chú thích ảnh">
+                    `;
+                    previewWrapper.appendChild(thumbCard);
+                });
+            }
+
             function addFileInput(containerId, inputName = 'danh_sach_anh', labelText = 'Ảnh khác') {
                 const container = document.getElementById(containerId);
 
                 // Create wrapper block for clean spacing
                 const wrapper = document.createElement('div');
                 wrapper.className = 'admin-dynamic-upload-block';
-                wrapper.style.display = 'grid';
-                wrapper.style.gap = '8px';
-                wrapper.style.padding = '12px';
-                wrapper.style.background = '#f8fafc';
-                wrapper.style.border = '1px dashed var(--border-color)';
-                wrapper.style.borderRadius = 'var(--radius-sm)';
-                wrapper.style.marginTop = '8px';
-                wrapper.style.marginBottom = '8px';
+                wrapper.style.cssText = 'display: grid; gap: 8px; padding: 12px; background: #f8fafc; border: 1px dashed var(--border-color); border-radius: var(--radius-sm); margin-top: 8px; margin-bottom: 8px;';
 
                 const fileLabel = document.createElement('label');
                 fileLabel.style.margin = '0';
-                fileLabel.innerHTML = `${labelText} <input name="${inputName}" type="file" accept="image/*" multiple>`;
+                fileLabel.innerHTML = `${labelText} <input name="${inputName}" type="file" accept="image/*" multiple onchange="handleFileSelectPreview(this)">`;
                 wrapper.appendChild(fileLabel);
-
-                if (inputName === 'anh_ngoai_that' || inputName === 'anh_noi_that') {
-                    const captionInputName = inputName === 'anh_ngoai_that' ? 'chu_thich_ngoai_that' : 'chu_thich_noi_that';
-                    const captionLabel = document.createElement('label');
-                    captionLabel.style.margin = '0';
-                    captionLabel.style.fontWeight = 'normal';
-                    captionLabel.innerHTML = `Chữ minh họa / chú thích cho ảnh trên <input name="${captionInputName}" type="text" placeholder="Nhập mô tả minh họa..." style="margin-top: 4px;">`;
-                    wrapper.appendChild(captionLabel);
-                }
 
                 container.appendChild(wrapper);
             }

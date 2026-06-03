@@ -26,32 +26,35 @@
     color: var(--primary);
     font-family: var(--font-title);
     font-size: 13px;
-    font-weight: 800;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
 }
 
 .kia-product-copy h1 {
     font-family: var(--font-title);
-    font-size: clamp(32px, 5vw, 64px);
+    font-size: clamp(36px, 5.5vw, 60px);
     line-height: 1.1;
-    font-weight: 900;
+    font-weight: 700;
     color: var(--text-dark);
-    margin: 12px 0 16px;
+    margin: 10px 0 16px;
+    letter-spacing: -0.022em;
 }
 
 .kia-product-copy p {
     color: var(--text-muted);
-    font-size: 16px;
-    line-height: 1.6;
+    font-family: var(--font-body);
+    font-size: 19px;
+    line-height: 1.55;
     margin-bottom: 24px;
+    font-weight: 400;
 }
 
 .kia-product-copy small {
     display: block;
     color: var(--text-muted);
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 500;
     margin-bottom: 4px;
 }
 
@@ -59,9 +62,10 @@
     display: block;
     font-family: var(--font-title);
     font-size: 32px;
-    font-weight: 800;
+    font-weight: 700;
     color: var(--accent);
     margin-bottom: 32px;
+    letter-spacing: -0.015em;
 }
 
 .kia-product-actions {
@@ -290,10 +294,11 @@
 .kia-overview h2 {
     font-family: var(--font-title);
     font-size: 32px;
-    font-weight: 800;
+    font-weight: 700;
     margin-bottom: 16px;
     position: relative;
     z-index: 1;
+    letter-spacing: -0.015em;
 }
 
 .kia-overview p {
@@ -468,16 +473,18 @@
 .feature-showcase-content h3 {
     font-family: var(--font-title);
     font-size: 24px;
-    font-weight: 800;
+    font-weight: 700;
     color: var(--text-dark);
     margin-bottom: 12px;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
 }
 
 .feature-showcase-content p {
     font-family: var(--font-body);
     font-size: 15px;
     color: var(--text-muted);
-    line-height: 1.65;
+    line-height: 1.6;
 }
 
 /* Section Headings */
@@ -490,17 +497,19 @@
 .kia-section-heading p {
     font-family: var(--font-title);
     color: var(--primary);
-    font-size: 12px;
-    font-weight: 800;
+    font-size: 13px;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     margin-bottom: 8px;
 }
 
 .kia-section-heading h2 {
     font-family: var(--font-title);
-    font-size: 28px;
-    font-weight: 800;
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.15;
 }
 
 /* Gallery and tabs styles */

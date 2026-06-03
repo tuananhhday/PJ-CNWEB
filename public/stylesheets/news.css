@@ -56,11 +56,12 @@
 .magazine-news-item h2 {
     font-family: var(--font-title);
     font-size: 24px;
-    font-weight: 800;
+    font-weight: 700;
     margin: 0 0 12px;
     line-height: 1.25;
     color: var(--text-dark);
     transition: var(--transition-smooth);
+    letter-spacing: -0.015em;
 }
 
 .magazine-news-item h2 a:hover {
@@ -107,10 +108,11 @@
 .magazine-news-sidebar h3 {
     font-family: var(--font-title);
     font-size: 18px;
-    font-weight: 800;
+    font-weight: 700;
     margin-bottom: 24px;
     padding-bottom: 12px;
     border-bottom: 2px solid var(--text-dark);
+    letter-spacing: -0.01em;
 }
 
 .magazine-sidebar-card {
@@ -176,10 +178,11 @@
 .news-article-detail h1 {
     font-family: var(--font-title);
     font-size: clamp(28px, 4.5vw, 48px);
-    font-weight: 900;
-    line-height: 1.2;
+    font-weight: 700;
+    line-height: 1.15;
     color: var(--text-dark);
     margin: 0;
+    letter-spacing: -0.022em;
 }
 
 .news-article-detail .post-detail-image {
@@ -191,9 +194,10 @@
 }
 
 .news-article-detail .post-body {
+    font-family: var(--font-body);
     font-size: 16px;
-    line-height: 1.8;
-    color: #334155;
+    line-height: 1.7;
+    color: #1e293b;
     display: grid;
     gap: 20px;
 }
