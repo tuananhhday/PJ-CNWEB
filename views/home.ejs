@@ -7,18 +7,21 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/stylesheets/base.css">
+    <link rel="stylesheet" href="/stylesheets/base.css?v=public-nav-mobile-20260603">
     <link rel="stylesheet" href="/stylesheets/home.css">
 </head>
 <body class="home-landing">
 <%- include('partials/site-nav') %>
 
 <main id="main-content">
+    <%# Hero/panel trang chủ: lấy danh sách panel từ admin, hỗ trợ cả ảnh và video. %>
     <section class="front-panel" aria-label="Showroom ô tô Double Anh">
+        <%# displayPanels là dữ liệu đã lọc để tránh lỗi khi panels rỗng hoặc chưa được truyền vào view. %>
         <% const displayPanels = panels && panels.length ? panels : []; %>
 
         <% if (displayPanels.length) { %>
             <% displayPanels.forEach((panel, index) => { %>
+                <%# Chuẩn hóa đường dẫn panel: nếu là URL đầy đủ thì dùng luôn, nếu là tên file thì lấy từ /images. %>
                 <% const panelImage = panel.duong_dan_anh || 'no-car.jpg'; %>
                 <% const panelImageSrc = /^https?:\/\//i.test(panelImage) || panelImage.startsWith('/') ? panelImage : '/images/' + panelImage; %>
                 <% const isVideo = /\.(mp4|webm|ogg|mov)$/i.test(panelImage); %>
@@ -62,8 +65,10 @@
         <% } %>
     </section>
 
+    <%# Khu xe nổi bật: render tab theo loại xe và để home.js xử lý chuyển xe trong từng nhóm. %>
     <section class="featured-cars" aria-label="Thông tin xe nổi bật">
         <% const carList = cars && cars.length ? cars : []; %>
+        <%# carTypes được tạo từ danh sách xe để số lượng tab luôn khớp dữ liệu thật trong database. %>
         <% const carTypes = []; %>
         <% carList.forEach((car) => { %>
             <% const typeName = car.ten_loai || 'Khác'; %>
@@ -82,6 +87,7 @@
 
             <div class="featured-stage">
                 <% carList.forEach((car, index) => { %>
+                    <%# Mỗi featured-car giữ data-feature-type để JS lọc theo tab loại xe. %>
                     <% const featureType = car.ten_loai || 'Khác'; %>
                     <% const carUrl = '/xe/' + (car.duong_dan || car.id); %>
                     <article class="featured-car <%= index === 0 ? 'is-active' : '' %>" data-feature-car data-feature-type="<%= featureType %>">
@@ -135,6 +141,7 @@
         <% } %>
     </section>
 
+    <%# Danh sách xe đầy đủ: hiển thị toàn bộ xe đang có, mỗi card dẫn về trang chi tiết theo slug/id. %>
     <section class="home-cars" aria-label="Danh sách xe của showroom">
         <div class="home-cars-heading">
             <p>Danh sách xe</p>
@@ -166,7 +173,7 @@
         </div>
     </section>
 
-    <!-- Why Choose Us / Services Section -->
+    <%# Khối dịch vụ nổi bật: giới thiệu các lợi ích showroom cung cấp cho khách mua xe. %>
     <section class="home-features-section" aria-label="Dịch vụ nổi bật">
         <div class="features-heading">
             <p>Tiện ích & Dịch vụ</p>
@@ -224,6 +231,7 @@
         </div>
     </section>
 
+    <%# CSS riêng cho cụm tin tức trang chủ; giữ inline vì hiện tại dự án đã quay lại trước bước tách file. %>
     <style>
         /* Scoped styling to fix distorted images in the homepage news section */
         .home-news-section {
@@ -520,20 +528,20 @@
         }
     </style>
 
+    <%# Khối tin tức trang chủ: chia bài viết thành xem nhiều, tin mới và tin khác. %>
     <section class="home-news-section" aria-label="Tin tức showroom">
         <% 
         const homePosts = posts && posts.length ? posts : [];
         
-        // 1. Center post: newest post overall (index 0)
+        // Bài đầu tiên được xem là tin mới nhất; các bài còn lại dùng để lấp khu xem nhiều/tin khác.
         const mainPost = homePosts.length ? homePosts[0] : null;
         const otherPosts = homePosts.slice(1);
         
-        // 2. Initial selection based on user flags (excluding mainPost since it's from otherPosts)
+        // Ưu tiên cờ cấu hình từ admin: xem_nhieu cho cột trái, hien_sidebar cho cột phải.
         let popularPosts = otherPosts.filter(p => Number(p.xem_nhieu)).slice(0, 4);
         let sidePosts = otherPosts.filter(p => Number(p.hien_sidebar)).slice(0, 3);
         
-        // 3. Fallback filling to show old posts and prevent them from disappearing:
-        // Fill popularPosts (up to 4) preferring posts not already in sidePosts
+        // Fallback: tự lấp đủ cột xem nhiều để bài cũ không biến mất khi admin chưa gắn cờ.
         for (const post of otherPosts) {
             if (popularPosts.length >= 4) break;
             if (popularPosts.some(x => x.id === post.id)) continue;
@@ -541,7 +549,7 @@
                 popularPosts.push(post);
             }
         }
-        // Fill remaining popularPosts slots with any other remaining posts
+        // Nếu vẫn thiếu, lấy thêm bất kỳ bài còn lại chưa trùng.
         for (const post of otherPosts) {
             if (popularPosts.length >= 4) break;
             if (!popularPosts.some(x => x.id === post.id)) {
@@ -549,7 +557,7 @@
             }
         }
         
-        // Fill sidePosts (up to 3) preferring posts not already in popularPosts
+        // Lấp cột tin khác, ưu tiên bài chưa xuất hiện ở cột xem nhiều.
         for (const post of otherPosts) {
             if (sidePosts.length >= 3) break;
             if (sidePosts.some(x => x.id === post.id)) continue;
@@ -557,7 +565,7 @@
                 sidePosts.push(post);
             }
         }
-        // Fill remaining sidePosts slots with any other remaining posts
+        // Nếu vẫn thiếu, lấy thêm bài còn lại để layout không bị trống.
         for (const post of otherPosts) {
             if (sidePosts.length >= 3) break;
             if (!sidePosts.some(x => x.id === post.id)) {

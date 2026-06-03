@@ -36,15 +36,15 @@ body.home-landing {
 }
 
 .home-landing .site-nav {
-    height: 90px;
+    height: 100px;
     max-width: 1280px;
     padding: 0 26px;
 }
 
 .home-landing .brand-mark {
-    min-width: 220px;
-    height: 90px;
-    padding: 6px 12px;
+    min-width: 240px;
+    height: 96px;
+    padding: 2px 6px;
     border: 0;
     outline: 0;
     background: transparent;
@@ -343,10 +343,10 @@ img {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 180px; /* TÄƒng kÃ­ch thÆ°á»›c logo á»Ÿ trang con */
-    height: 75px;
-    flex: 0 0 180px;
-    padding: 6px 10px;
+    width: 196px; /* Logo dùng ảnh nền trong suốt, tăng kích thước nhưng giữ nền header sạch. */
+    height: 80px;
+    flex: 0 0 196px;
+    padding: 2px 6px;
     border-radius: 12px; /* TÄƒng Ä‘á»™ bo trÃ²n */
     background: transparent;
 }
@@ -355,8 +355,8 @@ img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    mix-blend-mode: multiply; /* HÃ²a trá»™n Ä‘á»ƒ xÃ³a ná»n tráº¯ng */
-    filter: contrast(1.5) brightness(1.1); /* Ã‰p ná»n Ä‘á»¥c/xÃ¡m cá»§a áº£nh thÃ nh tráº¯ng tinh Ä‘á»ƒ xÃ³a sáº¡ch dáº¥u váº¿t */
+    mix-blend-mode: normal;
+    filter: drop-shadow(0 2px 5px rgba(15, 23, 42, 0.12));
 }
 
 .nav-menu {
@@ -3252,7 +3252,7 @@ body {
 }
 
 .site-nav {
-    height: 76px;
+    height: 88px;
     max-width: 1320px;
     gap: clamp(14px, 2vw, 28px);
 }
@@ -3783,9 +3783,11 @@ body {
 
 @media (max-width: 620px) {
     .brand-mark {
-        width: 132px;
-        height: 56px;
-        flex-basis: 132px;
+        width: 144px;
+        height: 60px;
+        flex-basis: 144px;
+        padding: 2px 4px;
+        background: transparent;
     }
 
     .front-panel {

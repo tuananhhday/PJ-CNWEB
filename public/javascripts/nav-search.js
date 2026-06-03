@@ -1,3 +1,5 @@
+// JS điều hướng dùng chung: xử lý menu mobile, lớp nền đóng menu, ô tìm kiếm nhanh và mega menu.
+// File này được dùng trên nhiều trang public nên cần giữ tương thích với trang chủ, danh sách xe và chi tiết xe.
 document.addEventListener('DOMContentLoaded', () => {
     // ── Mobile Navigation Drawer ──
     const navToggle = document.querySelector('.nav-toggle');
@@ -69,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchWrapper = document.getElementById('nav-search-wrapper');
     if (!searchWrapper) return;
 
+    // Khối tìm kiếm trên thanh điều hướng: mở overlay, nhập từ khóa và hiển thị kết quả xe từ API.
     const searchTrigger = document.getElementById('nav-search-trigger');
     const searchOverlay = document.getElementById('nav-search-overlay');
     const searchInput = document.getElementById('nav-search-input');
@@ -76,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchClose = document.getElementById('nav-search-close');
     let debounceTimer;
 
+    // Chuẩn hóa đường dẫn ảnh để kết quả tìm kiếm luôn có ảnh, kể cả khi dữ liệu chỉ lưu tên file.
     function getImageSrc(imagePath) {
         if (!imagePath) return '/images/no-car.jpg';
         if (/^https?:\/\//i.test(imagePath) || imagePath.startsWith('/')) return imagePath;
@@ -119,6 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Live search input handler
+    // Chờ 200ms sau khi người dùng dừng gõ rồi mới gọi API, tránh gửi quá nhiều request liên tục.
     searchInput.addEventListener('input', (event) => {
         const query = event.target.value.trim();
         clearTimeout(debounceTimer);
@@ -160,6 +165,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Mega Menu Hover / Tab Switch logic
+    // Khối mega menu: rê chuột qua loại xe thì nhóm xe preview bên phải đổi theo loại đó.
+    // Click vẫn giữ nhiệm vụ chuyển sang trang danh sách xe theo loại.
     const megaTypeBtns = document.querySelectorAll('.mega-type-item-btn');
     const megaCarGroups = document.querySelectorAll('.mega-cars-grid-group');
 

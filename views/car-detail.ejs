@@ -7,14 +7,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/stylesheets/base.css">
+    <link rel="stylesheet" href="/stylesheets/base.css?v=public-nav-mobile-20260603">
     <link rel="stylesheet" href="/stylesheets/showroom.css">
-    <link rel="stylesheet" href="/stylesheets/car-detail.css">
+    <link rel="stylesheet" href="/stylesheets/car-detail.css?v=product-nav-mobile-20260603">
 </head>
 <body>
 <%- include('partials/site-nav') %>
 
 <main class="kia-product-page" id="main-content">
+    <%# Chuẩn bị dữ liệu ảnh và đặc điểm xe trước khi render; có fallback để trang không lỗi khi admin chưa nhập đủ dữ liệu. %>
     <% 
       const galleryImages = images && images.length ? images : [{ duong_dan_anh: car.anh_dai_dien || 'no-car.jpg', nhom_anh: 'chung' }]; 
       const productFeatures = features && features.length ? features : []; 
@@ -30,7 +31,7 @@
           exteriorImages = dbExteriorImages;
           interiorImages = dbInteriorImages;
       } else {
-          // Fallback to legacy split or feature-based logic
+          // Fallback: nếu database chưa chia ảnh nội/ngoại thất thì tự tách từ feature hoặc chia đôi gallery.
           const exteriorFeatures = productFeatures.filter((feature) => String(feature.nhom || '').toLowerCase().includes('ngoai'));
           const interiorFeatures = productFeatures.filter((feature) => {
               const nh = String(feature.nhom || '').toLowerCase();
@@ -47,6 +48,7 @@
               : galleryImages.slice(galleryMid).map((image) => ({ duong_dan_anh: image.duong_dan_anh, title: car.ten_xe, desc: 'Ảnh nội thất' }));
       }
     %>
+    <%# Chuẩn bị bộ ảnh 360 mặc định: ưu tiên bộ ảnh được gắn với xe, sau đó kiểm tra màu xe có bộ 360 riêng hay không. %>
     <% 
       let defaultRotateFrames = (rotateImages || []).filter(img => img.nhom_360 === 'chung').map(img => img.duong_dan_anh);
       if (car.anh_360 && typeof bo360SetsMap !== 'undefined' && bo360SetsMap) {
@@ -59,6 +61,7 @@
       const hasAny360 = rotateFrameUrls.length > 0 || (colors && colors.some(c => c.anh_360)); 
     %>
 
+    <%# Hero sản phẩm: hiển thị tên xe, mô tả ngắn, giá và các nút báo giá/lái thử/brochure. %>
     <section class="kia-product-hero">
         <div class="kia-product-copy">
             <span><%= car.ten_loai %></span>
@@ -77,6 +80,7 @@
         <img id="detail-hero-image" src="/images/<%= heroImage %>" alt="<%= car.ten_xe %>">
     </section>
 
+    <%# Dải phiên bản: nếu có variants từ database thì dẫn sang từng phiên bản, nếu không thì tách từ chuỗi phien_ban. %>
     <section class="kia-variant-strip" aria-label="Phiên bản">
         <% if (locals.variants && variants.length > 1) { %>
             <% variants.forEach((variant) => { %>
@@ -101,6 +105,7 @@
         <% } %>
     </section>
 
+    <%# Khu chọn màu: mỗi nút màu có ảnh preview, giá cộng thêm và dữ liệu frame 360 nếu có. %>
     <section class="kia-product-section" id="mau-sac" style="margin-bottom: 24px;">
         <div class="kia-section-heading" style="margin-bottom: 20px;">
             <p>Màu sắc</p>
@@ -115,12 +120,12 @@
                     <% 
                       let color360Attr = '';
                       if (color.anh_360 && bo360SetsMap) {
-                          // Try lookup by ID first, then by name
+                          // Tìm bộ 360 theo ID trước, nếu không có thì thử theo tên để tương thích dữ liệu cũ.
                           const set360 = bo360SetsMap[String(color.anh_360)] || bo360SetsMap[color.anh_360] || null;
                           if (set360 && set360.danh_sach_anh) {
-                              color360Attr = set360.danh_sach_anh; // comma-separated filenames
+                              color360Attr = set360.danh_sach_anh; // Chuỗi tên file phân cách bằng dấu phẩy.
                           } else {
-                              // Fallback: old system using anh_xe_360 table grouped by nhom_360
+                              // Fallback dữ liệu cũ: lấy frame từ bảng anh_xe_360 theo nhom_360.
                               const colorFrames = (rotateImages || []).filter(img => img.nhom_360 === color.anh_360).map(img => img.duong_dan_anh);
                               color360Attr = colorFrames.join(', ');
                           }
@@ -140,6 +145,7 @@
         </div>
     </section>
 
+    <%# Xác định ảnh đầu tiên cho viewer 360: ưu tiên frame mặc định, sau đó tới màu đầu tiên có bộ 360. %>
     <% 
       let initial360Image = '/images/no-car.jpg';
       if (rotateFrameUrls.length) {
@@ -158,6 +164,7 @@
           }
       }
     %>
+    <%# Viewer 360 chỉ render khi xe hoặc màu xe có dữ liệu ảnh 360. %>
     <% if (hasAny360) { %>
         <section class="kia-product-section kia-product-360" id="anh-360" style="margin-bottom: 24px; padding: 24px;">
             <div class="viewer-360 <%= (rotateFrameUrls.length > 1 || (colors && colors.some(c => c.anh_360))) ? 'is-ready' : 'is-static-color' %>" id="car-360-viewer">
@@ -169,6 +176,7 @@
         </section>
     <% } %>
 
+    <%# Tab neo trong trang: giúp khách nhảy nhanh tới 360, thư viện, thông số, màu sắc, ebook/brochure. %>
     <nav class="kia-product-tabs" aria-label="Điều hướng chi tiết xe">
         <a href="#dac-diem">Đặc điểm nổi bật</a>
         <% if (hasAny360) { %><a href="#anh-360">Ảnh 360</a><% } %>
@@ -179,6 +187,7 @@
         <% if (car.brochure_url) { %><a href="<%= car.brochure_url %>" target="_blank" rel="noreferrer">E Brochure</a><% } %>
     </nav>
 
+    <%# Tổng quan xe: đoạn mô tả dài và ảnh đại diện chính. %>
     <section class="kia-product-section kia-overview" id="dac-diem">
         <div>
             <span class="overview-watermark"><%= (car.ten_xe || '').slice(0, 1) %></span>
@@ -188,6 +197,7 @@
         <img src="/images/<%= heroImage %>" alt="<%= car.ten_xe %>">
     </section>
 
+    <%# Đặc điểm nổi bật: nhóm feature theo loại nội thất, ngoại thất, vận hành, an toàn để render dạng showcase. %>
     <% if (productFeatures.length) { %>
         <% 
           const getNormalizedGroupName = (rawName) => {
@@ -200,7 +210,7 @@
               return rawName || 'Đặc điểm';
           };
 
-          // Group features by normalized group name
+          // Gom đặc điểm theo nhóm đã chuẩn hóa để tab/panel hiển thị ổn định dù tên nhóm trong admin khác nhau.
           const featuresGrouped = {};
           productFeatures.forEach((feature) => {
               const groupName = getNormalizedGroupName(feature.nhom);
@@ -245,7 +255,7 @@
                             <% }) %>
                         </div>
                         
-                        <!-- Right Side: Showcased dynamic image and description -->
+                        <%# Khung preview bên phải: hiển thị ảnh và mô tả của đặc điểm đang chọn. %>
                         <div class="feature-showcase-view">
                             <% const firstFeature = featuresGrouped[groupName][0]; %>
                             <div class="feature-image-wrapper">
@@ -262,6 +272,7 @@
         </section>
     <% } %>
 
+    <%# Thư viện ảnh: chia ngoại thất/nội thất, mô tả ảnh có thể dùng định dạng "Tiêu đề | Mô tả". %>
     <section class="kia-product-section" id="thu-vien">
         <div class="kia-section-heading">
             <p>Thư viện hình ảnh</p>
@@ -343,7 +354,7 @@
         </div>
 
         <%
-          // Build basic info items from car fields
+          // Tạo danh sách thông số cơ bản từ các trường chính của bảng xe.
           const fuelMap = { xang: 'Xăng', dau: 'Dầu Diesel', dien: 'Điện', hybrid: 'Hybrid' };
           const basicSpecItems = [];
           if (car.dong_co) basicSpecItems.push({ label: 'Động cơ', value: car.dong_co });
@@ -354,7 +365,7 @@
           if (car.bao_hanh) basicSpecItems.push({ label: 'Bảo hành', value: car.bao_hanh });
           if (car.nam_san_xuat) basicSpecItems.push({ label: 'Năm sản xuất', value: String(car.nam_san_xuat) });
 
-          // Group specs into sections
+          // Gom thông số admin nhập thành từng section; __SECTION__ là tiêu đề nhóm, __BULLET__ là dòng gạch đầu dòng.
           const specSections = [];
           let currentSection = null;
           (specs || []).forEach((spec) => {
@@ -372,7 +383,7 @@
         %>
 
         <div class="spec-accordion">
-            <%# Always show basic info section first if there's any data %>
+            <%# Luôn hiển thị nhóm thông tin cơ bản trước nếu xe có dữ liệu. %>
             <% if (basicSpecItems.length) { %>
             <div class="spec-accordion-item is-open" data-spec-section>
                 <button class="spec-accordion-header" type="button" aria-expanded="true">
@@ -392,7 +403,7 @@
             </div>
             <% } %>
 
-            <%# Render sections from admin-entered specs %>
+            <%# Render các nhóm thông số do admin nhập trong form quản lý xe. %>
             <% specSections.forEach((section, sIndex) => { %>
             <div class="spec-accordion-item is-open" data-spec-section>
                 <% if (section.title) { %>
@@ -426,6 +437,7 @@
         </div>
     </section>
 
+    <%# E Book chỉ hiển thị khi admin có nhập đường dẫn ebook cho xe. %>
     <% if (car.ebook_url) { %>
         <section class="kia-product-section kia-ebook" id="ebook">
             <h2>E Book</h2>
@@ -437,12 +449,13 @@
 <%- include('partials/site-footer') %>
 <script src="/javascripts/nav-search.js"></script>
 <script>
+    // Truyền danh sách frame 360 từ EJS sang car-detail.js.
     window.car360Frames = <%- JSON.stringify(rotateFrameUrls) %>;
     window.defaultCar360Frames = <%- JSON.stringify(rotateFrameUrls) %>;
 </script>
 <script src="/javascripts/car-detail.js"></script>
 <script>
-    // Tab switching for image gallery
+    // Chuyển tab thư viện ảnh ngoại thất/nội thất.
     document.querySelectorAll('[data-gallery-tab]').forEach((button) => {
         button.addEventListener('click', () => {
             const target = button.dataset.galleryTab;
@@ -453,7 +466,7 @@
         });
     });
 
-    // Swatches selection for colors
+    // Chọn màu xe: đổi ảnh preview, ảnh hero, giá và bộ frame 360 tương ứng.
     document.querySelectorAll('[data-color-image]').forEach((button) => {
         button.addEventListener('click', () => {
             const preview = document.querySelector('[data-color-preview]');
@@ -463,10 +476,10 @@
             const colorImg = button.dataset.colorImage;
             const priceAdded = Number(button.dataset.colorPriceAdded || 0);
 
-            // Update color section preview image
+            // Cập nhật ảnh preview trong khu màu sắc.
             if (preview && colorImg) preview.src = colorImg;
             
-            // Update top hero page main image with a smooth opacity fade
+            // Cập nhật ảnh hero phía trên với hiệu ứng mờ nhẹ.
             if (heroImage && colorImg) {
                 heroImage.style.opacity = '0';
                 setTimeout(() => {
@@ -475,14 +488,14 @@
                 }, 150);
             }
 
-            // Update top hero page price tag (Base Price + Selected Color Added Price)
+            // Cập nhật giá theo công thức giá gốc + giá cộng thêm của màu.
             if (priceTag) {
                 const basePrice = Number(priceTag.dataset.basePrice || 0);
                 const totalPrice = basePrice + priceAdded;
                 priceTag.textContent = totalPrice.toLocaleString('vi-VN') + ' VND';
             }
 
-            // Update 360-degree rotation frames if this color has specific 360 frames
+            // Nếu màu có bộ ảnh 360 riêng thì nạp bộ đó, không có thì quay về bộ mặc định của xe.
             const color360Raw = button.dataset.color360 || '';
             if (window.update360Frames) {
                 if (color360Raw.trim()) {
@@ -497,7 +510,7 @@
         });
     });
 
-    // On load, if active color swatch has specific 360 frames, load them
+    // Khi tải trang, nếu màu đang active có bộ 360 riêng thì nạp ngay để viewer hiển thị đúng.
     const activeColorBtn = document.querySelector('[data-color-image].is-active');
     if (activeColorBtn && activeColorBtn.dataset.color360 && window.update360Frames) {
         const frames = activeColorBtn.dataset.color360.split(',').map(f => '/images/' + f.trim()).filter(Boolean);
@@ -506,7 +519,7 @@
         }
     }
 
-    // Interactive Variant Selection
+    // Chọn phiên bản xe: cập nhật active card, ảnh hero và tiêu đề nếu phiên bản không phải link sang trang khác.
     const variantCards = document.querySelectorAll('.variant-card');
     const heroImage = document.getElementById('detail-hero-image');
     const heroTitle = document.getElementById('detail-hero-title');
@@ -514,15 +527,15 @@
 
     variantCards.forEach((card) => {
         card.addEventListener('click', () => {
-            // Remove active class from all version cards
+            // Xóa trạng thái active cũ khỏi toàn bộ card phiên bản.
             variantCards.forEach((c) => c.classList.remove('is-active'));
-            // Add active class to clicked card
+            // Gắn active cho card vừa chọn.
             card.classList.add('is-active');
 
             const versionName = card.dataset.versionName;
             const versionImage = card.dataset.versionImage;
 
-            // Fade out hero image, change src, fade in
+            // Đổi ảnh hero bằng hiệu ứng mờ để thao tác bớt gắt.
             if (heroImage && versionImage) {
                 heroImage.style.opacity = '0';
                 setTimeout(() => {
@@ -531,17 +544,17 @@
                 }, 200);
             }
 
-            // Update title
+            // Cập nhật tiêu đề hero theo phiên bản đang chọn.
             if (heroTitle && versionName) {
                 heroTitle.textContent = `${baseCarName} - ${versionName}`;
             }
 
-            // Smooth scroll to top showcase
+            // Cuộn nhẹ về đầu phần chi tiết để khách thấy thay đổi vừa chọn.
             document.getElementById('main-content').scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
     });
 
-    // Feature Group Tabs switching
+    // Chuyển tab nhóm đặc điểm nổi bật như ngoại thất, nội thất, vận hành, an toàn.
     document.querySelectorAll('[data-feature-group]').forEach((btn) => {
         btn.addEventListener('click', () => {
             const groupName = btn.dataset.featureGroup;
@@ -552,17 +565,17 @@
         });
     });
 
-    // Sub-feature item clicking within each panel
+    // Khi bấm từng đặc điểm con, cập nhật khung preview ảnh/mô tả trong cùng panel.
     document.querySelectorAll('.feature-item-row').forEach((row) => {
         row.addEventListener('click', () => {
             const parentPanel = row.closest('.feature-group-panel');
             if (!parentPanel) return;
 
-            // Toggle active state in row list
+            // Đánh dấu dòng đặc điểm đang được chọn.
             parentPanel.querySelectorAll('.feature-item-row').forEach((r) => r.classList.remove('is-active'));
             row.classList.add('is-active');
 
-            // Select showcase elements in the same panel
+            // Lấy các phần tử preview cùng panel để tránh cập nhật nhầm nhóm khác.
             const showcaseImg = parentPanel.querySelector('.feature-showcase-image');
             const showcaseTitle = parentPanel.querySelector('.feature-showcase-title');
             const showcaseDesc = parentPanel.querySelector('.feature-showcase-desc');
@@ -571,7 +584,7 @@
             const newTitle = row.dataset.featureTitle;
             const newDesc = row.dataset.featureDesc;
 
-            // Transition fade effect
+            // Hiệu ứng mờ khi đổi ảnh preview đặc điểm.
             if (showcaseImg && newImg) {
                 showcaseImg.style.opacity = '0';
                 setTimeout(() => {
@@ -585,7 +598,7 @@
         });
     });
 
-    // Spec Accordion toggle
+    // Accordion thông số kỹ thuật: bấm tiêu đề để mở/đóng từng nhóm thông số.
     document.querySelectorAll('.spec-accordion-header').forEach((header) => {
         header.addEventListener('click', () => {
             const item = header.closest('.spec-accordion-item');

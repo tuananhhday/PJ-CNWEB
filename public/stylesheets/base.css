@@ -20,6 +20,12 @@
      - Cách dùng: Thêm thuộc tính HTML data-aos="fade-up" vào thẻ muốn chuyển động (ví dụ: <article class="home-car-card" data-aos="fade-up">).
   =============================================================================
 */
+/* 
+  Ghi chú quản lý file:
+  - base.css chứa biến màu, reset mặc định, header/nav, footer và các style public dùng chung.
+  - Các trang riêng như trang chủ hoặc chi tiết xe có thể có CSS riêng, nhưng vẫn kế thừa biến và nav từ file này.
+  - Phần responsive cuối file giữ menu public ở dạng thanh ngang cuộn trên mobile để các nút truy cập không bị biến mất.
+*/
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
@@ -172,7 +178,7 @@ img {
 }
 
 .site-nav {
-    height: 76px;
+    height: 86px;
     max-width: 1400px;
     margin: 0 auto;
     padding: 0 32px;
@@ -186,14 +192,16 @@ img {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 160px;
-    height: 64px;
-    padding: 6px;
+    width: 180px;
+    height: 72px;
+    padding: 2px 4px;
     border-radius: var(--radius-sm);
+    background: transparent;
     transition: var(--transition-smooth);
 }
 
 .brand-mark img {
+    width: 100%;
     max-height: 100%;
     object-fit: contain;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.05));
@@ -1643,4 +1651,190 @@ img {
     background-color: var(--text-dark) !important;
 }
 
+/* 
+  Điều hướng public trên mobile:
+  - Biến menu thành thanh ngang có thể cuộn thay vì drawer che màn hình.
+  - Giữ logo, nút trang, đổi giao diện và tìm kiếm luôn nằm trên cùng một hàng.
+  - Ẩn mega menu/dropdown trên màn nhỏ vì các nút chính đã dẫn sang trang danh sách tương ứng.
+*/
+@media (max-width: 768px) {
+    .site-header {
+        overflow: visible;
+    }
 
+    /* Thanh nav được phép cuộn ngang để không làm mất nút khi màn hình hẹp. */
+    .site-nav {
+        height: auto;
+        min-height: 64px;
+        max-width: none;
+        width: 100%;
+        padding: 8px 10px;
+        justify-content: flex-start;
+        gap: 8px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: thin;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Logo giữ kích thước cố định, không bị ép nhỏ khi danh sách nút dài. */
+    .brand-mark {
+        flex: 0 0 auto;
+        width: 132px;
+        height: 56px;
+        padding: 2px 4px;
+        background: transparent;
+    }
+
+    /* Tắt drawer cũ trên public mobile để tránh lớp menu phủ lên nội dung trang. */
+    .nav-toggle,
+    .nav-drawer-title,
+    .nav-close-btn,
+    .nav-backdrop,
+    .nav-backdrop.is-open {
+        display: none !important;
+    }
+
+    /* Menu chính chuyển thành hàng ngang, đi cùng thanh cuộn của site-nav. */
+    .nav-menu,
+    .nav-menu.is-open {
+        position: static !important;
+        inset: auto !important;
+        display: flex !important;
+        flex: 1 0 auto;
+        width: auto !important;
+        min-width: 0;
+        height: auto;
+        max-height: none;
+        padding: 0;
+        margin: 0;
+        gap: 8px;
+        flex-direction: row;
+        align-items: center;
+        overflow: visible;
+        background: transparent !important;
+        box-shadow: none !important;
+        animation: none !important;
+        transform: none !important;
+    }
+
+    .nav-item {
+        flex: 0 0 auto;
+    }
+
+    /* Các liên kết được trình bày như nút bấm rõ ràng để người dùng mobile dễ chạm. */
+    .nav-menu > a,
+    .nav-item > a,
+    .theme-toggle-btn,
+    .nav-search-trigger {
+        flex: 0 0 auto;
+        width: auto;
+        height: 42px;
+        min-height: 42px;
+        padding: 0 14px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        background: var(--bg-card);
+        color: var(--text-dark);
+        box-shadow: var(--shadow-sm);
+        white-space: nowrap;
+        font-size: 13px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .nav-menu > a:hover,
+    .nav-item > a:hover,
+    .theme-toggle-btn:hover,
+    .nav-search-trigger:hover {
+        background: var(--bg-surface-soft);
+        color: var(--primary);
+        border-color: var(--primary);
+    }
+
+    .nav-item.has-menu > a {
+        justify-content: center;
+    }
+
+    .nav-item.has-menu > a::after {
+        display: none;
+        content: none;
+    }
+
+    /* Mobile không mở mega menu khi hover/focus vì thiết bị cảm ứng không có hover ổn định. */
+    .mega-menu,
+    .dropdown-menu,
+    .nav-item:hover .mega-menu,
+    .nav-item:hover .dropdown-menu,
+    .nav-item:focus-within .mega-menu,
+    .nav-item:focus-within .dropdown-menu {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+
+    .theme-toggle-btn {
+        margin: 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .theme-toggle-text {
+        display: none !important;
+    }
+
+    .nav-search-wrapper {
+        flex: 0 0 auto;
+        width: auto;
+        padding: 0;
+        border-bottom: 0;
+        position: relative;
+    }
+
+    .nav-search-trigger {
+        width: 42px;
+        padding: 0;
+    }
+
+    .nav-search-overlay {
+        position: fixed;
+        top: 74px;
+        left: 12px;
+        right: 12px;
+        width: auto;
+        max-width: none;
+        z-index: 220;
+    }
+
+    .nav-search-box {
+        width: 100%;
+    }
+}
+
+@media (max-width: 420px) {
+    .site-nav {
+        padding: 7px 8px;
+    }
+
+    .brand-mark {
+        width: 96px;
+    }
+
+    .nav-menu > a,
+    .nav-item > a,
+    .theme-toggle-btn {
+        height: 38px;
+        min-height: 38px;
+        padding: 0 12px;
+        font-size: 12px;
+    }
+
+    .nav-search-trigger {
+        width: 38px;
+        height: 38px;
+        min-height: 38px;
+    }
+}

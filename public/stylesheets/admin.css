@@ -2024,6 +2024,250 @@
     background: rgba(0, 0, 0, 0.02);
 }
 
+/* 
+  Layout admin cho tablet/mobile:
+  - Sidebar trái chuyển thành thanh điều hướng ngang sticky ở đầu trang.
+  - Nội dung admin chiếm đủ chiều rộng màn hình, tránh bị sidebar che.
+  - Các form, bảng, danh sách và preview được ép về 1 cột để dễ thao tác trên mobile.
+*/
+@media (max-width: 900px) {
+    .admin-page {
+        display: block;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
 
+    /* Sidebar không còn fixed bên trái; nó nằm trên cùng và cho phép cuộn ngang nếu nhiều mục. */
+    .admin-sidebar {
+        position: sticky;
+        top: 0;
+        height: auto;
+        max-width: 100vw;
+        padding: 10px 12px;
+        border-right: 0;
+        border-bottom: 1px solid var(--border-dark-color);
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: thin;
+        -webkit-overflow-scrolling: touch;
+    }
 
+    /* Logo admin giữ cố định để không bị co méo khi danh sách menu dài. */
+    .admin-sidebar .admin-brand {
+        flex: 0 0 auto;
+        margin: 0 8px 0 0;
+        padding: 10px 12px;
+        font-size: 15px;
+        white-space: nowrap;
+    }
+
+    .admin-sidebar .admin-brand::after {
+        display: none;
+    }
+
+    /* Từng mục menu admin trở thành nút ngang, dễ bấm bằng tay trên màn hình nhỏ. */
+    .admin-sidebar a:not(.admin-brand) {
+        flex: 0 0 auto;
+        min-height: 40px;
+        padding: 0 14px;
+        border-radius: var(--radius-sm);
+        white-space: nowrap;
+        font-size: 13px;
+    }
+
+    .admin-sidebar a.is-active {
+        border-left: 0;
+        box-shadow: inset 0 -3px 0 var(--primary);
+    }
+
+    /* Nội dung chính bỏ khoảng trống sidebar desktop và tự co theo màn hình. */
+    .admin-content {
+        width: 100%;
+        min-width: 0;
+        padding: 24px 16px 40px;
+        overflow-x: hidden;
+        box-sizing: border-box;
+    }
+
+    .admin-heading {
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 24px;
+        padding-bottom: 18px;
+        flex-wrap: wrap;
+    }
+
+    .admin-heading h1 {
+        font-size: clamp(22px, 7vw, 28px);
+        line-height: 1.15;
+    }
+
+    /* Các nút hành động chính full width để không bị tràn hoặc chồng lên nhau trên mobile. */
+    .admin-heading a,
+    .admin-form button[type="submit"],
+    .car-edit-form button[type="submit"],
+    .news-admin-form button[type="submit"],
+    .btn-primary-modern,
+    .secondary-button,
+    .danger-button {
+        width: 100%;
+        min-width: 0;
+    }
+
+    /* Các form/bảng lớn giảm padding và chuyển về khối dọc để dễ đọc. */
+    .admin-form,
+    .admin-table-wrap,
+    .premium-form-card {
+        padding: 20px;
+        margin-bottom: 28px;
+        border-radius: var(--radius-md);
+        box-sizing: border-box;
+    }
+
+    /* Các layout nhiều cột trong admin về 1 cột để không tràn ngang. */
+    .admin-form-grid,
+    .modern-form-grid,
+    .dealer-form-sections,
+    .blog-editor-layout,
+    .modal-form-grid,
+    .request-details-grid,
+    .request-info-table,
+    .request-process-box {
+        grid-template-columns: 1fr !important;
+    }
+
+    .spec-section-group,
+    .dealer-form-group-section.full-width {
+        grid-column: 1 / -1;
+    }
+
+    /* Preview xe không còn nổi/fixed trên mobile, tránh che form nhập liệu. */
+    .car-live-preview,
+    .car-live-preview.is-floating {
+        position: static !important;
+        width: 100% !important;
+        max-height: none !important;
+        transform: none !important;
+    }
+
+    .car-edit-item.is-open .car-edit-preview {
+        grid-template-columns: 1fr;
+    }
+
+    .car-edit-item.is-open .car-edit-preview strong,
+    .car-edit-item.is-open .car-edit-preview span,
+    .car-edit-item.is-open .car-edit-preview small {
+        padding: 0 16px 12px;
+    }
+
+    /* Danh sách ảnh, panel, đại lý và tin tức hiển thị 1 cột để vừa màn hình nhỏ. */
+    .panel-gallery-grid,
+    .panel-admin-list,
+    .dealer-admin-list,
+    .news-admin-list {
+        grid-template-columns: 1fr;
+    }
+
+    .dealer-admin-summary,
+    .car-admin-list-head,
+    .admin-request-filter,
+    .admin-controls-row,
+    .modal-actions,
+    .request-bottom-actions,
+    .dealer-summary-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .filter-search-box {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .request-type-tabs {
+        width: 100%;
+        overflow-x: auto;
+        box-sizing: border-box;
+    }
+
+    .type-tab-btn {
+        flex: 0 0 auto;
+        padding: 10px 16px;
+    }
+
+    .admin-modal {
+        align-items: flex-start;
+        justify-content: center;
+        padding: 16px;
+        overflow-y: auto;
+        box-sizing: border-box;
+    }
+
+    .admin-modal-content {
+        width: 100%;
+        max-width: none;
+        padding: 24px 18px;
+        margin: 0;
+        box-sizing: border-box;
+    }
+}
+
+@media (max-width: 560px) {
+    .admin-sidebar {
+        padding: 8px;
+    }
+
+    .admin-content {
+        padding: 18px 12px 32px;
+    }
+
+    .admin-form,
+    .admin-table-wrap,
+    .premium-form-card,
+    .dealer-form-group-section,
+    .panel-admin-item,
+    .dealer-admin-item,
+    .stat-card {
+        padding: 16px;
+    }
+
+    .admin-table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .admin-sidebar a:not(.admin-brand) {
+        min-height: 38px;
+        padding: 0 12px;
+        font-size: 12px;
+    }
+
+    .admin-sidebar .admin-brand {
+        font-size: 13px;
+        padding: 9px 10px;
+    }
+
+    .panel-card-hover-actions {
+        opacity: 1 !important;
+        visibility: visible !important;
+        position: absolute !important;
+        top: auto !important;
+        min-height: 54px !important;
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0), rgba(15, 23, 42, 0.82));
+        align-items: flex-end !important;
+        padding: 12px !important;
+        box-sizing: border-box;
+    }
+
+    .btn-edit,
+    .btn-delete,
+    .btn-save,
+    .btn-cancel {
+        width: 100%;
+    }
+}
 

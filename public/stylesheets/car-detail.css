@@ -817,7 +817,172 @@
     box-shadow: var(--shadow-glow);
 }
 
-/* Responsiveness */
+/* 
+  Responsive trang chi tiết xe:
+  - Điều chỉnh hero, tab, thông số, gallery và viewer 360 cho màn hình nhỏ.
+  - Đoạn đầu của media query còn sửa riêng thanh nav vì trang chi tiết có thêm CSS cũ dễ đè base.css.
+*/
+@media (max-width: 980px) {
+    /* 
+      Sửa nav mobile riêng cho trang chi tiết:
+      - showroom.css vẫn có kiểu drawer cũ nên cần ghi đè mạnh bằng !important.
+      - Kết quả mong muốn giống trang chủ: các nút nằm ngang, cuộn được, không bị mất.
+    */
+    .site-header {
+        overflow: visible !important;
+    }
+
+    /* Thanh nav cho phép cuộn ngang để giữ đủ nút truy cập trên mobile. */
+    .site-nav {
+        height: auto !important;
+        min-height: 64px !important;
+        max-width: none !important;
+        width: 100% !important;
+        padding: 8px 10px !important;
+        justify-content: flex-start !important;
+        flex-wrap: nowrap !important;
+        gap: 8px !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        scrollbar-width: thin;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Logo không bị ép co lại khi thanh menu có nhiều nút. */
+    .brand-mark {
+        flex: 0 0 auto !important;
+        flex-basis: auto !important;
+        width: 132px !important;
+        height: 56px !important;
+        padding: 2px 4px !important;
+        background: transparent !important;
+    }
+
+    /* Ẩn drawer cũ để không phủ lên phần thông tin xe. */
+    .nav-toggle,
+    .nav-drawer-title,
+    .nav-close-btn,
+    .nav-backdrop,
+    .nav-backdrop.is-open {
+        display: none !important;
+    }
+
+    /* Menu chính chuyển thành hàng ngang giống trang chủ. */
+    .nav-menu,
+    .nav-menu.is-open {
+        position: static !important;
+        inset: auto !important;
+        display: flex !important;
+        flex: 1 0 auto !important;
+        width: auto !important;
+        min-width: 0 !important;
+        height: auto !important;
+        max-height: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        gap: 8px !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        overflow: visible !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        animation: none !important;
+        transform: none !important;
+    }
+
+    .nav-item {
+        flex: 0 0 auto !important;
+    }
+
+    /* Nút điều hướng giữ chiều cao ổn định, phù hợp thao tác chạm trên mobile. */
+    .nav-menu > a,
+    .nav-item > a,
+    .theme-toggle-btn,
+    .nav-search-trigger {
+        flex: 0 0 auto !important;
+        width: auto !important;
+        height: 42px !important;
+        min-height: 42px !important;
+        padding: 0 14px !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: var(--radius-sm) !important;
+        background: var(--bg-card) !important;
+        color: var(--text-dark) !important;
+        box-shadow: var(--shadow-sm) !important;
+        white-space: nowrap !important;
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+    }
+
+    /* Tắt ký hiệu dropdown trên mobile vì mega menu đã bị ẩn. */
+    .nav-item.has-menu > a::after {
+        display: none !important;
+        content: none !important;
+    }
+
+    .mega-menu,
+    .dropdown-menu,
+    .nav-item:hover .mega-menu,
+    .nav-item:hover .dropdown-menu,
+    .nav-item:focus-within .mega-menu,
+    .nav-item:focus-within .dropdown-menu {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+
+    .nav-search-wrapper {
+        flex: 0 0 auto !important;
+        width: auto !important;
+        padding: 0 !important;
+        border-bottom: 0 !important;
+        position: relative !important;
+    }
+
+    .nav-search-trigger {
+        width: 42px !important;
+        padding: 0 !important;
+    }
+
+    .nav-search-overlay {
+        position: fixed !important;
+        top: 74px !important;
+        left: 12px !important;
+        right: 12px !important;
+        width: auto !important;
+        max-width: none !important;
+        z-index: 220 !important;
+    }
+}
+
+@media (max-width: 420px) {
+    .brand-mark {
+        width: 118px !important;
+        height: 52px !important;
+        padding: 2px 4px !important;
+    }
+
+    .nav-menu > a,
+    .nav-item > a,
+    .theme-toggle-btn {
+        height: 38px !important;
+        min-height: 38px !important;
+        padding: 0 12px !important;
+        font-size: 12px !important;
+    }
+
+    .nav-search-trigger {
+        width: 38px !important;
+        height: 38px !important;
+        min-height: 38px !important;
+    }
+}
+
 @media (max-width: 960px) {
     .kia-product-hero {
         grid-template-columns: 1fr;

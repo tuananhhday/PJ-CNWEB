@@ -1,10 +1,11 @@
+// JS trang chủ: điều khiển slider banner lớn và khu vực xe nổi bật.
+// File này chỉ xử lý tương tác phía trình duyệt, dữ liệu xe/panel đã được EJS render sẵn ra HTML.
+
+// Khối lấy phần tử HTML: gom các slide, nút chuyển banner, tab lọc xe và nút chuyển xe nổi bật.
 const slides = Array.from(document.querySelectorAll('[data-slide]'));
 const prevButton = document.querySelector('[data-prev]');
 const nextButton = document.querySelector('[data-next]');
 const dotButtons = Array.from(document.querySelectorAll('[data-goto]'));
-const navToggle = document.querySelector('.nav-toggle');
-const navMenu = document.querySelector('.nav-menu');
-const navActions = document.querySelector('.nav-actions');
 const featureCards = Array.from(document.querySelectorAll('[data-feature-car]'));
 const featureTabs = Array.from(document.querySelectorAll('[data-feature-filter]'));
 const featurePrev = document.querySelector('[data-feature-prev]');
@@ -16,6 +17,8 @@ let activeSlide = 0;
 let slideTimer = null;
 const slideDelay = 5000;
 
+// Hiển thị một banner theo vị trí index, đồng thời cập nhật trạng thái chấm điều hướng.
+// Công thức chia dư giúp bấm lùi ở slide đầu sẽ quay về slide cuối.
 function showSlide(index) {
     if (!slides.length) return;
 
@@ -30,6 +33,8 @@ function showSlide(index) {
     });
 }
 
+// Khởi động lại chế độ tự chạy banner sau mỗi lần người dùng bấm nút/chấm.
+// Việc reset timer giúp người dùng có đủ thời gian xem slide vừa chọn.
 function restartSlider() {
     if (slides.length <= 1) return;
     if (slideTimer) clearInterval(slideTimer);
@@ -52,24 +57,19 @@ dotButtons.forEach((button) => {
         restartSlider();
     });
 });
-
-navToggle?.addEventListener('click', () => {
-    const expanded = navToggle.getAttribute('aria-expanded') === 'true';
-    navToggle.setAttribute('aria-expanded', String(!expanded));
-    navMenu?.classList.toggle('is-open', !expanded);
-    navActions?.classList.toggle('is-open', !expanded);
-});
-
 showSlide(0);
 restartSlider();
 
+// Khối xe nổi bật: lưu loại xe đang chọn và vị trí xe đang hiện trong loại đó.
 let activeFeatureType = featureTabs[0]?.dataset.featureFilter || '';
 let activeFeatureIndex = 0;
 
+// Lọc ra các thẻ xe thuộc đúng nhóm người dùng đang chọn ở tab.
 function getVisibleFeatureCards() {
     return featureCards.filter((card) => card.dataset.featureType === activeFeatureType);
 }
 
+// Hiển thị xe nổi bật theo index trong nhóm hiện tại và cập nhật bộ đếm 1 / tổng số.
 function showFeatureCar(index) {
     if (!featureCards.length) return;
 
@@ -92,6 +92,7 @@ function showFeatureCar(index) {
     }
 }
 
+// Khi đổi tab loại xe, reset về xe đầu tiên của nhóm mới để giao diện luôn có nội dung hợp lệ.
 featureTabs.forEach((tab) => {
     tab.addEventListener('click', () => {
         activeFeatureType = tab.dataset.featureFilter;
@@ -105,6 +106,7 @@ featureTabs.forEach((tab) => {
     });
 });
 
+// Hai nút mũi tên chỉ xoay vòng trong nhóm xe đang lọc, không nhảy sang nhóm khác.
 featurePrev?.addEventListener('click', () => {
     showFeatureCar(activeFeatureIndex - 1);
 });
