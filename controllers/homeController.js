@@ -153,8 +153,8 @@ exports.getHome = async (req, res) => {
     let cars = [], panels = [], posts = [];
 
     try {
-        if (tim_kiem) {
-            const [searchedCars] = await dbp.query(`
+        const [carsData, panelsData, postsData] = await Promise.all([
+            tim_kiem ? dbp.query(`
                 SELECT xe.*, hang_xe.ten_hang, loai_xe.ten_loai, COALESCE(anh_xe.duong_dan_anh, 'no-car.jpg') AS anh_dai_dien 
                 FROM xe 
                 INNER JOIN dong_xe ON xe.dong_xe_id = dong_xe.id 
@@ -162,13 +162,13 @@ exports.getHome = async (req, res) => {
                 INNER JOIN loai_xe ON dong_xe.loai_xe_id = loai_xe.id 
                 LEFT JOIN anh_xe ON xe.id = anh_xe.xe_id AND anh_xe.la_anh_dai_dien = TRUE 
                 WHERE xe.trang_thai = 'con_hang' AND xe.ten_xe LIKE ? 
-                ORDER BY xe.gia_ban ASC`, [`%${tim_kiem}%`]);
-            cars = groupCarsByModel(searchedCars);
-        } else {
-            cars = await getCars();
-        }
-        panels = await getPanels(true);
-        posts = await getNewsPosts(true);
+                ORDER BY xe.gia_ban ASC`, [`%${tim_kiem}%`]).then(([rows]) => groupCarsByModel(rows)) : getCars(),
+            getPanels(true),
+            getNewsPosts(true)
+        ]);
+        cars = carsData;
+        panels = panelsData;
+        posts = postsData;
     } catch (err) {
         console.log('Loi tai trang chu:', err);
     }
@@ -192,8 +192,10 @@ exports.getDealers = async (req, res) => {
             khu_vuc: String(req.query.khu_vuc || '').trim(),
             loai_dai_ly: String(req.query.loai_dai_ly || '').trim()
         };
-        const allDealers = await getDealers(true);
-        const dealers = await getDealers(true, filters);
+        const [allDealers, dealers] = await Promise.all([
+            getDealers(true),
+            getDealers(true, filters)
+        ]);
         res.render('dealers', {
             title: 'Đại lý | Showroom Double Anh',
             dealers,
@@ -308,34 +310,44 @@ exports.getCarDetail = async (req, res) => {
         if (!cars.length) return res.status(404).send('Khong tim thay xe');
 
         const car = cars[0];
-        const [variants] = await dbp.query(`
-            SELECT
-                xe.id,
-                xe.ten_xe,
-                xe.phien_ban,
-                xe.duong_dan,
-                xe.gia_ban,
-                xe.slogan,
-                xe.mo_ta_ngan,
-                COALESCE(anh_xe.duong_dan_anh, 'no-car.jpg') AS anh_dai_dien
-            FROM xe
-            LEFT JOIN anh_xe ON xe.id = anh_xe.xe_id AND anh_xe.la_anh_dai_dien = TRUE
-            WHERE xe.ten_xe = ? AND xe.trang_thai = 'con_hang'
-            ORDER BY xe.gia_ban ASC
-        `, [car.ten_xe]);
 
-        const [specs] = await dbp.query('SELECT ten_thong_so, gia_tri FROM thong_so_ky_thuat WHERE xe_id = ? ORDER BY id ASC', [car.id]);
-        const [colors] = await dbp.query('SELECT ten_mau, ma_mau, anh_mau, gia_them, anh_360 FROM mau_xe WHERE xe_id = ? ORDER BY id ASC', [car.id]);
-        const [images] = await dbp.query('SELECT duong_dan_anh, nhom_anh, chu_thich FROM anh_xe WHERE xe_id = ? ORDER BY thu_tu ASC', [car.id]);
-        const [rotateImages] = await dbp.query('SELECT duong_dan_anh, nhom_360 FROM anh_xe_360 WHERE xe_id = ? ORDER BY thu_tu ASC, id ASC', [car.id]);
-        const [features] = await dbp.query('SELECT * FROM dac_diem_xe WHERE xe_id = ? ORDER BY thu_tu ASC, id ASC', [car.id]);
+        const [
+            [variants],
+            [specs],
+            [colors],
+            [images],
+            [rotateImages],
+            [features],
+            bo360SetsResult
+        ] = await Promise.all([
+            dbp.query(`
+                SELECT
+                    xe.id,
+                    xe.ten_xe,
+                    xe.phien_ban,
+                    xe.duong_dan,
+                    xe.gia_ban,
+                    xe.slogan,
+                    xe.mo_ta_ngan,
+                    COALESCE(anh_xe.duong_dan_anh, 'no-car.jpg') AS anh_dai_dien
+                FROM xe
+                LEFT JOIN anh_xe ON xe.id = anh_xe.xe_id AND anh_xe.la_anh_dai_dien = TRUE
+                WHERE xe.ten_xe = ? AND xe.trang_thai = 'con_hang'
+                ORDER BY xe.gia_ban ASC
+            `, [car.ten_xe]),
+            dbp.query('SELECT ten_thong_so, gia_tri FROM thong_so_ky_thuat WHERE xe_id = ? ORDER BY id ASC', [car.id]),
+            dbp.query('SELECT ten_mau, ma_mau, anh_mau, gia_them, anh_360 FROM mau_xe WHERE xe_id = ? ORDER BY id ASC', [car.id]),
+            dbp.query('SELECT duong_dan_anh, nhom_anh, chu_thich FROM anh_xe WHERE xe_id = ? ORDER BY thu_tu ASC', [car.id]),
+            dbp.query('SELECT duong_dan_anh, nhom_360 FROM anh_xe_360 WHERE xe_id = ? ORDER BY thu_tu ASC, id ASC', [car.id]),
+            dbp.query('SELECT * FROM dac_diem_xe WHERE xe_id = ? ORDER BY thu_tu ASC, id ASC', [car.id]),
+            dbp.query('SELECT id, ten_bo_anh, danh_sach_anh FROM bo_anh_360').catch(() => [[]])
+        ]);
 
         // Load global 360 sets to resolve color's anh_360 ID -> actual image list
         let bo360SetsMap = {};
-        try {
-            const [bo360Sets] = await dbp.query('SELECT id, ten_bo_anh, danh_sach_anh FROM bo_anh_360');
-            bo360Sets.forEach(s => { bo360SetsMap[String(s.id)] = s; bo360SetsMap[s.ten_bo_anh] = s; });
-        } catch (e) { /* table may not exist yet */ }
+        if (bo360SetsResult && bo360SetsResult[0]) {
+            bo360SetsResult[0].forEach(s => { bo360SetsMap[String(s.id)] = s; bo360SetsMap[s.ten_bo_anh] = s; });
+        }
 
         res.render('car-detail', {
             title: car.phien_ban ? `${car.ten_xe} - ${car.phien_ban}` : car.ten_xe,
@@ -527,34 +539,37 @@ exports.getCarsPage = async (req, res) => {
             params.push(loai);
         }
 
-        const [cars] = await dbp.query(`
-            SELECT
-                xe.id, xe.ten_xe, xe.duong_dan, xe.phien_ban,
-                xe.nam_san_xuat, xe.gia_ban, xe.gia_niem_yet,
-                xe.mo_ta_ngan, xe.dong_co, xe.hop_so,
-                xe.nhien_lieu, xe.so_cho_ngoi, xe.so_luong_ton,
-                hang_xe.ten_hang,
-                loai_xe.ten_loai,
-                COALESCE(anh_xe.duong_dan_anh, 'no-car.jpg') AS anh_dai_dien
-            FROM xe
-            INNER JOIN dong_xe  ON xe.dong_xe_id = dong_xe.id
-            INNER JOIN hang_xe  ON dong_xe.hang_xe_id = hang_xe.id
-            INNER JOIN loai_xe  ON dong_xe.loai_xe_id = loai_xe.id
-            LEFT  JOIN anh_xe   ON xe.id = anh_xe.xe_id AND anh_xe.la_anh_dai_dien = TRUE
-            WHERE ${where.join(' AND ')}
-            ORDER BY xe.gia_ban ASC
-        `, params);
-
-        // Sidebar: count all types (no filter)
-        const [typeCounts] = await dbp.query(`
-            SELECT loai_xe.ten_loai, COUNT(*) AS so_luong
-            FROM xe
-            INNER JOIN dong_xe ON xe.dong_xe_id = dong_xe.id
-            INNER JOIN loai_xe ON dong_xe.loai_xe_id = loai_xe.id
-            WHERE xe.trang_thai = 'con_hang'
-            GROUP BY loai_xe.ten_loai
-            ORDER BY so_luong DESC
-        `);
+        const [
+            [cars],
+            [typeCounts]
+        ] = await Promise.all([
+            dbp.query(`
+                SELECT
+                    xe.id, xe.ten_xe, xe.duong_dan, xe.phien_ban,
+                    xe.nam_san_xuat, xe.gia_ban, xe.gia_niem_yet,
+                    xe.mo_ta_ngan, xe.dong_co, xe.hop_so,
+                    xe.nhien_lieu, xe.so_cho_ngoi, xe.so_luong_ton,
+                    hang_xe.ten_hang,
+                    loai_xe.ten_loai,
+                    COALESCE(anh_xe.duong_dan_anh, 'no-car.jpg') AS anh_dai_dien
+                FROM xe
+                INNER JOIN dong_xe  ON xe.dong_xe_id = dong_xe.id
+                INNER JOIN hang_xe  ON dong_xe.hang_xe_id = hang_xe.id
+                INNER JOIN loai_xe  ON dong_xe.loai_xe_id = loai_xe.id
+                LEFT  JOIN anh_xe   ON xe.id = anh_xe.xe_id AND anh_xe.la_anh_dai_dien = TRUE
+                WHERE ${where.join(' AND ')}
+                ORDER BY xe.gia_ban ASC
+            `, params),
+            dbp.query(`
+                SELECT loai_xe.ten_loai, COUNT(*) AS so_luong
+                FROM xe
+                INNER JOIN dong_xe ON xe.dong_xe_id = dong_xe.id
+                INNER JOIN loai_xe ON dong_xe.loai_xe_id = loai_xe.id
+                WHERE xe.trang_thai = 'con_hang'
+                GROUP BY loai_xe.ten_loai
+                ORDER BY so_luong DESC
+            `)
+        ]);
 
         res.render('cars-list', {
             title: loai ? `Dòng xe ${loai} | Showroom` : 'Danh sách xe | Showroom Double Anh',

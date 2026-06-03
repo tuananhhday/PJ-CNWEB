@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const compression = require('compression');
 const db = require('./config/database');
 const indexRouter = require('./routes/index');
 const adminRouter = require('./routes/admin');
@@ -28,13 +29,16 @@ initDatabase();
 
 const app = express();
 
+app.use(compression());
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), {
+    maxAge: 86400000 // Cache assets for 1 day in milliseconds
+}));
 
 // Middleware đặt header UTF-8 toàn cục cho EJS Render
 app.use((req, res, next) => {
