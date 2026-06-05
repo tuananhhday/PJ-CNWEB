@@ -1,0 +1,1003 @@
+<!-- Floating AI Chatbox Widget -->
+<div id="ai-chatbox-widget" class="ai-chatbox-container">
+    <!-- Welcome Notification Banner -->
+    <div id="chatbox-welcome-banner" class="chatbox-welcome-banner">
+        <div class="welcome-banner-content">
+            <span class="welcome-kicker">Trợ lý AI Double Anh</span>
+            <p>Xin chào! Tôi có thể giúp gì cho bạn về thông tin xe hoặc dịch vụ?</p>
+        </div>
+        <button id="close-welcome-banner" class="close-welcome-btn">&times;</button>
+    </div>
+
+    <!-- Floating Chat Button -->
+    <button id="chatbox-toggle-btn" class="chatbox-toggle-btn" aria-label="Mở hộp thoại hỗ trợ">
+        <span class="notification-badge" id="chatbox-badge">1</span>
+        <svg class="icon-chat" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        <svg class="icon-close" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+    </button>
+
+    <!-- Chat Box Window -->
+    <div id="chatbox-window" class="chatbox-window">
+        <!-- Header -->
+        <div class="chatbox-header">
+            <div class="chatbox-header-info">
+                <div class="chatbox-avatar">
+                    <img src="/images/logo.png" alt="Double Anh Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" />
+                    <span class="avatar-status-dot"></span>
+                </div>
+                <div>
+                    <h4 class="chatbox-title" style="margin: 0; line-height: 1.2;">Trợ lý ảo Double Anh</h4>
+                </div>
+            </div>
+            <button id="chatbox-close-btn" class="chatbox-action-btn" aria-label="Đóng chatbox">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Messages Area -->
+        <div id="chatbox-messages" class="chatbox-messages">
+            <!-- Messages will be injected by JavaScript -->
+        </div>
+
+        <!-- Media Preview Area -->
+        <div id="chatbox-media-preview" class="chatbox-media-preview" style="display: none;">
+            <div class="preview-container">
+                <img id="image-preview" src="#" alt="Xem trước ảnh" style="display: none;" />
+                <button id="remove-media-btn" class="remove-media-btn" title="Hủy chọn tệp">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                </button>
+            </div>
+            <span id="preview-filename" class="preview-filename">file.jpg</span>
+        </div>
+
+        <!-- Footer / Input Area -->
+        <form id="chatbox-input-form" class="chatbox-input-form" onsubmit="return false;">
+            <div class="input-actions-wrapper">
+                <input type="file" id="chatbox-file-input" accept="image/*" style="display: none;" />
+                <button type="button" id="attach-file-btn" class="chatbox-input-btn" title="Đính kèm hình ảnh xe">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                    </svg>
+                </button>
+                <textarea id="chatbox-textarea" class="chatbox-textarea" placeholder="Nhập câu hỏi về xe hoặc showroom..." rows="1" required></textarea>
+                <button type="submit" id="send-chat-btn" class="chatbox-send-btn" title="Gửi tin nhắn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+/* Core Chatbox Design System (Glassmorphic Theme matching Double Anh Showroom) */
+.ai-chatbox-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1000;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+/* Floating Toggle Button */
+.chatbox-toggle-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    box-shadow: 0 8px 30px rgba(2, 132, 199, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chatbox-toggle-btn:hover {
+    transform: scale(1.08) translateY(-2px);
+    box-shadow: 0 12px 35px rgba(2, 132, 199, 0.45), 0 0 15px rgba(2, 132, 199, 0.3);
+}
+
+.chatbox-toggle-btn svg {
+    width: 26px;
+    height: 26px;
+    stroke-width: 2;
+    transition: transform 0.3s ease;
+}
+
+/* Notification Badge */
+.notification-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #f97316; /* Accent orange */
+    color: white;
+    font-size: 11px;
+    font-weight: 800;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ffffff;
+    box-shadow: 0 2px 8px rgba(249, 115, 22, 0.4);
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-6px); }
+    60% { transform: translateY(-3px); }
+}
+
+/* Welcome Banner Popup */
+.chatbox-welcome-banner {
+    position: absolute;
+    bottom: 76px;
+    right: 0;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 16px 20px;
+    width: 280px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    opacity: 0;
+}
+
+@keyframes slideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.welcome-banner-content {
+    flex: 1;
+}
+
+.welcome-kicker {
+    color: #0284c7;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.welcome-banner-content p {
+    color: #f8fafc;
+    font-size: 13px;
+    margin: 0;
+    line-height: 1.4;
+    font-weight: 500;
+}
+
+.close-welcome-btn {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    transition: color 0.2s;
+}
+
+.close-welcome-btn:hover {
+    color: #ffffff;
+}
+
+/* Chat Window */
+.chatbox-window {
+    position: absolute;
+    bottom: 76px;
+    right: 0;
+    width: 380px;
+    height: 520px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 18px;
+    box-shadow: 0 15px 40px -5px rgba(15, 23, 42, 0.18), 0 0 1px 1px rgba(255, 255, 255, 0.8) inset;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(30px) scale(0.95);
+    transform-origin: bottom right;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.chatbox-window.is-active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+/* Header Area */
+.chatbox-header {
+    background: #0f172a; /* Sophisticated deep dark slate */
+    color: #ffffff;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chatbox-header-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chatbox-avatar {
+    width: 38px;
+    height: 38px;
+    background: #1e293b;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0284c7;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.chatbox-avatar svg {
+    width: 20px;
+    height: 20px;
+}
+
+.avatar-status-dot {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    background: #22c55e; /* Green status dot */
+    border-radius: 50%;
+    border: 2px solid #0f172a;
+}
+
+.chatbox-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0;
+    color: #ffffff;
+}
+
+.chatbox-subtitle {
+    font-size: 11px;
+    color: #94a3b8;
+    display: block;
+}
+
+.chatbox-action-btn {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chatbox-action-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+.chatbox-action-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Messages container */
+.chatbox-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: #f8fafc;
+}
+
+/* Message bubble design */
+.message-bubble {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 16px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    word-break: break-word;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+}
+
+/* User Message */
+.message-bubble.user {
+    align-self: flex-end;
+    background: #0284c7;
+    color: #ffffff;
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15);
+}
+
+/* Bot Message */
+.message-bubble.assistant {
+    align-self: flex-start;
+    background: #ffffff;
+    color: #0f172a;
+    border-bottom-left-radius: 4px;
+    border: 1px solid #e2e8f0;
+}
+
+.message-bubble img, .message-bubble video {
+    max-width: 100%;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* Message metadata text */
+.message-meta {
+    font-size: 10px;
+    margin-top: 4px;
+    display: block;
+    opacity: 0.7;
+    text-align: right;
+}
+
+.message-bubble.assistant .message-meta {
+    text-align: left;
+    color: #64748b;
+}
+
+/* Media Preview styling */
+.chatbox-media-preview {
+    background: #f1f5f9;
+    border-top: 1px solid #e2e8f0;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.preview-container {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #cbd5e1;
+    background: #cbd5e1;
+    flex-shrink: 0;
+}
+
+.preview-container img, .preview-container video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.remove-media-btn {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: rgba(15, 23, 42, 0.75);
+    color: #ffffff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.remove-media-btn:hover {
+    background: rgba(15, 23, 42, 0.9);
+}
+
+.remove-media-btn svg {
+    width: 12px;
+    height: 12px;
+}
+
+.preview-filename {
+    font-size: 11px;
+    color: #64748b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+}
+
+/* Input form wrapper */
+.chatbox-input-form {
+    border-top: 1px solid #e2e8f0;
+    background: #ffffff;
+    padding: 12px 16px;
+}
+
+.input-actions-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    padding: 4px 8px;
+    transition: border-color 0.25s, background-color 0.25s;
+}
+
+.input-actions-wrapper:focus-within {
+    border-color: #0284c7;
+    background: #ffffff;
+}
+
+.chatbox-textarea {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 13.5px;
+    color: #0f172a;
+    padding: 8px 6px;
+    resize: none;
+    line-height: 1.4;
+    max-height: 60px;
+}
+
+.chatbox-input-btn {
+    background: transparent;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.chatbox-input-btn:hover {
+    background: rgba(15, 23, 42, 0.06);
+    color: #0284c7;
+}
+
+.chatbox-input-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.chatbox-send-btn {
+    background: #0284c7;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.chatbox-send-btn:hover {
+    background: #0369a1;
+    transform: scale(1.05);
+}
+
+.chatbox-send-btn svg {
+    width: 14px;
+    height: 14px;
+    margin-right: -1px;
+    margin-top: 1px;
+}
+
+/* Typing indicator dot animation */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+}
+
+.typing-dot {
+    width: 6px;
+    height: 6px;
+    background: #94a3b8;
+    border-radius: 50%;
+    animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typing {
+    0%, 100% { transform: translateY(0); opacity: 0.4; }
+    50% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* Table formatting for specifications inside chatbot answers */
+.chat-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    font-size: 11.5px;
+}
+
+.chatbox-link {
+    color: #0284c7;
+    text-decoration: underline;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.chatbox-link:hover {
+    color: #0369a1;
+}
+
+.chat-table th, .chat-table td {
+    padding: 6px;
+    border: 1px solid #cbd5e1;
+    text-align: left;
+}
+
+.chat-table th {
+    background: #f1f5f9;
+    font-weight: 700;
+}
+
+/* Responsive adjustment */
+@media (max-width: 480px) {
+    .chatbox-window {
+        width: calc(100vw - 32px);
+        right: -8px;
+        height: 480px;
+    }
+    .chatbox-welcome-banner {
+        width: calc(100vw - 32px);
+        right: -8px;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const chatboxWidget = document.getElementById('ai-chatbox-widget');
+    const toggleBtn = document.getElementById('chatbox-toggle-btn');
+    const welcomeBanner = document.getElementById('chatbox-welcome-banner');
+    const closeWelcomeBtn = document.getElementById('close-welcome-banner');
+    const chatWindow = document.getElementById('chatbox-window');
+    const closeWindowBtn = document.getElementById('chatbox-close-btn');
+    const messagesContainer = document.getElementById('chatbox-messages');
+    const inputForm = document.getElementById('chatbox-input-form');
+    const textarea = document.getElementById('chatbox-textarea');
+    const fileInput = document.getElementById('chatbox-file-input');
+    const attachBtn = document.getElementById('attach-file-btn');
+    const mediaPreview = document.getElementById('chatbox-media-preview');
+    const imgPreview = document.getElementById('image-preview');
+    const previewFilename = document.getElementById('preview-filename');
+    const removeMediaBtn = document.getElementById('remove-media-btn');
+    const badge = document.getElementById('chatbox-badge');
+
+    let chatHistory = [];
+    let currentBase64File = null;
+    let currentMimeType = null;
+
+    // Load chat history from sessionStorage
+    const savedHistory = sessionStorage.getItem('doubleanh_chat_history');
+    if (savedHistory) {
+        chatHistory = JSON.parse(savedHistory);
+        badge.style.display = 'none'; // Hide badge if they have chatting history
+    } else {
+        // Initial bot greeting
+        chatHistory = [
+            {
+                role: 'model',
+                parts: [{ text: 'Xin chào quý khách! Tôi là trợ lý ảo hỗ trợ trực tuyến của Showroom Double Anh. Tôi có thể giúp bạn giải đáp các thông tin về các mẫu xe (thông số, phiên bản, giá bán) hoặc thông tin hệ thống các đại lý showroom bên tôi. Quý khách cần tư vấn gì ạ?' }]
+            }
+        ];
+        // Show welcome banner after 3 seconds for first-time visitors
+        setTimeout(() => {
+            if (!chatWindow.classList.contains('is-active')) {
+                welcomeBanner.style.opacity = '1';
+            }
+        }, 3000);
+    }
+
+    renderMessages();
+
+    // Toggle Chat Window Open/Close
+    toggleBtn.addEventListener('click', () => {
+        const isClosed = !chatWindow.classList.contains('is-active');
+        if (isClosed) {
+            chatWindow.classList.contains('is-active');
+            chatWindow.classList.add('is-active');
+            welcomeBanner.style.display = 'none';
+            badge.style.display = 'none';
+            toggleBtn.querySelector('.icon-chat').style.display = 'none';
+            toggleBtn.querySelector('.icon-close').style.display = 'block';
+            setTimeout(() => messagesContainer.scrollTop = messagesContainer.scrollHeight, 100);
+        } else {
+            closeChatWindow();
+        }
+    });
+
+    closeWindowBtn.addEventListener('click', closeChatWindow);
+
+    function closeChatWindow() {
+        chatWindow.classList.remove('is-active');
+        toggleBtn.querySelector('.icon-chat').style.display = 'block';
+        toggleBtn.querySelector('.icon-close').style.display = 'none';
+    }
+
+    // Close welcome banner
+    closeWelcomeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        welcomeBanner.style.display = 'none';
+    });
+
+    // Auto-growing textarea
+    textarea.addEventListener('input', () => {
+        textarea.style.height = 'auto';
+        textarea.style.height = (textarea.scrollHeight) + 'px';
+    });
+
+    // Handle Enter to send on Desktop/Laptop, Shift+Enter for newline. Keep default behavior on Mobile.
+    textarea.addEventListener('keydown', (e) => {
+        const isDesktop = window.innerWidth > 768;
+        if (isDesktop && e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            const sendBtn = document.getElementById('send-chat-btn');
+            if (sendBtn) {
+                sendBtn.click();
+            }
+        }
+    });
+
+    // Trigger file input
+    attachBtn.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    // Handle File selection
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Size check (Limit to 10MB)
+        if (file.size > 10 * 1024 * 1024) {
+            alert('Kích thước tệp vượt quá giới hạn 10MB. Vui lòng chọn tệp nhỏ hơn.');
+            fileInput.value = '';
+            return;
+        }
+
+        previewFilename.textContent = file.name;
+        currentMimeType = file.type;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const result = event.target.result;
+            currentBase64File = result.split(',')[1]; // Strip base64 metadata
+
+            if (file.type.startsWith('image/')) {
+                imgPreview.src = result;
+                imgPreview.style.display = 'block';
+            }
+
+            mediaPreview.style.display = 'flex';
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // Remove media selection
+    removeMediaBtn.addEventListener('click', () => {
+        clearSelectedMedia();
+    });
+
+    function clearSelectedMedia() {
+        fileInput.value = '';
+        currentBase64File = null;
+        currentMimeType = null;
+        imgPreview.src = '#';
+        imgPreview.style.display = 'none';
+        mediaPreview.style.display = 'none';
+    }
+
+    // Handle Form Submit (Send message)
+    inputForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const text = textarea.value.trim();
+        if (!text && !currentBase64File) return;
+
+        // Reset text area
+        textarea.value = '';
+        textarea.style.height = 'auto';
+
+        // Prepare current turn attachment data
+        let userPart = { text: text };
+        let tempUserMsg = {
+            role: 'user',
+            text: text,
+            mediaBase64: currentBase64File ? `data:${currentMimeType};base64,${currentBase64File}` : null,
+            mediaType: currentMimeType
+        };
+
+        // Render user message immediately in UI
+        renderMessageBubble(tempUserMsg);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+        // Show typing indicator
+        showTypingIndicator();
+
+        // 1. Prepare history to send to Gemini API (API cost optimization):
+        // We only send plain text representations of previous images/videos in history
+        const processedHistory = chatHistory.map(hist => {
+            return {
+                role: hist.role,
+                parts: hist.parts.map(p => ({ text: p.text }))
+            };
+        });
+
+        // 2. Add current user prompt
+        let currentMessageParts = [];
+        if (text) {
+            currentMessageParts.push({ text: text });
+        }
+        if (currentBase64File) {
+            currentMessageParts.push({
+                inlineData: {
+                    mimeType: currentMimeType,
+                    data: currentBase64File
+                }
+            });
+        }
+
+        // Save plain text representation of this user prompt to local storage history
+        let savedUserParts = [];
+        let historyPromptText = text;
+        if (currentBase64File) {
+            historyPromptText += ` [Đã đính kèm: Hình ảnh]`;
+        }
+        savedUserParts.push({ text: historyPromptText });
+
+        chatHistory.push({
+            role: 'user',
+            parts: savedUserParts
+        });
+
+        // Clear file input immediately
+        clearSelectedMedia();
+
+        try {
+            // Send payload to backend Express API
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    messageParts: currentMessageParts,
+                    history: processedHistory
+                })
+            });
+
+            removeTypingIndicator();
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Lỗi server');
+            }
+
+            const data = await response.json();
+            const botAnswerText = data.text;
+
+            // Render bot bubble
+            const botMsg = {
+                role: 'model',
+                text: botAnswerText
+            };
+            renderMessageBubble(botMsg);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Save to history
+            chatHistory.push({
+                role: 'model',
+                parts: [{ text: botAnswerText }]
+            });
+
+            // Save state in session storage
+            sessionStorage.setItem('doubleanh_chat_history', JSON.stringify(chatHistory));
+
+        } catch (error) {
+            console.error('Lỗi khi gửi tin nhắn chatbox:', error);
+            removeTypingIndicator();
+            renderMessageBubble({
+                role: 'model',
+                text: '❌ Có lỗi xảy ra trong quá trình xử lý tin nhắn của bạn. Vui lòng thử lại sau.'
+            });
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    });
+
+    // Helper functions for UI rendering
+    function renderMessages() {
+        messagesContainer.innerHTML = '';
+        chatHistory.forEach(msg => {
+            const role = msg.role;
+            const text = msg.parts && msg.parts[0] ? msg.parts[0].text : '';
+            renderMessageBubble({ role, text });
+        });
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function renderMessageBubble(msg) {
+        const bubble = document.createElement('div');
+        bubble.className = `message-bubble ${msg.role}`;
+
+        // Support rendering media attachment if any (only on local instant render)
+        if (msg.mediaBase64) {
+            if (msg.mediaType.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.src = msg.mediaBase64;
+                bubble.appendChild(img);
+            }
+        }
+
+        // Parse tables if present in markdown-like format
+        let formattedText = msg.text || '';
+        
+        // Escape HTML to prevent XSS
+        const tempDiv = document.createElement('div');
+        tempDiv.textContent = formattedText;
+        let escapedText = tempDiv.innerHTML;
+
+        // Custom parser for Markdown tables to HTML tables for specifications
+        if (escapedText.includes('|') && escapedText.includes('---')) {
+            escapedText = parseMarkdownTables(escapedText);
+        }
+
+        // Convert newline characters into <br> tags
+        escapedText = escapedText.replace(/\n/g, '<br>');
+
+        // Highlight bold words (**bold**)
+        escapedText = escapedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        escapedText = escapedText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+        // Convert Markdown links [text](url)
+        escapedText = escapedText.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="chatbox-link" target="_blank">$1</a>');
+
+        // Convert standalone relative paths (like /bao-gia, /dang-ky-lai-thu, etc.) into clickable links
+        escapedText = escapedText.replace(/(?<!href=["']\/|src=["']\/)(?<![a-zA-Z0-9])(\/(?:bao-gia|dang-ky-lai-thu|tin-tuc|lien-he|danh-sach-xe|trang-chu))(?:\s|<br>|$|[,.!?]|\))/g, '<a href="$1" class="chatbox-link">$1</a>');
+
+        const textSpan = document.createElement('span');
+        textSpan.innerHTML = escapedText;
+        bubble.appendChild(textSpan);
+
+        // Meta time indicator
+        const timeMeta = document.createElement('span');
+        timeMeta.className = 'message-meta';
+        const now = new Date();
+        timeMeta.textContent = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+        bubble.appendChild(timeMeta);
+
+        messagesContainer.appendChild(bubble);
+    }
+
+    function showTypingIndicator() {
+        const indicator = document.createElement('div');
+        indicator.id = 'chatbox-typing-indicator';
+        indicator.className = 'message-bubble assistant';
+        indicator.style.padding = '8px 12px';
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'typing-indicator';
+        for (let i = 0; i < 3; i++) {
+            const dot = document.createElement('span');
+            dot.className = 'typing-dot';
+            wrapper.appendChild(dot);
+        }
+
+        indicator.appendChild(wrapper);
+        messagesContainer.appendChild(indicator);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function removeTypingIndicator() {
+        const indicator = document.getElementById('chatbox-typing-indicator');
+        if (indicator) {
+            indicator.remove();
+        }
+    }
+
+    // Direct parser for Markdown-style table inside chatbot answers
+    function parseMarkdownTables(text) {
+        const lines = text.split('\n');
+        let inTable = false;
+        let tableHtml = '<table class="chat-table">';
+        let newLines = [];
+        let tableRows = [];
+
+        lines.forEach(line => {
+            const trimmed = line.trim();
+            if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+                if (!inTable) {
+                    inTable = true;
+                    tableRows = [];
+                }
+                tableRows.push(trimmed);
+            } else {
+                if (inTable) {
+                    inTable = false;
+                    tableHtml += renderHtmlTable(tableRows);
+                    newLines.push(tableHtml);
+                    tableHtml = '<table class="chat-table">';
+                }
+                newLines.push(line);
+            }
+        });
+
+        if (inTable) {
+            tableHtml += renderHtmlTable(tableRows);
+            newLines.push(tableHtml);
+        }
+
+        return newLines.join('\n');
+    }
+
+    function renderHtmlTable(rows) {
+        let html = '';
+        // Skip separator line (row index 1 e.g. |---|---|)
+        rows.forEach((row, idx) => {
+            if (row.includes('---')) return;
+            const cells = row.split('|').map(c => c.trim()).filter((c, i, a) => i > 0 && i < a.length - 1);
+            html += '<tr>';
+            cells.forEach(cell => {
+                const tag = idx === 0 ? 'th' : 'td';
+                html += `<${tag}>${cell}</${tag}>`;
+            });
+            html += '</tr>';
+        });
+        return html + '</table>';
+    }
+});
+</script>

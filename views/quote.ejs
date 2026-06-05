@@ -4,124 +4,589 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-        <%= title %>
-    </title>
+    <title><%= title %></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/stylesheets/base.css?v=public-nav-mobile-20260603">
     <link rel="stylesheet" href="/stylesheets/forms.css">
+    
+    <style>
+        /* Premium split layout for quote page */
+        .quote-page-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .quote-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .quote-header h1 {
+            font-size: 36px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .quote-header p {
+            color: #475569;
+            font-size: 16px;
+            max-width: 650px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .quote-split-layout {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 32px;
+            align-items: start;
+        }
+
+        /* Calculator Panel */
+        .calculator-panel {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+        }
+
+        .panel-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 12px;
+        }
+
+        .panel-title svg {
+            width: 24px;
+            height: 24px;
+            color: #0284c7;
+        }
+
+        /* Cost Breakdown Table */
+        .breakdown-list {
+            margin-top: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14.5px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .breakdown-label {
+            color: #475569;
+            font-weight: 500;
+        }
+
+        .breakdown-value {
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .breakdown-note {
+            font-size: 11px;
+            color: #64748b;
+            display: block;
+            margin-top: 2px;
+            font-weight: 400;
+        }
+
+        /* Total Highlight Box */
+        .total-cost-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 12px;
+            padding: 24px;
+            color: #ffffff;
+            text-align: center;
+            margin-top: 32px;
+            box-shadow: 0 8px 25px rgba(15, 23, 42, 0.15);
+        }
+
+        .total-cost-card .total-label {
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #38bdf8;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .total-cost-card .total-price {
+            font-size: 32px;
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: -0.01em;
+        }
+
+        /* Form Panel */
+        .form-panel {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+        }
+
+        .form-select, .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #0f172a;
+            outline: none;
+            transition: all 0.2s;
+            background-color: #ffffff;
+        }
+
+        .form-select:focus, .form-control:focus {
+            border-color: #0284c7;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+
+        /* Responsiveness */
+        @media (max-width: 992px) {
+            .quote-split-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 
 <body class="page-form">
     <%- include('partials/site-nav') %>
 
-        <main id="main-content">
-            <section class="form-section">
-                <div class="form-container">
-                    <div class="form-header">
-                        <span>Báo giá xe</span>
-                        <h1>Nhận báo giá chi tiết</h1>
-                        <p>Điền thông tin để showroom tư vấn phiên bản, màu xe, ưu đãi hiện có và chi phí lăn bánh phù
-                            hợp với khu vực của bạn.</p>
+    <main id="main-content">
+        <div class="quote-page-container">
+            <!-- Header section -->
+            <div class="quote-header">
+                <h1>Dự toán chi phí &amp; Báo giá</h1>
+                <p>Xem bảng dự toán chi phí lăn bánh ước tính theo luật thuế mới nhất năm 2026 và điền thông tin để showroom hỗ trợ tư vấn chi tiết nhất.</p>
+            </div>
+
+            <div class="quote-split-layout">
+                <!-- Left column: Live Cost Estimator -->
+                <section class="calculator-panel">
+                    <h3 class="panel-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                        Dự toán chi phí lăn bánh xe
+                    </h3>
+
+                    <div class="form-group">
+                        <label for="calc_xe_select">Phiên bản xe quan tâm</label>
+                        <select id="calc_xe_select" class="form-select">
+                            <% cars.forEach(car => { %>
+                                <option value="<%= car.id %>" 
+                                    data-nhien-lieu="<%= car.nhien_lieu %>"
+                                    data-ten-loai="<%= car.ten_loai %>"
+                                    data-so-cho="<%= car.so_cho_ngoi || 5 %>"
+                                    <%= String(selectedCarId || '') === String(car.id) ? 'selected' : '' %>>
+                                    <%= car.ten_xe %> - <%= car.phien_ban %> (<%= (car.nhien_lieu === 'dien') ? 'Xe điện' : ((car.ten_loai === 'Pickup' || car.ten_xe.toLowerCase().includes('ranger')) ? 'Bán tải' : (car.nhien_lieu === 'dau' ? 'Xe dầu' : 'Xe xăng')) %>)
+                                </option>
+                            <% }) %>
+                        </select>
                     </div>
 
-                    <% const quoteFormData=locals.formData || {}; %>
-                        <% const quoteUser=locals.currentUser || null; %>
-                            <% const quoteError=locals.error || '' ; %>
-                                <% const quoteSuccess=locals.success || '' ; %>
-                                    <form action="/bao-gia" method="post" class="customer-form">
-                                        <% if (quoteError) { %>
-                                            <div class="message error-message">
-                                                <%= quoteError %>
-                                            </div>
-                                            <% } %>
-                                                <% if (quoteSuccess) { %>
-                                                    <div class="message success-message">
-                                                        <%= quoteSuccess %>
-                                                    </div>
-                                                    <% } %>
+                    <div class="form-group">
+                        <label for="calc_tinh_select">Khu vực đăng ký xe (tính thuế/phí biển số)</label>
+                        <select id="calc_tinh_select" class="form-select">
+                            <option value="HN_HP_QN">Hà Nội / Hải Phòng / Quảng Ninh (Lệ phí trước bạ 12%)</option>
+                            <option value="HCM">TP. Hồ Chí Minh (Lệ phí trước bạ 10%)</option>
+                            <option value="OTHER" selected>Các tỉnh thành khác (Lệ phí trước bạ 10%)</option>
+                        </select>
+                    </div>
 
-                                                        <div class="form-group">
-                                                            <label for="ho_ten">Họ và tên*</label>
-                                                            <input type="text" id="ho_ten" name="ho_ten" required
-                                                                placeholder="Nhập họ và tên"
-                                                                value="<%= quoteFormData.ho_ten || (quoteUser ? quoteUser.ho_ten : '') || '' %>">
-                                                        </div>
+                    <div class="breakdown-list">
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Giá xe niêm yết</span>
+                            <span id="val_gia_xe" class="breakdown-value">0 VNĐ</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <div>
+                                <span class="breakdown-label">Lệ phí trước bạ</span>
+                                <span id="lbl_truoc_ba_rate" class="breakdown-note">Áp dụng 10%</span>
+                            </div>
+                            <span id="val_truoc_ba" class="breakdown-value">0 VNĐ</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <div>
+                                <span class="breakdown-label">Lệ phí cấp biển số</span>
+                                <span id="lbl_bien_so_note" class="breakdown-note">Khu vực biển số</span>
+                            </div>
+                            <span id="val_bien_so" class="breakdown-value">0 VNĐ</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <div>
+                                <span class="breakdown-label">Phí bảo trì đường bộ</span>
+                                <span id="lbl_duong_bo_note" class="breakdown-note">Xe cá nhân dưới 10 chỗ (12 tháng)</span>
+                            </div>
+                            <span id="val_duong_bo" class="breakdown-value">1.560.000 VNĐ</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <div>
+                                <span class="breakdown-label">Bảo hiểm TNDS bắt buộc</span>
+                                <span id="lbl_tnds_note" class="breakdown-note">Xe dưới 6 chỗ ngồi (480.700đ)</span>
+                            </div>
+                            <span id="val_bao_hiem" class="breakdown-value">480.700 VNĐ</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <div>
+                                <span class="breakdown-label">Lệ phí đăng kiểm</span>
+                                <span id="lbl_dang_kiem_note" class="breakdown-note">Xe dưới 10 chỗ ngồi (340.000đ)</span>
+                            </div>
+                            <span id="val_dang_kiem" class="breakdown-value">340.000 VNĐ</span>
+                        </div>
+                    </div>
 
-                                                        <div class="form-group">
-                                                            <label for="email">Email*</label>
-                                                            <input type="email" id="email" name="email" required
-                                                                placeholder="Nhập địa chỉ email"
-                                                                value="<%= quoteFormData.email || (quoteUser ? quoteUser.email : '') || '' %>">
-                                                        </div>
+                    <div class="total-cost-card">
+                        <span class="total-label">Tổng chi phí lăn bánh (Ước tính)</span>
+                        <span id="val_tong_lan_banh" class="total-price">0 VNĐ</span>
+                    </div>
+                </section>
 
-                                                        <div class="form-group">
-                                                            <label for="dien_thoai">Số điện thoại*</label>
-                                                            <input type="tel" id="dien_thoai" name="so_dien_thoai"
-                                                                required placeholder="Nhập số điện thoại"
-                                                                value="<%= quoteFormData.so_dien_thoai || (quoteUser ? quoteUser.so_dien_thoai : '') || '' %>">
-                                                        </div>
+                <!-- Right column: Customer lead generation form -->
+                <section class="form-panel">
+                    <h3 class="panel-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L22 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        Đăng ký nhận báo giá chi tiết
+                    </h3>
 
-                                                        <div class="form-group">
-                                                            <label for="mau_xe">Mẫu xe quan tâm*</label>
-                                                            <select id="mau_xe" name="xe_id" required>
-                                                                <option value="">Chọn mẫu xe muốn nhận báo giá</option>
-                                                                <% cars.forEach(car=> { %>
-                                                                    <option value="<%= car.id %>"
-                                                                        <%=String(quoteFormData.xe_id || selectedCarId
-                                                                        || '' )===String(car.id) ? 'selected' : '' %>>
-                                                                        <%= car.ten_xe %>
-                                                                    </option>
-                                                                    <% }) %>
-                                                            </select>
-                                                        </div>
+                    <% const quoteFormData = locals.formData || {}; %>
+                    <% const quoteUser = locals.currentUser || null; %>
+                    <% const quoteError = locals.error || ''; %>
+                    <% const quoteSuccess = locals.success || ''; %>
 
-                                                        <div class="form-group">
-                                                            <label for="thanh_pho">Tỉnh/Thành phố*</label>
-                                                            <input type="text" id="thanh_pho" name="thanh_pho" required
-                                                                placeholder="Nhập tỉnh hoặc thành phố"
-                                                                value="<%= quoteFormData.thanh_pho || '' %>">
-                                                        </div>
+                    <form action="/bao-gia" method="post" class="customer-form">
+                        <% if (quoteError) { %>
+                            <div class="message error-message">
+                                <%= quoteError %>
+                            </div>
+                        <% } %>
+                        <% if (quoteSuccess) { %>
+                            <div class="message success-message">
+                                <%= quoteSuccess %>
+                            </div>
+                        <% } %>
 
-                                                        <div class="form-group">
-                                                            <label for="noi_dung">Nội dung tư vấn</label>
-                                                            <input type="text" id="noi_dung" name="noi_dung"
-                                                                placeholder="Ví dụ: Tôi muốn báo giá lăn bánh và trả góp"
-                                                                value="<%= quoteFormData.noi_dung || '' %>">
-                                                        </div>
+                        <div class="form-group">
+                            <label for="ho_ten">Họ và tên*</label>
+                            <input type="text" id="ho_ten" name="ho_ten" required placeholder="Nhập họ và tên"
+                                value="<%= quoteFormData.ho_ten || (quoteUser ? quoteUser.ho_ten : '') || '' %>">
+                        </div>
 
-                                                        <div class="form-policy">
-                                                            <label class="checkbox-label">
-                                                                <input type="checkbox" name="dong_y_bao_mat" required>
-                                                                <span>Tôi đồng ý để Showroom Double Anh sử dụng thông
-                                                                    tin cá nhân nhằm liên hệ, tư vấn và xử lý yêu cầu
-                                                                    báo giá theo chính sách bảo mật.</span>
-                                                            </label>
-                                                            <p class="marketing-consent">Tôi đồng ý nhận thông tin ưu
-                                                                đãi, chương trình bán hàng và dịch vụ chăm sóc khách
-                                                                hàng từ Showroom Double Anh.</p>
-                                                            <div class="radio-group">
-                                                                <label class="radio-label"><input type="radio"
-                                                                        name="dong_y_tiep_thi" value="co" required>
-                                                                    Có</label>
-                                                                <label class="radio-label"><input type="radio"
-                                                                        name="dong_y_tiep_thi" value="khong">
-                                                                    Không</label>
-                                                            </div>
-                                                        </div>
-                                                        <button type="submit" class="btn primary btn-submit">Gửi yêu cầu
-                                                            báo giá</button>
-                                    </form>
-                </div>
-            </section>
-        </main>
+                        <div class="form-group">
+                            <label for="email">Email*</label>
+                            <input type="email" id="email" name="email" required placeholder="Nhập địa chỉ email"
+                                value="<%= quoteFormData.email || (quoteUser ? quoteUser.email : '') || '' %>">
+                        </div>
 
-        <%- include('partials/site-footer') %>
+                        <div class="form-group">
+                            <label for="dien_thoai">Số điện thoại*</label>
+                            <input type="tel" id="dien_thoai" name="so_dien_thoai" required placeholder="Nhập số điện thoại"
+                                value="<%= quoteFormData.so_dien_thoai || (quoteUser ? quoteUser.so_dien_thoai : '') || '' %>">
+                        </div>
 
-            <script src="/javascripts/nav-search.js"></script>
+                        <!-- Car select field - linked to calculator -->
+                        <div class="form-group">
+                            <label for="form_xe_id">Mẫu xe quan tâm*</label>
+                            <select id="form_xe_id" name="xe_id" required class="form-select">
+                                <option value="">Chọn mẫu xe muốn nhận báo giá</option>
+                                <% cars.forEach(car => { %>
+                                    <option value="<%= car.id %>" <%= String(quoteFormData.xe_id || selectedCarId || '') === String(car.id) ? 'selected' : '' %>>
+                                        <%= car.ten_xe %> - <%= car.phien_ban %>
+                                    </option>
+                                <% }) %>
+                            </select>
+                        </div>
+
+                        <!-- City input field - linked to calculator -->
+                        <div class="form-group">
+                            <label for="form_thanh_pho">Tỉnh/Thành phố đăng ký*</label>
+                            <input type="text" id="form_thanh_pho" name="thanh_pho" required placeholder="Nhập tỉnh hoặc thành phố đăng ký"
+                                value="<%= quoteFormData.thanh_pho || '' %>">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="noi_dung">Nội dung tư vấn thêm</label>
+                            <input type="text" id="noi_dung" name="noi_dung" placeholder="Ví dụ: Tôi muốn tư vấn trả góp và khuyến mãi"
+                                value="<%= quoteFormData.noi_dung || '' %>">
+                        </div>
+
+                        <div class="form-policy">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="dong_y_bao_mat" required checked>
+                                <span>Tôi đồng ý để Showroom Double Anh sử dụng thông tin cá nhân nhằm liên hệ, tư vấn theo chính sách bảo mật.</span>
+                            </label>
+                            <p class="marketing-consent">Tôi đồng ý nhận thông tin ưu đãi và chăm sóc khách hàng.</p>
+                            <div class="radio-group" style="display: flex; gap: 16px; margin-top: 8px;">
+                                <label class="radio-label"><input type="radio" name="dong_y_tiep_thi" value="co" checked required> Có</label>
+                                <label class="radio-label"><input type="radio" name="dong_y_tiep_thi" value="khong"> Không</label>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn primary btn-submit" style="width: 100%; margin-top: 24px;">Gửi yêu cầu báo giá</button>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <%- include('partials/site-footer') %>
+
+    <script src="/javascripts/nav-search.js"></script>
+
+    <!-- Client-side Calculation & Synchronization Logic -->
+    <script>
+        // Embed the cars database retrieved from Express dynamically
+        const carsData = <%- JSON.stringify(cars) %>;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const calcXeSelect = document.getElementById('calc_xe_select');
+            const calcTinhSelect = document.getElementById('calc_tinh_select');
+            
+            const formXeSelect = document.getElementById('form_xe_id');
+            const formThanhPho = document.getElementById('form_thanh_pho');
+
+            const valGiaXe = document.getElementById('val_gia_xe');
+            const valTruocBa = document.getElementById('val_truoc_ba');
+            const valBienSo = document.getElementById('val_bien_so');
+            const valBaoHiem = document.getElementById('val_bao_hiem');
+            const valTongLanBanh = document.getElementById('val_tong_lan_banh');
+
+            const lblTruocBaRate = document.getElementById('lbl_truoc_ba_rate');
+            const lblBienSoNote = document.getElementById('lbl_bien_so_note');
+            const lblTndsNote = document.getElementById('lbl_tnds_note');
+
+            // Format helper
+            function formatVND(value) {
+                return value.toLocaleString('vi-VN') + ' VNĐ';
+            }
+
+            // Lấy label cho val_duong_bo và val_dang_kiem
+            const lblDuongBoNote = document.getElementById('lbl_duong_bo_note');
+            const lblDangKiemNote = document.getElementById('lbl_dang_kiem_note');
+            const valDangKiem = document.getElementById('val_dang_kiem');
+            const valDuongBo = document.getElementById('val_duong_bo');
+
+            // Bảng biểu phí chính xác theo quy định 2026 (nguồn: oto360.net)
+            const FEE_TABLE = {
+                // Phí đăng kiểm theo số chỗ (xe dưới 10 chỗ: 340.000đ)
+                inspection: {
+                    under10: 340000,   // Xe ô tô dưới 10 chỗ ngồi
+                    from10to24: 330000, // Xe ô tô khách 10-24 chỗ  
+                    above24: 370000    // Xe ô tô khách 25-40 chỗ
+                },
+                // Phí đường bộ theo số chỗ (xe cá nhân dưới 10 chỗ: 1.560.000đ/năm)
+                roadFee: {
+                    under10_personal: 1560000,  // Xe cá nhân dưới 10 chỗ
+                    under10_biz: 2160000,       // Xe kinh doanh dưới 10 chỗ
+                    from10to24: 3240000         // Xe 10-24 chỗ
+                },
+                // Bảo hiểm TNDS bắt buộc 1 năm
+                tnds: {
+                    under6: 480700,    // Dưới 6 chỗ (không kinh doanh)
+                    from6to11: 873400, // 6-11 chỗ (không kinh doanh)
+                    from12to24: 1397000, // 12-24 chỗ
+                    above24: 2007500,  // Trên 24 chỗ
+                    pickup: 480700     // Xe bán tải/pickup - giống xe con dưới 6 chỗ
+                }
+            };
+
+            // Xác định có phải xe bán tải không
+            function isPickup(car) {
+                return (car.ten_loai && car.ten_loai.toLowerCase().includes('pickup')) ||
+                       car.ten_xe.toLowerCase().includes('ranger') ||
+                       car.ten_xe.toLowerCase().includes('hilux') ||
+                       car.ten_xe.toLowerCase().includes('triton') ||
+                       car.ten_xe.toLowerCase().includes('navara') ||
+                       car.ten_xe.toLowerCase().includes('frontier');
+            }
+
+            // Central Calculation Function
+            function updateCalculator() {
+                const carId = calcXeSelect.value;
+                const region = calcTinhSelect.value;
+
+                if (!carId) return;
+
+                // Find active car in data
+                const car = carsData.find(c => String(c.id) === String(carId));
+                if (!car) return;
+
+                const listingPrice = Number(car.gia_ban);
+                const soChoNgoi = Number(car.so_cho_ngoi) || 5;
+                const pickup = isPickup(car);
+                
+                // 1. Lệ phí trước bạ (Registration Tax)
+                // Nguồn: Luật phí và lệ phí, Nghị định 20/2019/NĐ-CP và sửa đổi
+                let beforeTaxRate = 0.10; // Mặc định 10%
+                let noteTax = "Áp dụng 10%";
+
+                if (car.nhien_lieu === 'dien') {
+                    beforeTaxRate = 0.00;
+                    noteTax = "Áp dụng 0% (Miễn lệ phí trước bạ xe điện đến 2/2027)";
+                } else if (pickup) {
+                    beforeTaxRate = 0.06;
+                    noteTax = "Áp dụng 6% (Biểu phí xe bán tải/Pickup)";
+                } else if (region === 'HN_HP_QN') {
+                    beforeTaxRate = 0.12;
+                    noteTax = "Áp dụng 12% (Khu vực Hà Nội, Hải Phòng, Quảng Ninh)";
+                } else {
+                    noteTax = "Áp dụng 10% (TP.HCM và các tỉnh thành)";
+                }
+
+                const regFee = Math.round(listingPrice * beforeTaxRate);
+                
+                // 2. Lệ phí cấp biển số (Theo Thông tư 155/2025/TT-BTC hiệu lực 2026)
+                let plateFee = 140000; // Tỉnh thành khác: 140.000 VNĐ
+                let notePlate = "Khu vực II & III - Tỉnh thành khác";
+
+                if (region === 'HN_HP_QN' || region === 'HCM') {
+                    plateFee = 14000000; // Hà Nội, TP.HCM: 14.000.000 VNĐ
+                    notePlate = region === 'HN_HP_QN' ? "Khu vực I - Hà Nội" : "Khu vực I - TP. Hồ Chí Minh";
+                }
+
+                // 3. Bảo hiểm TNDS bắt buộc (Theo Thông tư 04/2021/TT-BTC cập nhật)
+                let tndsFee, noteTnds;
+                if (pickup) {
+                    // Xe bán tải (pickup, minivan) = xe dưới 6 chỗ
+                    tndsFee = FEE_TABLE.tnds.pickup;
+                    noteTnds = "Xe bán tải/Pickup (480.700đ/năm)";
+                } else if (soChoNgoi >= 12 && soChoNgoi <= 24) {
+                    tndsFee = FEE_TABLE.tnds.from12to24;
+                    noteTnds = `Xe ${soChoNgoi} chỗ ngồi (1.397.000đ/năm)`;
+                } else if (soChoNgoi >= 6) {
+                    tndsFee = FEE_TABLE.tnds.from6to11;
+                    noteTnds = `Xe ${soChoNgoi} chỗ ngồi (873.400đ/năm)`;
+                } else {
+                    tndsFee = FEE_TABLE.tnds.under6;
+                    noteTnds = `Xe dưới 6 chỗ ngồi (480.700đ/năm)`;
+                }
+
+                // 4. Phí đăng kiểm (Theo Thông tư 238/2016/TT-BTC)
+                let inspectionFee, noteInspection;
+                if (soChoNgoi < 10) {
+                    inspectionFee = FEE_TABLE.inspection.under10;
+                    noteInspection = `Xe dưới 10 chỗ ngồi (340.000đ)`;
+                } else if (soChoNgoi <= 24) {
+                    inspectionFee = FEE_TABLE.inspection.from10to24;
+                    noteInspection = `Xe ${soChoNgoi} chỗ ngồi (330.000đ)`;
+                } else {
+                    inspectionFee = FEE_TABLE.inspection.above24;
+                    noteInspection = `Xe trên 24 chỗ (370.000đ)`;
+                }
+
+                // 5. Phí bảo trì đường bộ (Theo NĐ 18/2012/NĐ-CP và sửa đổi)
+                let roadFee, noteRoad;
+                if (soChoNgoi >= 10) {
+                    roadFee = FEE_TABLE.roadFee.from10to24;
+                    noteRoad = `Xe ${soChoNgoi} chỗ - 12 tháng (3.240.000đ)`;
+                } else {
+                    roadFee = FEE_TABLE.roadFee.under10_personal;
+                    noteRoad = "Xe cá nhân dưới 10 chỗ - 12 tháng";
+                }
+
+                // Tổng chi phí lăn bánh
+                const totalOnRoad = listingPrice + regFee + plateFee + inspectionFee + roadFee + tndsFee;
+
+                // Cập nhật giao diện
+                valGiaXe.textContent = formatVND(listingPrice);
+                valTruocBa.textContent = formatVND(regFee);
+                valBienSo.textContent = formatVND(plateFee);
+                valBaoHiem.textContent = formatVND(tndsFee);
+                valTongLanBanh.textContent = formatVND(totalOnRoad);
+                if (valDangKiem) valDangKiem.textContent = formatVND(inspectionFee);
+                if (valDuongBo) valDuongBo.textContent = formatVND(roadFee);
+
+                lblTruocBaRate.textContent = noteTax;
+                lblBienSoNote.textContent = notePlate;
+                lblTndsNote.textContent = noteTnds;
+                if (lblDangKiemNote) lblDangKiemNote.textContent = noteInspection;
+                if (lblDuongBoNote) lblDuongBoNote.textContent = noteRoad;
+            }
+
+            // Sync: Calculator Car Selection -> Form Car Selection
+            calcXeSelect.addEventListener('change', () => {
+                formXeSelect.value = calcXeSelect.value;
+                updateCalculator();
+            });
+
+            // Sync: Form Car Selection -> Calculator Car Selection
+            formXeSelect.addEventListener('change', () => {
+                calcXeSelect.value = formXeSelect.value;
+                updateCalculator();
+            });
+
+            // Sync: Calculator Region Selection -> Form Text Input
+            calcTinhSelect.addEventListener('change', () => {
+                const selectedVal = calcTinhSelect.value;
+                if (selectedVal === 'HN_HP_QN') {
+                    formThanhPho.value = 'Hà Nội';
+                } else if (selectedVal === 'HCM') {
+                    formThanhPho.value = 'TP. Hồ Chí Minh';
+                } else {
+                    formThanhPho.value = 'Tỉnh thành khác';
+                }
+                updateCalculator();
+            });
+
+            // Sync: Form Text Input -> Calculator Region Selection
+            formThanhPho.addEventListener('input', () => {
+                const typedText = formThanhPho.value.toLowerCase();
+                if (typedText.includes('hà nội') || typedText.includes('hanoi') || typedText.includes('hải phòng') || typedText.includes('quảng ninh')) {
+                    calcTinhSelect.value = 'HN_HP_QN';
+                } else if (typedText.includes('hồ chí minh') || typedText.includes('hcm') || typedText.includes('sài gòn') || typedText.includes('saigon')) {
+                    calcTinhSelect.value = 'HCM';
+                } else {
+                    calcTinhSelect.value = 'OTHER';
+                }
+                updateCalculator();
+            });
+
+            // Đồng bộ xe từ form sang calculator khi tải trang (xe_id từ URL)
+            if (formXeSelect.value && calcXeSelect.value !== formXeSelect.value) {
+                calcXeSelect.value = formXeSelect.value;
+            }
+            if (calcXeSelect.value && formXeSelect.value !== calcXeSelect.value) {
+                formXeSelect.value = calcXeSelect.value;
+            }
+
+            // Initial calculation run
+            updateCalculator();
+            
+            // Sync initial text value for location field if empty
+            if (!formThanhPho.value) {
+                formThanhPho.value = 'Tỉnh thành khác';
+            }
+        });
+    </script>
 </body>
 
 </html>

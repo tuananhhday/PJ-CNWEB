@@ -392,7 +392,14 @@ exports.searchCarsApi = async (req, res) => {
 
 exports.getQuote = async (req, res) => {
     try {
-        const cars = await getCars();
+        const [cars] = await dbp.query(`
+            SELECT xe.id, xe.ten_xe, xe.phien_ban, xe.gia_ban, xe.nhien_lieu, xe.so_cho_ngoi, loai_xe.ten_loai
+            FROM xe
+            INNER JOIN dong_xe ON xe.dong_xe_id = dong_xe.id
+            INNER JOIN loai_xe ON dong_xe.loai_xe_id = loai_xe.id
+            WHERE xe.trang_thai = 'con_hang'
+            ORDER BY xe.ten_xe ASC, xe.gia_ban ASC
+        `);
         res.render('quote', {
             title: 'Nhận báo giá | Showroom Double Anh',
             cars,

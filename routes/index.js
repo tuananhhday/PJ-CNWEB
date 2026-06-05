@@ -17,4 +17,8 @@ router.post('/bao-gia', homeController.postQuote);
 router.get('/dang-ky-lai-thu', homeController.getTestDrive);
 router.post('/dang-ky-lai-thu', homeController.postTestDrive);
 
+// Chatbot AI API Route
+const chatController = require('../controllers/chatController');
+router.post('/api/chat', chatController.handleChat);
+
 module.exports = router;
