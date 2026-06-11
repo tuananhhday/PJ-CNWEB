@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeFrame = 0;
     let dragStartX = 0;
     let dragLastX = 0;
+    let hasDragged = false;
     let isDragging = false;
     let staticColorMode = false;
     const dragSensitivity = 14;
@@ -88,36 +89,62 @@ document.addEventListener('DOMContentLoaded', () => {
         isDragging = true;
         dragStartX = getPointerX(event);
         dragLastX = dragStartX;
+        hasDragged = false;
         viewer.classList.add('is-dragging');
+        if (event.pointerId && viewer.setPointerCapture) {
+            viewer.setPointerCapture(event.pointerId);
+        }
         event.preventDefault();
     }
 
     // Khi kéo ngang đủ xa, chuyển frame theo hướng kéo để tạo cảm giác xoay xe.
     function moveDrag(event) {
         if (!isDragging || staticColorMode) return;
+        if (event.cancelable) event.preventDefault();
         const currentX = getPointerX(event);
         const diff = currentX - dragLastX;
 
         if (Math.abs(diff) >= dragSensitivity) {
             showFrame(activeFrame + (diff > 0 ? -1 : 1));
             dragLastX = currentX;
+            hasDragged = true;
         }
     }
 
     // Kết thúc kéo và trả viewer về trạng thái bình thường.
-    function endDrag() {
+    function endDrag(event) {
         if (!isDragging) return;
         isDragging = false;
         viewer.classList.remove('is-dragging');
+        if (event && event.pointerId && viewer.releasePointerCapture) {
+            try {
+                viewer.releasePointerCapture(event.pointerId);
+            } catch (err) {
+                // Pointer may already be released by the browser.
+            }
+        }
     }
 
-    viewer.addEventListener('mousedown', startDrag);
-    viewer.addEventListener('touchstart', startDrag, { passive: false });
-    window.addEventListener('mousemove', moveDrag);
-    window.addEventListener('touchmove', moveDrag, { passive: true });
-    window.addEventListener('mouseup', endDrag);
-    window.addEventListener('touchend', endDrag);
-    window.addEventListener('mouseleave', endDrag);
+    if (window.PointerEvent) {
+        viewer.addEventListener('pointerdown', startDrag);
+        viewer.addEventListener('pointermove', moveDrag);
+        viewer.addEventListener('pointerup', endDrag);
+        viewer.addEventListener('pointercancel', endDrag);
+        viewer.addEventListener('lostpointercapture', endDrag);
+    } else {
+        viewer.addEventListener('mousedown', startDrag);
+        viewer.addEventListener('touchstart', startDrag, { passive: false });
+        window.addEventListener('mousemove', moveDrag);
+        window.addEventListener('touchmove', moveDrag, { passive: false });
+        window.addEventListener('mouseup', endDrag);
+        window.addEventListener('touchend', endDrag);
+        window.addEventListener('mouseleave', endDrag);
+    }
+
+    viewer.addEventListener('click', () => {
+        if (staticColorMode || frameUrls.length < 2 || hasDragged) return;
+        showFrame(activeFrame + 1);
+    });
 
     // Cho phép dùng bàn phím mũi tên trái/phải để xem 360, hỗ trợ người dùng không dùng chuột.
     viewer.addEventListener('keydown', (event) => {

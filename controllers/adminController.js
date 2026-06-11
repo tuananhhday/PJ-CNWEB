@@ -809,7 +809,7 @@ exports.addCar = async (req, res) => {
 
         const rotateImages = Array.isArray(anh_360) ? anh_360 : parser.parseLines(anh_360);
         for (let index = 0; index < rotateImages.length; index += 1) {
-            if (!rotateImages[index]) continue;
+            if (!rotateImages[index] || /^\d+$/.test(String(rotateImages[index]).trim())) continue;
             await conn.query(
                 "INSERT INTO anh_xe_360 (xe_id, duong_dan_anh, thu_tu, nhom_360) VALUES (?, ?, ?, 'chung')",
                 [carId, rotateImages[index], index + 1]
@@ -970,13 +970,29 @@ exports.editCar = async (req, res) => {
             await conn.query("DELETE FROM anh_xe WHERE xe_id = ? AND la_anh_dai_dien = FALSE", [req.params.id]);
         }
 
+        // Check if admin chose to delete specific images
+        const deleteImageIds = req.body.delete_image_ids;
+        let deletedImageIdSet = new Set();
+        if (deleteImageIds && !parser.isChecked(replace_images)) {
+            const idsToDelete = Array.isArray(deleteImageIds) ? deleteImageIds : [deleteImageIds];
+            const cleanIds = idsToDelete.map(id => Number(id)).filter(id => !isNaN(id));
+            deletedImageIdSet = new Set(cleanIds);
+            if (cleanIds.length) {
+                await conn.query('DELETE FROM anh_xe WHERE id IN (?) AND xe_id = ?', [cleanIds, req.params.id]);
+            }
+        }
+
         // Update captions for existing images (only run if they weren't deleted)
         if (!parser.isChecked(replace_images)) {
             for (const key of Object.keys(req.body)) {
                 if (key.startsWith('chu_thich_anh_')) {
-                    const imgId = key.replace('chu_thich_anh_', '');
+                    const imgId = Number(key.replace('chu_thich_anh_', ''));
+                    if (!imgId || deletedImageIdSet.has(imgId)) continue;
                     const caption = req.body[key] || null;
-                    await conn.query('UPDATE anh_xe SET chu_thich = ? WHERE id = ?', [caption, imgId]);
+                    await conn.query(
+                        'UPDATE anh_xe SET chu_thich = ? WHERE id = ? AND xe_id = ?',
+                        [caption, imgId, req.params.id]
+                    );
                 }
             }
         }
@@ -1024,7 +1040,9 @@ exports.editCar = async (req, res) => {
         }
 
         const rotateImages = Array.isArray(anh_360) ? anh_360 : parser.parseLines(anh_360);
-        const newRotateFrames = rotateImages.filter(Boolean);
+        const newRotateFrames = rotateImages
+            .map((frame) => String(frame || '').trim())
+            .filter((frame) => frame && !/^\d+$/.test(frame));
         if (newRotateFrames.length) {
             const [orderRows] = await conn.query(
                 'SELECT COALESCE(MAX(thu_tu), 0) AS max_order FROM anh_xe_360 WHERE xe_id = ?',

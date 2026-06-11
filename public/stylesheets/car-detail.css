@@ -590,6 +590,263 @@
 }
 
 /* Color selection preview and selectors */
+.kia-color-showcase {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+    align-items: center;
+    min-height: 520px;
+    margin: -18px 0 38px;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+}
+
+.kia-color-showcase__visual {
+    position: relative;
+    min-height: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 54px 36px 84px;
+}
+
+.kia-color-showcase__panel {
+    position: absolute;
+    inset: 0 12% 0 0;
+    background: #dfe8e9;
+    clip-path: polygon(0 0, 86% 0, 100% 100%, 0% 100%);
+    z-index: 0;
+}
+
+.kia-color-showcase__watermark {
+    position: absolute;
+    top: 22px;
+    right: -18px;
+    z-index: 0;
+    color: rgba(15, 23, 42, 0.045);
+    font-family: var(--font-title);
+    font-size: clamp(72px, 10vw, 148px);
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    pointer-events: none;
+    user-select: none;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.kia-color-showcase__visual .viewer-360 {
+    z-index: 1;
+    width: min(760px, 100%);
+    max-width: 760px;
+}
+
+.kia-color-showcase__visual .viewer-360 img,
+.kia-color-showcase__visual > .detail-main-image {
+    width: 100%;
+    max-height: 360px;
+    object-fit: contain;
+    filter: drop-shadow(0 26px 28px rgba(15, 23, 42, 0.20));
+}
+
+.kia-color-showcase__name {
+    position: absolute;
+    left: 50%;
+    bottom: 48px;
+    z-index: 2;
+    transform: translateX(-50%);
+    color: var(--text-dark);
+    font-family: var(--font-title);
+    font-size: 22px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.kia-color-showcase__content {
+    position: relative;
+    z-index: 1;
+    padding: 64px 56px 64px 30px;
+}
+
+.kia-color-showcase__content > p {
+    margin: 0 0 12px;
+    color: var(--primary);
+    font-family: var(--font-title);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.kia-color-showcase__content h2 {
+    margin: 0;
+    color: var(--text-dark);
+    font-family: var(--font-title);
+    font-size: clamp(42px, 5vw, 66px);
+    font-weight: 500;
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+}
+
+.kia-color-showcase__content > span {
+    display: block;
+    margin-top: 12px;
+    color: var(--text-dark);
+    font-size: 24px;
+    line-height: 1.35;
+    font-weight: 400;
+}
+
+.kia-color-showcase__swatches {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 22px;
+    margin: 72px 0 18px;
+}
+
+.kia-color-showcase__swatches button {
+    width: 96px;
+    height: 64px;
+    border: 2px solid #d1d5db;
+    border-radius: 18px 18px 12px 12px;
+    background: #ffffff;
+    padding: 7px;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.10);
+    transform: skewX(-14deg);
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.kia-color-showcase__swatches button span {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 13px 13px 8px 8px;
+    box-shadow: inset 0 10px 16px rgba(255,255,255,0.35), inset 0 -10px 18px rgba(15,23,42,0.18);
+}
+
+.kia-color-showcase__swatches button:hover,
+.kia-color-showcase__swatches button.is-active {
+    border-color: #2563eb;
+    box-shadow: 0 12px 26px rgba(37, 99, 235, 0.20);
+    transform: skewX(-14deg) translateY(-5px);
+}
+
+.kia-color-showcase__content > small {
+    display: block;
+    color: var(--text-muted);
+    font-size: 22px;
+    line-height: 1.35;
+}
+
+.kia-smart-color {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 28px;
+    margin: -18px 0 32px;
+}
+
+.kia-smart-color__head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 22px;
+}
+
+.kia-smart-color__head p {
+    margin: 0 0 6px;
+    color: var(--primary);
+    font-family: var(--font-title);
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.kia-smart-color__head h2 {
+    margin: 0;
+    color: var(--text-dark);
+    font-family: var(--font-title);
+    font-size: 28px;
+    line-height: 1.1;
+    font-weight: 800;
+}
+
+.kia-smart-color__head > span {
+    flex: 0 0 auto;
+    min-height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 14px;
+    border-radius: var(--radius-full);
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.kia-color-grid--smart {
+    justify-content: flex-start;
+    gap: 12px;
+}
+
+.kia-color-grid--smart button {
+    min-width: 104px;
+    min-height: 92px;
+    padding: 12px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: #ffffff;
+    box-shadow: var(--shadow-sm);
+}
+
+.kia-color-grid--smart button:hover {
+    transform: translateY(-3px);
+    border-color: var(--primary-glow);
+    box-shadow: var(--shadow-md);
+}
+
+.kia-color-grid--smart button.is-active {
+    border-color: var(--primary);
+    background: #f8fafc;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.10);
+}
+
+.kia-color-grid--smart button span {
+    width: 44px;
+    height: 44px;
+}
+
+.kia-color-grid--smart button strong {
+    color: var(--text-dark);
+    font-size: 13px;
+}
+
+.kia-smart-color__viewer {
+    padding: 28px !important;
+    margin: 22px 0 0 !important;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.kia-smart-color__viewer .viewer-360 {
+    max-width: 760px;
+}
+
+.kia-smart-color__viewer .viewer-360 img {
+    max-height: 380px;
+}
+
 .kia-color-preview {
     background: #ffffff;
     border: 1px solid var(--border-color);
@@ -1031,5 +1288,44 @@
     }
     .feature-image-wrapper {
         height: 240px !important; /* Reduce preview image size on mobile */
+    }
+
+    .kia-smart-color {
+        padding: 20px !important;
+        margin: -18px 0 28px !important;
+    }
+
+    .kia-smart-color__head {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .kia-smart-color__head h2 {
+        font-size: 24px;
+    }
+
+    .kia-color-grid--smart {
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding: 2px 2px 10px;
+        scroll-snap-type: x proximity;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .kia-color-grid--smart button {
+        flex: 0 0 94px;
+        min-width: 94px;
+        min-height: 86px;
+        scroll-snap-align: start;
+    }
+
+    .kia-smart-color__viewer {
+        padding: 18px !important;
+    }
+
+    .kia-smart-color__viewer .viewer-360 img {
+        max-height: 280px;
     }
 }

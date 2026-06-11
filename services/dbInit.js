@@ -121,6 +121,13 @@ async function ensureCarDetailTables() {
     await ensureColumn('anh_xe', 'chu_thich', "VARCHAR(500) DEFAULT NULL");
     await ensureColumn('mau_xe', 'anh_360', 'TEXT DEFAULT NULL');
 
+    // Đảm bảo cột mô tả ngắn có dung lượng không giới hạn
+    try {
+        await dbp.query('ALTER TABLE xe MODIFY COLUMN mo_ta_ngan TEXT DEFAULT NULL');
+    } catch (err) {
+        console.log('Bypass mo_ta_ngan column type adjustment:', err.message);
+    }
+
     await dbp.query(`
         CREATE TABLE IF NOT EXISTS dac_diem_xe (
             id INT AUTO_INCREMENT PRIMARY KEY,

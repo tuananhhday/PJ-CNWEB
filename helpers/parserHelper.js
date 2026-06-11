@@ -340,6 +340,7 @@ async function getUniqueSlug(tableName, baseSlug, currentId = null) {
 
 async function cleanupOrphanImages() {
     try {
+        const allowPhysicalDelete = String(process.env.DELETE_ORPHAN_IMAGES || '').toLowerCase() === 'true';
         const referenced = new Set();
 
         const addRefs = (rows, colName) => {
@@ -381,15 +382,26 @@ async function cleanupOrphanImages() {
         const imageDir = path.join(__dirname, '..', 'public', 'images');
         if (!fs.existsSync(imageDir)) return;
 
+        const minAgeMs = Number(process.env.ORPHAN_IMAGE_MIN_AGE_MS || 7 * 24 * 60 * 60 * 1000);
+        const now = Date.now();
         const files = fs.readdirSync(imageDir);
         for (const file of files) {
             const fullPath = path.join(imageDir, file);
-            if (fs.statSync(fullPath).isDirectory()) continue;
+            const stat = fs.statSync(fullPath);
+            if (stat.isDirectory()) continue;
 
             const isHashed = /^[a-fA-F0-9]{32}\.[a-zA-Z0-9]+$/.test(file);
             const isTimestamped = /^\d{13}-/.test(file);
 
             if (!referenced.has(file) && (isHashed || isTimestamped)) {
+                if (!allowPhysicalDelete) {
+                    console.log(`[Deduplication] Skip deleting orphan file because DELETE_ORPHAN_IMAGES is not true: ${file}`);
+                    continue;
+                }
+                if (now - stat.mtimeMs < minAgeMs) {
+                    console.log(`[Deduplication] Skip recent orphan file: ${file}`);
+                    continue;
+                }
                 fs.unlinkSync(fullPath);
                 console.log(`[Deduplication] Deleted orphan file: ${file}`);
             }

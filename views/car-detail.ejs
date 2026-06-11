@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/stylesheets/base.css?v=public-nav-mobile-20260603">
     <link rel="stylesheet" href="/stylesheets/showroom.css">
-    <link rel="stylesheet" href="/stylesheets/car-detail.css?v=product-nav-mobile-20260603">
+    <link rel="stylesheet" href="/stylesheets/car-detail.css?v=smart-color-rollback-20260610">
 </head>
 <body>
 <%- include('partials/site-nav') %>
@@ -50,7 +50,10 @@
     %>
     <%# Chuẩn bị bộ ảnh 360 mặc định: ưu tiên bộ ảnh được gắn với xe, sau đó kiểm tra màu xe có bộ 360 riêng hay không. %>
     <% 
-      let defaultRotateFrames = (rotateImages || []).filter(img => img.nhom_360 === 'chung').map(img => img.duong_dan_anh);
+      let defaultRotateFrames = (rotateImages || [])
+          .filter(img => img.nhom_360 === 'chung')
+          .map(img => String(img.duong_dan_anh || '').trim())
+          .filter(file => file && !/^\d+$/.test(file));
       if (car.anh_360 && typeof bo360SetsMap !== 'undefined' && bo360SetsMap) {
           const defaultSet = bo360SetsMap[String(car.anh_360)] || bo360SetsMap[car.anh_360];
           if (defaultSet && defaultSet.danh_sach_anh) {
@@ -59,6 +62,7 @@
       }
       const rotateFrameUrls = defaultRotateFrames.map((file) => '/images/' + file);
       const hasAny360 = rotateFrameUrls.length > 0 || (colors && colors.some(c => c.anh_360)); 
+      let initial360Image = rotateFrameUrls.length ? rotateFrameUrls[0] : '/images/no-car.jpg';
     %>
 
     <%# Hero sản phẩm: hiển thị tên xe, mô tả ngắn, giá và các nút báo giá/lái thử/brochure. %>
@@ -81,7 +85,40 @@
     </section>
 
     <%# Dải phiên bản: nếu có variants từ database thì dẫn sang từng phiên bản, nếu không thì tách từ chuỗi phien_ban. %>
-    <section class="kia-variant-strip" aria-label="Phiên bản">
+    <section class="kia-product-section kia-smart-color" id="mau-sac">
+        <div class="kia-smart-color__head">
+            <div>
+                <p>Mau sac</p>
+                <h2>Chon mau xe</h2>
+            </div>
+            <span><%= colors && colors.length ? colors.length : 0 %> tuy chon mau</span>
+        </div>
+        <div class="kia-color-grid kia-color-grid--smart">
+            <% if (colors && colors.length) { %>
+                <% colors.forEach((color, index) => { %>
+                    <button class="<%= index === 0 ? 'is-active' : '' %>" type="button"
+                            data-color-image="<%= color.anh_mau ? '/images/' + color.anh_mau : '/images/' + heroImage %>"
+                            data-color-price-added="<%= color.gia_them || 0 %>">
+                        <span style="background:<%= color.ma_mau || '#fff' %>"></span>
+                        <strong><%= color.ten_mau %></strong>
+                    </button>
+                <% }) %>
+            <% } else { %>
+                <p class="empty-state">Chua co mau xe duoc cau hinh.</p>
+            <% } %>
+        </div>
+        <% if (hasAny360) { %>
+            <div class="kia-color-preview kia-product-360 kia-smart-color__viewer" id="anh-360">
+                <div class="viewer-360 <%= rotateFrameUrls.length > 1 ? 'is-ready' : 'is-static-color' %>" id="car-360-viewer">
+                    <img class="detail-main-image" data-car-image src="<%= initial360Image %>" alt="<%= car.ten_xe %> 360">
+                    <div class="viewer-360-progress" aria-hidden="true" style="<%= rotateFrameUrls.length > 1 ? '' : 'display: none;' %>">
+                        <span data-360-progress></span>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+    </section>
+<section class="kia-variant-strip" aria-label="Phiên bản">
         <% if (locals.variants && variants.length > 1) { %>
             <% variants.forEach((variant) => { %>
                 <a href="/xe/<%= variant.duong_dan %>" class="variant-link" style="text-decoration: none; color: inherit;">
@@ -106,48 +143,9 @@
     </section>
 
     <%# Khu chọn màu: mỗi nút màu có ảnh preview, giá cộng thêm và dữ liệu frame 360 nếu có. %>
-    <section class="kia-product-section" id="mau-sac" style="margin-bottom: 24px;">
-        <div class="kia-section-heading" style="margin-bottom: 20px;">
-            <p>Màu sắc</p>
-            <h2>Lựa chọn màu xe</h2>
-        </div>
-        <div class="kia-color-preview" style="padding: 24px; margin-bottom: 16px;">
-            <img data-color-preview src="/images/<%= colors && colors.length && colors[0].anh_mau ? colors[0].anh_mau : heroImage %>" alt="<%= car.ten_xe %>">
-        </div>
-        <div class="kia-color-grid">
-            <% if (colors && colors.length) { %>
-                <% colors.forEach((color, index) => { %>
-                    <% 
-                      let color360Attr = '';
-                      if (color.anh_360 && bo360SetsMap) {
-                          // Tìm bộ 360 theo ID trước, nếu không có thì thử theo tên để tương thích dữ liệu cũ.
-                          const set360 = bo360SetsMap[String(color.anh_360)] || bo360SetsMap[color.anh_360] || null;
-                          if (set360 && set360.danh_sach_anh) {
-                              color360Attr = set360.danh_sach_anh; // Chuỗi tên file phân cách bằng dấu phẩy.
-                          } else {
-                              // Fallback dữ liệu cũ: lấy frame từ bảng anh_xe_360 theo nhom_360.
-                              const colorFrames = (rotateImages || []).filter(img => img.nhom_360 === color.anh_360).map(img => img.duong_dan_anh);
-                              color360Attr = colorFrames.join(', ');
-                          }
-                      }
-                    %>
-                    <button class="<%= index === 0 ? 'is-active' : '' %>" type="button" 
-                            data-color-image="<%= color.anh_mau ? '/images/' + color.anh_mau : '/images/' + heroImage %>"
-                            data-color-price-added="<%= color.gia_them || 0 %>"
-                            data-color-360="<%= color360Attr %>">
-                        <span style="background:<%= color.ma_mau || '#fff' %>"></span>
-                        <strong><%= color.ten_mau %></strong>
-                    </button>
-                <% }) %>
-            <% } else { %>
-                <p class="empty-state">Chưa có màu xe được cấu hình.</p>
-            <% } %>
-        </div>
-    </section>
-
-    <%# Xác định ảnh đầu tiên cho viewer 360: ưu tiên frame mặc định, sau đó tới màu đầu tiên có bộ 360. %>
+<%# Xác định ảnh đầu tiên cho viewer 360: ưu tiên frame mặc định, sau đó tới màu đầu tiên có bộ 360. %>
     <% 
-      let initial360Image = '/images/no-car.jpg';
+      initial360Image = initial360Image || '/images/no-car.jpg';
       if (rotateFrameUrls.length) {
           initial360Image = rotateFrameUrls[0];
       } else if (colors && colors.length && bo360SetsMap) {
@@ -158,14 +156,17 @@
                   const firstFile = set360.danh_sach_anh.split(',').map(f => f.trim()).filter(Boolean)[0];
                   if (firstFile) initial360Image = '/images/' + firstFile;
               } else {
-                  const colorFrames = (rotateImages || []).filter(img => img.nhom_360 === firstColorWith360.anh_360).map(img => img.duong_dan_anh);
+                  const colorFrames = (rotateImages || [])
+                      .filter(img => img.nhom_360 === firstColorWith360.anh_360)
+                      .map(img => String(img.duong_dan_anh || '').trim())
+                      .filter(file => file && !/^\d+$/.test(file));
                   if (colorFrames.length) initial360Image = '/images/' + colorFrames[0];
               }
           }
       }
     %>
     <%# Viewer 360 chỉ render khi xe hoặc màu xe có dữ liệu ảnh 360. %>
-    <% if (hasAny360) { %>
+    <% if (false && hasAny360) { %>
         <section class="kia-product-section kia-product-360" id="anh-360" style="margin-bottom: 24px; padding: 24px;">
             <div class="viewer-360 <%= (rotateFrameUrls.length > 1 || (colors && colors.some(c => c.anh_360))) ? 'is-ready' : 'is-static-color' %>" id="car-360-viewer">
                 <img class="detail-main-image" data-car-image src="<%= initial360Image %>" alt="<%= car.ten_xe %> 360">
@@ -453,7 +454,7 @@
     window.car360Frames = <%- JSON.stringify(rotateFrameUrls) %>;
     window.defaultCar360Frames = <%- JSON.stringify(rotateFrameUrls) %>;
 </script>
-<script src="/javascripts/car-detail.js"></script>
+<script src="/javascripts/car-detail.js?v=360-default-20260610"></script>
 <script>
     // Chuyển tab thư viện ảnh ngoại thất/nội thất.
     document.querySelectorAll('[data-gallery-tab]').forEach((button) => {
@@ -469,15 +470,14 @@
     // Chọn màu xe: đổi ảnh preview, ảnh hero, giá và bộ frame 360 tương ứng.
     document.querySelectorAll('[data-color-image]').forEach((button) => {
         button.addEventListener('click', () => {
-            const preview = document.querySelector('[data-color-preview]');
             const heroImage = document.getElementById('detail-hero-image');
             const priceTag = document.getElementById('detail-hero-price');
+            const selectedColorName = document.querySelector('[data-selected-color-name]');
             
             const colorImg = button.dataset.colorImage;
             const priceAdded = Number(button.dataset.colorPriceAdded || 0);
 
             // Cập nhật ảnh preview trong khu màu sắc.
-            if (preview && colorImg) preview.src = colorImg;
             
             // Cập nhật ảnh hero phía trên với hiệu ứng mờ nhẹ.
             if (heroImage && colorImg) {
@@ -496,14 +496,12 @@
             }
 
             // Nếu màu có bộ ảnh 360 riêng thì nạp bộ đó, không có thì quay về bộ mặc định của xe.
-            const color360Raw = button.dataset.color360 || '';
             if (window.update360Frames) {
-                if (color360Raw.trim()) {
-                    const frames = color360Raw.split(',').map(f => '/images/' + f.trim()).filter(Boolean);
-                    window.update360Frames(frames);
-                } else {
-                    window.update360Frames(window.defaultCar360Frames || []);
-                }
+                window.update360Frames(window.defaultCar360Frames || []);
+            }
+
+            if (selectedColorName && button.dataset.colorName) {
+                selectedColorName.textContent = button.dataset.colorName;
             }
 
             document.querySelectorAll('[data-color-image]').forEach((item) => item.classList.toggle('is-active', item === button));
@@ -511,12 +509,8 @@
     });
 
     // Khi tải trang, nếu màu đang active có bộ 360 riêng thì nạp ngay để viewer hiển thị đúng.
-    const activeColorBtn = document.querySelector('[data-color-image].is-active');
-    if (activeColorBtn && activeColorBtn.dataset.color360 && window.update360Frames) {
-        const frames = activeColorBtn.dataset.color360.split(',').map(f => '/images/' + f.trim()).filter(Boolean);
-        if (frames.length) {
-            window.update360Frames(frames);
-        }
+    if (window.update360Frames) {
+        window.update360Frames(window.defaultCar360Frames || []);
     }
 
     // Chọn phiên bản xe: cập nhật active card, ảnh hero và tiêu đề nếu phiên bản không phải link sang trang khác.

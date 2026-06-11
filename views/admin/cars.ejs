@@ -581,19 +581,23 @@
                                                                                         <% existingExt.forEach(img=> {
                                                                                             %>
                                                                                             <div class="thumb-card-item"
-                                                                                                style="display: flex; flex-direction: column; gap: 6px; width: 140px;">
+                                                                                                style="display: flex; flex-direction: column; gap: 6px; width: 140px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px; background: #ffffff;">
                                                                                                 <div class="thumb-container"
-                                                                                                    style="width: 140px; height: 90px; margin: 0;">
+                                                                                                    style="width: 100%; height: 80px; margin: 0; border-radius: var(--radius-sm); overflow: hidden; position: relative;">
                                                                                                     <img src="/images/<%= img.duong_dan_anh %>"
-                                                                                                        alt="Ngoại thất">
+                                                                                                        alt="Ngoại thất" style="width: 100%; height: 100%; object-fit: cover;">
                                                                                                 </div>
                                                                                                 <input
                                                                                                     name="chu_thich_anh_<%= img.id %>"
                                                                                                     type="text"
                                                                                                     placeholder="Thêm mô tả..."
                                                                                                     value="<%= img.chu_thich || '' %>"
-                                                                                                    style="font-size: 11px; height: 28px; padding: 0 8px; width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-surface-soft);"
+                                                                                                    style="font-size: 11px; height: 28px; padding: 0 8px; width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-surface-soft); margin-top: 4px;"
                                                                                                     title="Chú thích ảnh Ngoại thất">
+                                                                                                <label style="font-size: 11px; color: #dc2626; display: flex; align-items: center; gap: 6px; cursor: pointer; margin: 4px 0 0 0; font-weight: 600; padding: 2px;">
+                                                                                                    <input type="checkbox" name="delete_image_ids" value="<%= img.id %>" style="width: auto; height: auto; min-height: auto; margin: 0; cursor: pointer; accent-color: #dc2626;">
+                                                                                                    ✕ Xóa ảnh
+                                                                                                </label>
                                                                                             </div>
                                                                                             <% }) %>
                                                                                     </div>
@@ -606,29 +610,32 @@
                                                                                                 tại (Nhập
                                                                                                 chữ minh họa bên dưới
                                                                                                 ảnh):</strong>
-                                                                                            <div
-                                                                                                class="gallery-thumbs-strip">
-                                                                                                <%
-                                                                                                    existingInt.forEach(img=>
-                                                                                                    {
-                                                                                                    %>
-                                                                                                    <div class="thumb-card-item"
-                                                                                                        style="display: flex; flex-direction: column; gap: 6px; width: 140px;">
-                                                                                                        <div class="thumb-container"
-                                                                                                            style="width: 140px; height: 90px; margin: 0;">
-                                                                                                            <img src="/images/<%= img.duong_dan_anh %>"
-                                                                                                                alt="Nội thất">
+                                                                                                <div class="gallery-thumbs-strip">
+                                                                                                    <%
+                                                                                                        existingInt.forEach(img=>
+                                                                                                        {
+                                                                                                        %>
+                                                                                                        <div class="thumb-card-item"
+                                                                                                            style="display: flex; flex-direction: column; gap: 6px; width: 140px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px; background: #ffffff;">
+                                                                                                            <div class="thumb-container"
+                                                                                                                style="width: 100%; height: 80px; margin: 0; border-radius: var(--radius-sm); overflow: hidden; position: relative;">
+                                                                                                                <img src="/images/<%= img.duong_dan_anh %>"
+                                                                                                                    alt="Nội thất" style="width: 100%; height: 100%; object-fit: cover;">
+                                                                                                            </div>
+                                                                                                            <input
+                                                                                                                name="chu_thich_anh_<%= img.id %>"
+                                                                                                                type="text"
+                                                                                                                placeholder="Thêm mô tả..."
+                                                                                                                value="<%= img.chu_thich || '' %>"
+                                                                                                                style="font-size: 11px; height: 28px; padding: 0 8px; width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-surface-soft); margin-top: 4px;"
+                                                                                                                title="Chú thích ảnh Nội thất">
+                                                                                                            <label style="font-size: 11px; color: #dc2626; display: flex; align-items: center; gap: 6px; cursor: pointer; margin: 4px 0 0 0; font-weight: 600; padding: 2px;">
+                                                                                                                <input type="checkbox" name="delete_image_ids" value="<%= img.id %>" style="width: auto; height: auto; min-height: auto; margin: 0; cursor: pointer; accent-color: #dc2626;">
+                                                                                                                ✕ Xóa ảnh
+                                                                                                            </label>
                                                                                                         </div>
-                                                                                                        <input
-                                                                                                            name="chu_thich_anh_<%= img.id %>"
-                                                                                                            type="text"
-                                                                                                            placeholder="Thêm mô tả..."
-                                                                                                            value="<%= img.chu_thich || '' %>"
-                                                                                                            style="font-size: 11px; height: 28px; padding: 0 8px; width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-surface-soft);"
-                                                                                                            title="Chú thích ảnh Nội thất">
-                                                                                                    </div>
-                                                                                                    <% }) %>
-                                                                                            </div>
+                                                                                                        <% }) %>
+                                                                                                </div>
                                                                                         </div>
                                                                                         <% } %>
                                                                                             <% if (existingGen.length) {
@@ -638,25 +645,28 @@
                                                                                                     <strong>Ảnh phụ khác
                                                                                                         hiện
                                                                                                         tại:</strong>
-                                                                                                    <div
-                                                                                                        class="gallery-thumbs-strip">
+                                                                                                    <div class="gallery-thumbs-strip">
                                                                                                         <%
                                                                                                             existingGen.forEach(img=>
                                                                                                             { %>
                                                                                                             <div class="thumb-card-item"
-                                                                                                                style="display: flex; flex-direction: column; gap: 6px; width: 140px;">
+                                                                                                                style="display: flex; flex-direction: column; gap: 6px; width: 140px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px; background: #ffffff;">
                                                                                                                 <div class="thumb-container"
-                                                                                                                    style="width: 140px; height: 90px; margin: 0;">
+                                                                                                                    style="width: 100%; height: 80px; margin: 0; border-radius: var(--radius-sm); overflow: hidden; position: relative;">
                                                                                                                     <img src="/images/<%= img.duong_dan_anh %>"
-                                                                                                                        alt="Ảnh khác">
+                                                                                                                        alt="Ảnh khác" style="width: 100%; height: 100%; object-fit: cover;">
                                                                                                                 </div>
                                                                                                                 <input
                                                                                                                     name="chu_thich_anh_<%= img.id %>"
                                                                                                                     type="text"
                                                                                                                     placeholder="Thêm mô tả..."
                                                                                                                     value="<%= img.chu_thich || '' %>"
-                                                                                                                    style="font-size: 11px; height: 28px; padding: 0 8px; width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-surface-soft);"
+                                                                                                                    style="font-size: 11px; height: 28px; padding: 0 8px; width: 100%; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-surface-soft); margin-top: 4px;"
                                                                                                                     title="Chú thích ảnh phụ">
+                                                                                                                <label style="font-size: 11px; color: #dc2626; display: flex; align-items: center; gap: 6px; cursor: pointer; margin: 4px 0 0 0; font-weight: 600; padding: 2px;">
+                                                                                                                    <input type="checkbox" name="delete_image_ids" value="<%= img.id %>" style="width: auto; height: auto; min-height: auto; margin: 0; cursor: pointer; accent-color: #dc2626;">
+                                                                                                                    ✕ Xóa ảnh
+                                                                                                                </label>
                                                                                                             </div>
                                                                                                             <% }) %>
                                                                                                     </div>
@@ -1496,11 +1506,6 @@
             // --- Visual Editors For Colors & Features (Interactive Form Synchronization) ---
 
             function createColorRowHTML(ten = '', ma = '#ffffff', anh = '', gia = '0', anh_360 = '') {
-                let options = `<option value="">-- Chọn ảnh xe theo màu --</option>`;
-                (allImageFiles || []).forEach((file) => {
-                    options += `<option value="${file}" ${file === anh ? 'selected' : ''}>${file}</option>`;
-                });
-
                 const selectedSet = (allBo360Sets || []).find((set) => String(set.id) === String(anh_360) || set.ten_bo_anh === anh_360);
                 const selectedSetName = selectedSet ? selectedSet.ten_bo_anh : '';
                 let firstImageSrc = '';
@@ -1530,10 +1535,22 @@
             <div style="flex: 2; min-width: 200px; display: flex; flex-direction: column; gap: 4px;">
                 <label style="margin: 0; font-size: 11px; color: var(--text-muted); font-weight: 600;">Ảnh xe theo màu</label>
                 <div style="display: flex; align-items: center; gap: 8px; width: 100%;">
-                    <select class="color-image-select" style="min-height: 34px; padding: 0 8px; font-size: 12px; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); flex: 1;">
-                        ${options}
-                    </select>
-                    <img class="color-image-preview" src="${imgPreview}" style="width: 50px; height: 34px; object-fit: contain; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: #ffffff; flex-shrink: 0;">
+                    <div style="position: relative; flex: 1; display: flex; align-items: center; width: 100%;">
+                        <input type="hidden" class="color-image-value-input" value="${anh}">
+                        <input type="file" class="color-image-file-picker" accept="image/*" style="display: none;">
+                        <button type="button" class="btn-trigger-color-upload btn secondary" style="min-height: 34px; padding: 0 10px; font-size: 12px; font-weight: 600; margin: 0; cursor: pointer; flex: 1; text-align: left; display: flex; align-items: center; justify-content: space-between; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-dark); width: 100%; overflow: hidden;">
+                            <span class="color-image-name-display" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; display: inline-block;">
+                                ${anh || 'Chọn ảnh từ máy...'}
+                            </span>
+                            <span style="font-size: 10px; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; color: var(--text-muted); border: 1px solid var(--border-color); flex-shrink: 0; margin-left: 4px;">Tải lên</span>
+                        </button>
+                    </div>
+                    <div style="position: relative; width: 50px; height: 34px; flex-shrink: 0; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: #ffffff; overflow: hidden;">
+                        <img class="color-image-preview" src="${imgPreview}" style="width: 100%; height: 100%; object-fit: contain;">
+                        <div class="color-image-upload-spinner" style="display: none; position: absolute; inset: 0; background: rgba(255,255,255,0.8); align-items: center; justify-content: center;">
+                            <div style="width: 14px; height: 14px; border: 2px solid var(--primary); border-top-color: transparent; border-radius: 50%; animation: color-upload-spin 0.8s linear infinite;"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1640,7 +1657,7 @@
                 const lines = rows.map((row) => {
                     const ten = row.querySelector('.color-name-input').value.trim();
                     const ma = row.querySelector('.color-hex-input').value.trim();
-                    const anh = row.querySelector('.color-image-select').value.trim();
+                    const anh = row.querySelector('.color-image-value-input').value.trim();
                     const gia = row.querySelector('.color-price-input').value.trim() || '0';
                     const input360 = row.querySelector('.color-360-input') || row.querySelector('.color-360-select');
                     const anh_360 = input360 ? input360.value.trim() : '';
@@ -1754,18 +1771,54 @@
                         }
                     });
 
-                    list.addEventListener('change', (e) => {
+                    list.addEventListener('change', async (e) => {
                         const target = e.target;
-                        if (target.classList.contains('color-image-select')) {
-                            const row = target.closest('.visual-color-row');
-                            const img = row.querySelector('.color-image-preview');
-                            if (img) {
-                                img.src = target.value ? `/images/${target.value}` : '/images/no-car.jpg';
-                            }
-                            syncColors(container);
-                        }
                         if (target.classList.contains('color-picker-input') || target.classList.contains('color-360-select')) {
                             syncColors(container);
+                        }
+                        if (target.classList.contains('color-image-file-picker')) {
+                            const files = target.files;
+                            if (!files || !files.length) return;
+
+                            const row = target.closest('.visual-color-row');
+                            const imgPreview = row.querySelector('.color-image-preview');
+                            const valInput = row.querySelector('.color-image-value-input');
+                            const nameDisplay = row.querySelector('.color-image-name-display');
+                            const spinner = row.querySelector('.color-image-upload-spinner');
+
+                            if (spinner) spinner.style.display = 'flex';
+                            if (nameDisplay) nameDisplay.textContent = 'Đang tải lên...';
+
+                            try {
+                                const fd = new FormData();
+                                fd.append('files', files[0]);
+
+                                const res = await fetch('/admin/api/upload-images', { method: 'POST', body: fd });
+                                const json = await res.json();
+
+                                if (json.files && json.files.length) {
+                                    const uploadedFile = json.files[0];
+                                    if (valInput) valInput.value = uploadedFile;
+                                    if (nameDisplay) {
+                                        nameDisplay.textContent = uploadedFile;
+                                        nameDisplay.title = uploadedFile;
+                                    }
+                                    if (imgPreview) {
+                                        imgPreview.src = `/images/${uploadedFile}`;
+                                    }
+                                    syncColors(container);
+                                } else {
+                                    if (nameDisplay) nameDisplay.textContent = valInput.value || 'Chọn ảnh từ máy...';
+                                    alert('Không thể tải ảnh lên.');
+                                }
+                            } catch (err) {
+                                console.error('Lỗi tải ảnh màu xe:', err);
+                                if (nameDisplay) nameDisplay.textContent = valInput.value || 'Chọn ảnh từ máy...';
+                                alert('Đã có lỗi xảy ra khi tải ảnh lên.');
+                            } finally {
+                                if (spinner) spinner.style.display = 'none';
+                                target.value = '';
+                            }
                         }
                     });
 
@@ -1778,6 +1831,15 @@
                                 row.remove();
                                 syncColors(container);
                             }
+                            return;
+                        }
+
+                        const btnUploadTrigger = e.target.closest('.btn-trigger-color-upload');
+                        if (btnUploadTrigger) {
+                            e.preventDefault();
+                            const row = btnUploadTrigger.closest('.visual-color-row');
+                            const filePicker = row.querySelector('.color-image-file-picker');
+                            if (filePicker) filePicker.click();
                             return;
                         }
 
